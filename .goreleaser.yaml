@@ -1,0 +1,34 @@
+version: 2
+project_name: binsight
+before:
+  hooks:
+    - make ui            # build the embedded web UI before compiling
+builds:
+  - id: binsight
+    main: ./cmd/binsight
+    binary: binsight
+    env:
+      - CGO_ENABLED=0
+    goos: [darwin, linux]
+    goarch: [amd64, arm64]
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+archives:
+  - id: binsight
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+checksum:
+  name_template: "checksums.txt"
+homebrew_casks:
+  - name: binsight
+    repository:
+      owner: adrijshikhar
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: "https://github.com/adrijshikhar/binsight"
+    description: "A local MySQL & MariaDB binlog viewer and analyzer for developers"
+    license: "MIT"
+release:
+  github:
+    owner: adrijshikhar
+    name: binsight

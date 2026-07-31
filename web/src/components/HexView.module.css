@@ -1,0 +1,107 @@
+/* HexView — hex dump pane styles, scoped to v2 CSS Modules.
+   Ported from the global .hex*, .hl-*, .hex-pager rules in styles.css.
+   Light-scheme overrides use :global([data-mantine-color-scheme='light'])
+   because CSS Modules can't scope attribute selectors on <html>. */
+
+/* hex dump: each row (offset + 16 bytes + ascii) stays on one line;
+   the dump scrolls horizontally when wider than the drawer. */
+.hex {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.hex > div {
+  white-space: nowrap;
+}
+
+.off {
+  color: var(--muted);
+  margin-right: 12px;
+}
+
+.ascii {
+  color: var(--muted);
+  margin-left: 12px;
+}
+
+/* field-highlight chips — 7 semantic colours for the 7 binlog header fields */
+.hlTs {
+  background: #12331c;
+}
+.hlTy {
+  background: #3a2c10;
+}
+.hlSid {
+  background: #1f3a5f;
+}
+.hlSz {
+  background: #2d2240;
+}
+.hlNpos {
+  background: #3d1518;
+}
+.hlFlags {
+  background: var(--border-subtle, #21262d);
+}
+.hlCrc {
+  background: var(--surface-active, #11243d);
+}
+
+/* Light-scheme tints — the dark tints above are unreadable on white surfaces */
+:global([data-mantine-color-scheme='light']) .hlTs {
+  background: #dafbe1;
+}
+:global([data-mantine-color-scheme='light']) .hlTy {
+  background: #fff1c2;
+}
+:global([data-mantine-color-scheme='light']) .hlSid {
+  background: #ddf4ff;
+}
+:global([data-mantine-color-scheme='light']) .hlSz {
+  background: #fbeffb;
+}
+:global([data-mantine-color-scheme='light']) .hlNpos {
+  background: #ffebe9;
+}
+
+/* hex pager buttons */
+.hexPager {
+  margin-left: 12px;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.hexPager button {
+  background: var(--panel2, #1c2330);
+  color: var(--text, #e6edf3);
+  border: 1px solid var(--border, #30363d);
+  border-radius: 6px;
+  padding: 1px 8px;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+
+.hexPager button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* row-nav: small info bar above hex dump */
+.rowNav {
+  font-size: var(--fs-sm);
+  color: var(--muted, #8b949e);
+  margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ok {
+  color: var(--green, #3fb950);
+}
+
+.warn {
+  color: var(--orange, #d29922);
+}

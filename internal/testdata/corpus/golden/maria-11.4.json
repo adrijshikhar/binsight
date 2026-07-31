@@ -1,0 +1,1597 @@
+[
+  {
+    "header": {
+      "pos": 4,
+      "ts": 1780860098,
+      "type_code": 15,
+      "type_name": "FORMAT_DESCRIPTION",
+      "server_id": 1,
+      "size": 252,
+      "next_pos": 256,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "sql": "binlog v4, server 11.4.3-MariaDB-ubu2404-log"
+    }
+  },
+  {
+    "header": {
+      "pos": 256,
+      "ts": 1780860098,
+      "type_code": 163,
+      "type_name": "MARIA_GTID_LIST",
+      "server_id": 1,
+      "size": 29,
+      "next_pos": 285,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 285,
+      "ts": 1780860098,
+      "type_code": 161,
+      "type_name": "BINLOG_CHECKPOINT",
+      "server_id": 1,
+      "size": 43,
+      "next_pos": 328,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 328,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 370,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-1"
+    }
+  },
+  {
+    "header": {
+      "pos": 370,
+      "ts": 1780860098,
+      "type_code": 2,
+      "type_name": "QUERY",
+      "server_id": 1,
+      "size": 133,
+      "next_pos": 503,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "sql": "CREATE DATABASE IF NOT EXISTS corpus CHARACTER SET utf8mb4"
+    }
+  },
+  {
+    "header": {
+      "pos": 503,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 545,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-2"
+    }
+  },
+  {
+    "header": {
+      "pos": 545,
+      "ts": 1780860098,
+      "type_code": 2,
+      "type_name": "QUERY",
+      "server_id": 1,
+      "size": 644,
+      "next_pos": 1189,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "sql": "CREATE TABLE types_all (\n  id            INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  i_signed      INT,\n  big           BIGINT,\n  big_unsigned  BIGINT UNSIGNED,\n  dec_num       DECIMAL(18,4),\n  f_float       FLOAT,\n  d_double      DOUBLE,\n  c_char        CHAR(8),\n  v_varchar     VARCHAR(255),\n  v_utf8        VARCHAR(64) CHARACTER SET utf8mb4,\n  d_date        DATE,\n  dt_datetime   DATETIME,\n  ts_stamp      TIMESTAMP NULL,\n  b_blob        BLOB,\n  t_text        TEXT,\n  e_enum        ENUM('a','b','c'),\n  s_set         SET('x','y','z')\n) ENGINE=InnoDB"
+    }
+  },
+  {
+    "header": {
+      "pos": 1189,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 1231,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-3"
+    }
+  },
+  {
+    "header": {
+      "pos": 1231,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 432,
+      "next_pos": 1663,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 1663,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 1753,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 1753,
+      "ts": 1780860098,
+      "type_code": 23,
+      "type_name": "WRITE_ROWS_V1",
+      "server_id": 1,
+      "size": 164,
+      "next_pos": 1917,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "after": [
+            1,
+            -42,
+            9223372036854775807,
+            -1,
+            "12345.6789",
+            3.14,
+            2.718281828,
+            "fixedch",
+            "hello varchar",
+            "日本語テスト",
+            "2024-01-15",
+            "2024-01-15 12:34:56",
+            "2024-01-15 12:34:56",
+            "ޭ\ufffd\ufffd",
+            "lorem ipsum text",
+            2,
+            5
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 1917,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 1948,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 14
+    }
+  },
+  {
+    "header": {
+      "pos": 1948,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 1990,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-4"
+    }
+  },
+  {
+    "header": {
+      "pos": 1990,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 119,
+      "next_pos": 2109,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 2109,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 2199,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 2199,
+      "ts": 1780860098,
+      "type_code": 23,
+      "type_name": "WRITE_ROWS_V1",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 2241,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "after": [
+            2,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 2241,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 2272,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 15
+    }
+  },
+  {
+    "header": {
+      "pos": 2272,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 2314,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-5"
+    }
+  },
+  {
+    "header": {
+      "pos": 2314,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 147,
+      "next_pos": 2461,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 2461,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 2551,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 2551,
+      "ts": 1780860098,
+      "type_code": 23,
+      "type_name": "WRITE_ROWS_V1",
+      "server_id": 1,
+      "size": 155,
+      "next_pos": 2706,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "after": [
+            3,
+            1,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            4,
+            2,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r2",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            5,
+            3,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r3",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            6,
+            4,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r4",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            7,
+            5,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r5",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            8,
+            6,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r6",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            9,
+            7,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r7",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            10,
+            8,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r8",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 2706,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 2737,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 16
+    }
+  },
+  {
+    "header": {
+      "pos": 2737,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 2779,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-6"
+    }
+  },
+  {
+    "header": {
+      "pos": 2779,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 112,
+      "next_pos": 2891,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 2891,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 2981,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 2981,
+      "ts": 1780860098,
+      "type_code": 24,
+      "type_name": "UPDATE_ROWS_V1",
+      "server_id": 1,
+      "size": 174,
+      "next_pos": 3155,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "before": [
+            3,
+            1,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "after": [
+            3,
+            1,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r1-upd",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "before": [
+            4,
+            2,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r2",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "after": [
+            4,
+            2,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r2-upd",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "before": [
+            5,
+            3,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r3",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "after": [
+            5,
+            3,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r3-upd",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "before": [
+            6,
+            4,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r4",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "after": [
+            6,
+            4,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r4-upd",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 3155,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 3186,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 17
+    }
+  },
+  {
+    "header": {
+      "pos": 3186,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 3228,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-7"
+    }
+  },
+  {
+    "header": {
+      "pos": 3228,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 69,
+      "next_pos": 3297,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 3297,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 3387,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 3387,
+      "ts": 1780860098,
+      "type_code": 25,
+      "type_name": "DELETE_ROWS_V1",
+      "server_id": 1,
+      "size": 65,
+      "next_pos": 3452,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "before": [
+            9,
+            7,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r7",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "before": [
+            10,
+            8,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "r8",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 3452,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 3483,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 18
+    }
+  },
+  {
+    "header": {
+      "pos": 3483,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 3525,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-8"
+    }
+  },
+  {
+    "header": {
+      "pos": 3525,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 101,
+      "next_pos": 3626,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 3626,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 3716,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 3716,
+      "ts": 1780860098,
+      "type_code": 23,
+      "type_name": "WRITE_ROWS_V1",
+      "server_id": 1,
+      "size": 71,
+      "next_pos": 3787,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "after": [
+            11,
+            100,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "txn-a",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "after": [
+            12,
+            101,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "txn-b",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 3787,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 76,
+      "next_pos": 3863,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 3863,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 90,
+      "next_pos": 3953,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "column_types": [
+        "INT",
+        "INT",
+        "BIGINT",
+        "BIGINT",
+        "NEWDECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "STRING",
+        "VARSTRING",
+        "VARSTRING",
+        "DATE",
+        "DATETIME",
+        "TIMESTAMP",
+        "BLOB",
+        "BLOB",
+        "STRING",
+        "STRING"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 3953,
+      "ts": 1780860098,
+      "type_code": 24,
+      "type_name": "UPDATE_ROWS_V1",
+      "server_id": 1,
+      "size": 83,
+      "next_pos": 4036,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "types_all",
+      "table_id": 18,
+      "rows": [
+        {
+          "before": [
+            11,
+            100,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "txn-a",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "after": [
+            11,
+            100,
+            null,
+            null,
+            "0.0000",
+            null,
+            null,
+            null,
+            "txn-a",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 4036,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 4067,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 20
+    }
+  },
+  {
+    "header": {
+      "pos": 4067,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 4109,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-9"
+    }
+  },
+  {
+    "header": {
+      "pos": 4109,
+      "ts": 1780860098,
+      "type_code": 2,
+      "type_name": "QUERY",
+      "server_id": 1,
+      "size": 137,
+      "next_pos": 4246,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "sql": "ALTER TABLE types_all ADD COLUMN added_col VARCHAR(16) NULL"
+    }
+  },
+  {
+    "header": {
+      "pos": 4246,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 4288,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-10"
+    }
+  },
+  {
+    "header": {
+      "pos": 4288,
+      "ts": 1780860098,
+      "type_code": 2,
+      "type_name": "QUERY",
+      "server_id": 1,
+      "size": 93,
+      "next_pos": 4381,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "sql": "TRUNCATE TABLE types_all"
+    }
+  },
+  {
+    "header": {
+      "pos": 4381,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 4423,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-11"
+    }
+  },
+  {
+    "header": {
+      "pos": 4423,
+      "ts": 1780860098,
+      "type_code": 2,
+      "type_name": "QUERY",
+      "server_id": 1,
+      "size": 185,
+      "next_pos": 4608,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "sql": "CREATE TABLE json_docs (\n  id  INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,\n  doc JSON\n) ENGINE=InnoDB"
+    }
+  },
+  {
+    "header": {
+      "pos": 4608,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 4650,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-12"
+    }
+  },
+  {
+    "header": {
+      "pos": 4650,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 160,
+      "next_pos": 4810,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 4810,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 56,
+      "next_pos": 4866,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "json_docs",
+      "table_id": 24,
+      "column_types": [
+        "INT",
+        "BLOB"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 4866,
+      "ts": 1780860098,
+      "type_code": 23,
+      "type_name": "WRITE_ROWS_V1",
+      "server_id": 1,
+      "size": 139,
+      "next_pos": 5005,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "json_docs",
+      "table_id": 24,
+      "rows": [
+        {
+          "after": [
+            1,
+            "{\"a\": 1, \"b\": [1, 2, 3], \"c\": {\"nested\": true}}"
+          ]
+        },
+        {
+          "after": [
+            2,
+            "{\"name\": \"テスト\", \"tags\": [\"x\", \"y\"]}"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 5005,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 5036,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 31
+    }
+  },
+  {
+    "header": {
+      "pos": 5036,
+      "ts": 1780860098,
+      "type_code": 162,
+      "type_name": "MARIA_GTID",
+      "server_id": 1,
+      "size": 42,
+      "next_pos": 5078,
+      "flags": 8
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "gtid": "0-1-13"
+    }
+  },
+  {
+    "header": {
+      "pos": 5078,
+      "ts": 1780860098,
+      "type_code": 160,
+      "type_name": "ANNOTATE_ROWS",
+      "server_id": 1,
+      "size": 91,
+      "next_pos": 5169,
+      "flags": 0
+    },
+    "decode_confidence": "full"
+  },
+  {
+    "header": {
+      "pos": 5169,
+      "ts": 1780860098,
+      "type_code": 19,
+      "type_name": "TABLE_MAP",
+      "server_id": 1,
+      "size": 56,
+      "next_pos": 5225,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "json_docs",
+      "table_id": 24,
+      "column_types": [
+        "INT",
+        "BLOB"
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 5225,
+      "ts": 1780860098,
+      "type_code": 24,
+      "type_name": "UPDATE_ROWS_V1",
+      "server_id": 1,
+      "size": 125,
+      "next_pos": 5350,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "db": "corpus",
+      "table": "json_docs",
+      "table_id": 24,
+      "rows": [
+        {
+          "before": [
+            1,
+            "{\"a\": 1, \"b\": [1, 2, 3], \"c\": {\"nested\": true}}"
+          ],
+          "after": [
+            1,
+            "{\"a\": 2, \"replaced\": true}"
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "header": {
+      "pos": 5350,
+      "ts": 1780860098,
+      "type_code": 16,
+      "type_name": "XID",
+      "server_id": 1,
+      "size": 31,
+      "next_pos": 5381,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "xid": 32
+    }
+  },
+  {
+    "header": {
+      "pos": 5381,
+      "ts": 1780860098,
+      "type_code": 4,
+      "type_name": "ROTATE",
+      "server_id": 1,
+      "size": 47,
+      "next_pos": 5428,
+      "flags": 0
+    },
+    "decode_confidence": "full",
+    "decoded": {
+      "sql": "rotate to mysql-bin.000002 pos 4"
+    }
+  }
+]

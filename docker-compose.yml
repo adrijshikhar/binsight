@@ -1,0 +1,21 @@
+services:
+  binsight:
+    build: .
+    container_name: binsight
+    ports:
+      # Loopback-only by default — the UI has no auth and shows decoded row data.
+      # Override (e.g. "8080:8080") only behind a trusted network / authed proxy.
+      - "127.0.0.1:8080:8080"
+    volumes:
+      # binlog directory to inspect (read-only). Defaults to the bundled demo
+      # sample so `docker compose up` shows something immediately. For real use:
+      #   BINLOG_DIR=/path/to/binlogs docker compose up
+      - "${BINLOG_DIR:-./samples}:/data:ro"
+      # SQLite index + settings, persisted across restarts
+      - viewer-state:/var/lib/binlog-viewer
+    restart: unless-stopped
+    # Image binds 0.0.0.0 inside the container; real exposure is controlled by
+    # the host port mapping above. Remove/scope the published port to limit it.
+
+volumes:
+  viewer-state:

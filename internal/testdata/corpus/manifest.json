@@ -1,0 +1,105 @@
+{
+  "fixtures": [
+    {
+      "path": "5.5/mysql-5.5.binlog",
+      "server_version": "5.5.62-log",
+      "format": "ROW",
+      "checksum": "NONE",
+      "gtid_mode": "OFF",
+      "features": []
+    },
+    {
+      "path": "5.6/mysql-5.6.binlog",
+      "server_version": "5.6.51-log",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "OFF",
+      "features": []
+    },
+    {
+      "path": "5.7/mysql-5.7.binlog",
+      "server_version": "5.7.44-log",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "ON",
+      "features": [
+        "json",
+        "generated_columns"
+      ]
+    },
+    {
+      "path": "8.0-fkeys/mysql-8.0-fkeys.binlog",
+      "server_version": "8.0.39",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "ON",
+      "features": [
+        "fkeys",
+        "json",
+        "generated_columns",
+        "partial_json"
+      ]
+    },
+    {
+      "path": "8.0-full/mysql-8.0-full.binlog",
+      "server_version": "8.0.39",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "ON",
+      "features": [
+        "json",
+        "generated_columns",
+        "partial_json",
+        "row_metadata_full"
+      ]
+    },
+    {
+      "path": "8.0/mysql-8.0.binlog",
+      "server_version": "8.0.39",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "ON",
+      "features": [
+        "json",
+        "generated_columns",
+        "partial_json"
+      ]
+    },
+    {
+      "path": "8.4/mysql-8.4.binlog",
+      "server_version": "8.4.3",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "ON",
+      "features": [
+        "json",
+        "generated_columns",
+        "partial_json"
+      ]
+    },
+    {
+      "path": "maria-10.6/mysql-maria-10.6.binlog",
+      "server_version": "10.6.18-MariaDB-ubu2004-log",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "OFF",
+      "features": [
+        "json",
+        "annotate_rows",
+        "maria_gtid"
+      ]
+    },
+    {
+      "path": "maria-11.4/mysql-maria-11.4.binlog",
+      "server_version": "11.4.3-MariaDB-ubu2404-log",
+      "format": "ROW",
+      "checksum": "CRC32",
+      "gtid_mode": "OFF",
+      "features": [
+        "json",
+        "annotate_rows",
+        "maria_gtid"
+      ]
+    }
+  ]
+}

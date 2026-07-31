@@ -1,0 +1,67 @@
+/* Chart container layout — replaces the old global styles.css .ov-* classes */
+
+.charts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.chartRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.panel {
+  flex: 1 1 220px;
+  min-width: 180px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--mantine-radius-sm);
+  padding: 8px;
+}
+
+.panelTitle {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.widePanel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--mantine-radius-sm);
+  padding: 8px;
+}
+
+.skeleton {
+  display: block;
+  height: 240px;
+  background: var(--panel2);
+  border-radius: var(--mantine-radius-sm);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Visually hidden but accessible to screen readers */
+.visHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

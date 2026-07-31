@@ -1,0 +1,64 @@
+/* content area inside AppShell.Main — fills the main slot and stacks tabs + panels */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Underline tabs — matches the Drawer's Mantine Tabs (one tab style app-wide). */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.tab {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: var(--fs-base);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition:
+    color 150ms,
+    border-color 150ms;
+}
+
+.tab:hover:not(.active) {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* tabpanel wrapper — fills the remaining flex space so inner table-wrap
+   and events-toolbar keep their full-height scrolling behaviour */
+.tabpanelFill {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Scroll by DEFAULT: every direct child of .content is a vertical scroll region
+   that fills the remaining flex height — overview/anomalies/schema/tables panels,
+   the architecture + settings pages, the empty state, everything. The only
+   opt-outs are the fixed tab nav (.tabs) and .tabpanelFill views, which bound
+   their OWN inner scroll (sticky table headers, the virtualized events table).
+   This makes a forgotten scroll region impossible — new views just scroll. */
+.content > *:not(.tabs):not(.tabpanelFill) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* suppress mouse-click outline on tabpanels; keyboard users still see it */
+[role='tabpanel']:focus:not(:focus-visible) {
+  outline: none;
+}

@@ -1,0 +1,43 @@
+#!/bin/sh
+# pre-commit — enforce canonical formatting on staged files before a commit.
+#   Go  : gofmt (tabs + alignment, the canonical Go indentation)
+#   Web : Prettier (src/**/*.{ts,tsx,css})
+#
+# Only STAGED, added/copied/modified files are checked, so it is fast and never
+# blocks on unrelated pre-existing files. Install once with:  make hooks
+# (sets core.hooksPath=.githooks). Fix reported files with:   make fmt
+set -u
+
+fail=0
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+
+# --- Go: gofmt ----------------------------------------------------------------
+gofiles=$(printf '%s\n' "$staged" | grep '\.go$' || true)
+if [ -n "$gofiles" ]; then
+  unformatted=$(gofmt -l $gofiles)
+  if [ -n "$unformatted" ]; then
+    echo "✖ gofmt: staged Go files are not formatted:"
+    printf '%s\n' "$unformatted" | sed 's/^/    /'
+    echo "  fix: gofmt -w <files>   (or: make fmt)"
+    fail=1
+  fi
+fi
+
+# --- Web: Prettier ------------------------------------------------------------
+webfiles=$(printf '%s\n' "$staged" | grep -E '^web/src/.*\.(ts|tsx|css)$' | sed 's#^web/##' || true)
+if [ -n "$webfiles" ]; then
+  if [ -x web/node_modules/.bin/prettier ]; then
+    if ! printf '%s\n' "$webfiles" | (cd web && xargs ./node_modules/.bin/prettier --check >/dev/null 2>&1); then
+      echo "✖ prettier: staged web files are not formatted."
+      echo "  fix: cd web && bun run format"
+      fail=1
+    fi
+  else
+    echo "⚠ prettier not installed — run 'cd web && bun install'; skipping web format check"
+  fi
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo "pre-commit: formatting checks failed — see above."
+  exit 1
+fi

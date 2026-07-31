@@ -1,0 +1,42 @@
+/* State dot — inline in Sidebar, kept here to avoid polluting global CSS. */
+
+.st {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.st.ready {
+  background: var(--green);
+}
+
+.st.indexing {
+  background: var(--orange);
+  animation: pulse 1s infinite;
+}
+
+.st.error {
+  background: var(--red);
+}
+
+.st.growing {
+  background: var(--accent);
+}
+
+.st.stale {
+  background: var(--muted);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st.indexing {
+    animation: none;
+  }
+}

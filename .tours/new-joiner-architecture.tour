@@ -1,0 +1,107 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "binlog-viewer — new joiner walkthrough",
+  "description": "Follow a binlog from disk to the browser: pluggable decoders → normalized schema → SQLite index → HTTP API → React UI. Aimed at a new maintainer ramping up on the whole system.",
+  "ref": "feature/binlog-viewer-phase1",
+  "steps": [
+    {
+      "directory": "internal",
+      "title": "Where the code lives",
+      "description": "Situation: the Go core is split into small single-purpose packages under internal/ — schema, adapter (+ 3 sub-adapters), store, indexer, scanner, hexsvc, diffsvc, config, server. Mechanism: each package has one job and talks to others only through exported types. Implication: you can read any one package in isolation. Gotcha: the React UI lives separately under web/ and is compiled into the Go binary via go:embed — there is no runtime coupling, just an HTTP API between them."
+    },
+    {
+      "file": "cmd/binlog-viewer/main.go",
+      "pattern": "func main()",
+      "title": "Entry point — wiring",
+      "description": "Situation: `binlog-viewer serve <dir>` boots here. Mechanism: open the SQLite store, load config, build the adapter Registry (register go-mysql + mysqlbinlog if present + any BV_EXEC_ADAPTERS), assign roles, then start the HTTP server and kick off an initial scan in a goroutine. Implication: this is the dependency-injection seam — everything downstream gets the store, registry, and config from here. Gotcha: it binds 127.0.0.1 by default (BV_BIND to override) because the UI exposes decoded row data with no auth."
+    },
+    {
+      "file": "internal/adapter/adapter.go",
+      "pattern": "type Decoder interface",
+      "title": "The one contract the core knows",
+      "description": "Situation: this is THE central abstraction. Mechanism: every binlog parser implements Decoder (Name / Capabilities / Decode→EventStream); the core never imports a parsing library directly. Implication: adding a parser = implementing this interface, nothing else changes. Gotcha: Capabilities (FullScan/SeekDecode/RemoteStream/RowImages) is how the registry decides which adapter may take which role — no adapter is privileged."
+    },
+    {
+      "file": "internal/adapter/registry.go",
+      "pattern": "func roleQualifies",
+      "title": "Roles, assigned not hardcoded",
+      "description": "Situation: adapters are bound to roles (indexer / detail / stream / diff-set) at runtime. Mechanism: roleQualifies gates each assignment against the adapter's Capabilities (e.g. indexer needs FullScan). Implication: the Settings UI can swap which adapter indexes vs which adapters get compared, validated server-side. Gotcha: the diff-set is a list — comparing two adapters on the same event is the app's headline feature (see the diff service later)."
+    },
+    {
+      "file": "internal/schema/event.go",
+      "pattern": "type Event struct",
+      "title": "Normalized event schema — the real coupling point",
+      "description": "Situation: every adapter emits this shape, not its library's native type. Mechanism: three layers — Header (the 19-byte common header, byte-identical across correct adapters), Decoded (best-effort canonical: db/table/rows/sql), Native (opaque per-adapter rendering). Implication: filtering, the index, and the diff view all speak this one schema. Gotcha: the Native layer is exactly what the diff view compares — that's where adapters legitimately disagree (e.g. DATETIME rendering)."
+    },
+    {
+      "file": "internal/schema/types.go",
+      "pattern": "func TypeName",
+      "title": "Canonical type names",
+      "description": "Situation: MySQL event type codes and column type codes get mapped to stable names here. Mechanism: a wire-code → name table (0x1f → UPDATE_ROWS_V2, etc.); unknown codes render as UNKNOWN_0xNN rather than failing. Implication: every adapter maps its library's naming into these, which is what makes cross-adapter diff alignment and UI filtering work. Gotcha: the mysqlbinlog text adapter has to reverse-map CLI labels (\"Update_rows:\") back to these names."
+    },
+    {
+      "file": "internal/adapter/gomysql/gomysql.go",
+      "pattern": "func convert",
+      "title": "Default adapter: go-mysql → schema",
+      "description": "Situation: the builtin in-process adapter, used as the default indexer/detail/stream. Mechanism: convert() turns a go-mysql replication event into a schema.Event — pos = LogPos - EventSize, UPDATE rows paired as [before,after,...], []byte→string and time→UTC RFC3339 normalization. Implication: this is the reference decode the others are compared against. Gotcha: ParseFile always starts at offset 4 (it needs FORMAT_DESCRIPTION for checksum detection) and skips forward to the requested offset — never call it with offset > 4."
+    },
+    {
+      "file": "internal/adapter/mysqlbinlog/parse.go",
+      "pattern": "func ParseText",
+      "title": "Second adapter: parsing the mysqlbinlog CLI",
+      "description": "Situation: an exec adapter that shells out to the official `mysqlbinlog` and parses its text. Mechanism: regexes pull pos / header / `### @N=` row values out of the CLI output and build the same schema.Event, marked decode_confidence=partial. Implication: it joins go-mysql in the diff set, so you can see exactly where the two decoders differ. Gotcha: text is lossy — the @N column ordinal is discarded (binlog_row_image=MINIMAL can misalign columns), a documented limitation. The execadapter package generalizes this to any JSON-lines sidecar."
+    },
+    {
+      "file": "internal/indexer/indexer.go",
+      "pattern": "func (ix \\*Indexer) IndexFile",
+      "title": "Indexing: events → SQLite, with the txn state machine",
+      "description": "Situation: the heart of ingestion. Mechanism: streams events from the indexer-role adapter, batches metadata inserts (no row values stored), and runs a transaction state machine — GTID opens a txn, BEGIN continues it, a non-BEGIN QUERY (DDL) or XID commits it, EOF mid-txn marks it incomplete; per-table counts are aggregated alongside. Implication: this is why the UI can group events into transactions and show table stats. Gotcha: row VALUES never live in SQLite — only offsets/counts — so detail views re-decode on demand by seeking (next step explains why that matters)."
+    },
+    {
+      "file": "internal/store/store.go",
+      "pattern": "func Open",
+      "title": "The index store (metadata only)",
+      "description": "Situation: SQLite is the queryable index, not the source of truth. Mechanism: Open runs migrations (files/events/txns/tables/decode_errors/settings) with WAL + a single writer; the binlog file on disk stays authoritative. Implication: the index is ~5% of the binlog and fully disposable/rebuildable. Gotcha: because row values aren't stored, detail/hex/diff endpoints re-open the file and seek to the event offset — the index just tells them where to look."
+    },
+    {
+      "file": "internal/store/events.go",
+      "pattern": "func (s \\*Store) QueryEvents",
+      "title": "Filtering + cursor pagination",
+      "description": "Situation: the events table view is powered by this query. Mechanism: composable WHERE filters (type/db/table/txn/time/position) over indexed columns, plus keyset pagination on `pos` (pos > cursor ORDER BY pos) so paging is stable while a file grows. Implication: filters stay fast on million-event files and the UI can 'load more' without OFFSET drift. Gotcha: the free-text `q` searches the summary column only — row values aren't indexed, by design."
+    },
+    {
+      "file": "internal/diffsvc/diffsvc.go",
+      "pattern": "func Diff",
+      "title": "The killer feature: multi-parser diff",
+      "description": "Situation: this is why the tool exists for CDC debugging. Mechanism: decode one event at one offset with every adapter in the diff set, align the schema layers field-by-field, and flag disagreements — header-layer mismatch = a broken adapter (severe), decoded-layer mismatch = the interesting library-behavior difference. Implication: you can tell instantly whether a weird value came from the binlog itself or from a parser's decode step. Gotcha: it runs lazily per click, never during indexing, so it never slows ingestion."
+    },
+    {
+      "file": "internal/hexsvc/hexsvc.go",
+      "pattern": "func ReadEvent",
+      "title": "Forensics: raw bytes + CRC, adapter-independent",
+      "description": "Situation: the Hex tab needs ground truth, no decoder involved. Mechanism: reads the exact event bytes straight from the file via offset, annotates the 19-byte common header, and verifies the trailing CRC32 over bytes[:-4]. Implication: when adapters disagree, this shows what's actually on disk. Gotcha: CRC is only checked when the file used binlog_checksum=CRC32 (captured during indexing); the guard is `>= 23` bytes so even the smallest CRC event is validated."
+    },
+    {
+      "file": "internal/server/server.go",
+      "pattern": "func (srv \\*Server) Handler",
+      "title": "HTTP API + SSE + embedded UI",
+      "description": "Situation: everything above is exposed here. Mechanism: a Go 1.22 method+path mux maps /api/files, /api/events, /api/events/{file}/{pos}(/hex|/diff), /api/txns, /api/tables, /api/settings, /api/stream (SSE), and serves the embedded React bundle at /. Implication: this is the contract the frontend consumes — match these shapes to web/src/types.ts. Gotcha: ScanAndIndex is serialized by a mutex and coalesced via triggerScan, and config writes go through cfgMu — the server is concurrent and the locking discipline matters."
+    },
+    {
+      "file": "web/src/App.tsx",
+      "pattern": "export default function App",
+      "title": "Frontend shell",
+      "description": "Situation: the React entry the browser loads from the embedded bundle. Mechanism: holds the selected file/tab/filters, restores them from the URL (deep-linking), and listens on /api/stream (SSE, debounced) to refresh as indexing progresses. Implication: the whole UI is driven by the same JSON the API returns — no separate data model. Gotcha: SSE refreshes are debounced and the selected file resets if it's deleted/staled out, to avoid a refetch storm and stranded 404s during indexing."
+    },
+    {
+      "file": "web/src/components/Drawer.tsx",
+      "pattern": "function DetailsTab",
+      "title": "Type-aware detail drawer",
+      "description": "Situation: clicking an event opens this drawer (Details / Diff / Hex / Raw JSON). Mechanism: DetailsTab renders by event type — row before/after grid for DML, table_id↔name mapping for TABLE_MAP (no row data), GTID/XID/SQL for control events. Implication: each event type shows what's actually meaningful for it rather than a one-size grid. Gotcha: hex/diff are fetched lazily per tab with a stale-guard so switching events fast can't render the previous event's bytes."
+    },
+    {
+      "title": "You can now trace a binlog end to end",
+      "description": "Disk → adapter (Decoder) → schema.Event → indexer/SQLite → HTTP API → React UI, with diff and hex as the cross-checking tools. To extend: implement Decoder (or drop in a JSON-lines exec adapter via BV_EXEC_ADAPTERS) and register a role — nothing else in the core needs to change. The architecture diagram is also viewable in-app via the sidebar's 'Architecture' link."
+    }
+  ]
+}
