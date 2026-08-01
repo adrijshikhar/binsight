@@ -86,12 +86,6 @@ Options: `BINSIGHT_VERSION=v0.1.1` to pin a version,
 brew install adrijshikhar/tap/binsight
 ```
 
-> **macOS Gatekeeper:** the binaries are not notarized, so macOS quarantines
-> anything downloaded through a browser. The install script and the Homebrew cask
-> (0.1.1+) both clear this for you. If you download a tarball manually and macOS
-> kills it on first run, clear it with
-> `xattr -dr com.apple.quarantine ./binsight`.
-
 ### Docker
 
 ```sh
