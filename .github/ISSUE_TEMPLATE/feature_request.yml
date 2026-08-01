@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest something binsight should do
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        binsight is a local, read-only debugging tool for MySQL and MariaDB
+        binlogs. Things deliberately out of scope: writing or replaying binlogs,
+        multi-user or hosted deployment, authentication, and acting as a
+        general-purpose replication target.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you hitting?
+      description: The situation, not the solution — what were you trying to find out?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do today
+      description: Current workaround, if any — mysqlbinlog invocations, scripts, other tools.

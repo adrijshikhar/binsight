@@ -1,0 +1,84 @@
+name: Bug report
+description: Something decoded wrong, crashed, or behaved unexpectedly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not attach a real binlog file.** Binlogs usually contain production
+        data. Describe the structure instead, or reproduce with a synthetic file
+        from `make sample`.
+
+        For security issues (parser crashes on crafted input, path traversal,
+        XSS, guard bypass), please use
+        [private vulnerability reporting](https://github.com/adrijshikhar/binsight/security/advisories/new)
+        instead of this form.
+
+  - type: input
+    id: version
+    attributes:
+      label: binsight version
+      description: Output of `binsight version`
+      placeholder: binsight 0.1.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install it?
+      options:
+        - install script
+        - Homebrew
+        - Docker / GHCR
+        - go install
+        - prebuilt binary
+        - built from source
+    validations:
+      required: true
+
+  - type: input
+    id: server
+    attributes:
+      label: Source server
+      description: Which MySQL or MariaDB version produced the binlog?
+      placeholder: MySQL 8.0.39 / MariaDB 11.4
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what you got instead. Include exact error text.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: |
+        The workload that produced the binlog is often the important part —
+        transaction size, row images, DDL, whether GTID is on.
+      placeholder: |
+        1. Ran `binsight serve /var/log/mysql`
+        2. Opened the Events view
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: file-shape
+    attributes:
+      label: Binlog characteristics
+      description: |
+        Helpful when relevant — file size (especially if over 4 GiB), largest
+        transaction, `binlog_format`, `binlog_row_image`, whether GTID is enabled.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant output from the binsight process.
+      render: shell
