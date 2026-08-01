@@ -120,10 +120,15 @@ not a binsight-specific discovery):**
   field. Same diagnosis as ours: rotation deferred until COMMIT → >4 GiB file →
   overflow.
 - [gh-ost#1366](https://github.com/github/gh-ost/issues/1366) — real-world data
-  loss. gh-ost skips events whose `end_log_pos <= last`, so after the wrap
-  (`4294962881` → `3601`) **every subsequent event is silently dropped**.
-  Evidence that a widely-deployed tool gets this wrong; a useful cross-check
-  that our accumulator approach is the right one.
+  loss (2024-01-11). gh-ost skips events whose `end_log_pos <= last` as a
+  duplicate guard, so after the wrap (`4294962881` → `3601`) every subsequent
+  event fails the guard and is dropped. **Closed as `completed` the same day
+  WITHOUT a code change** — gh-ost deliberately declined, arguing they mimic a
+  replica and MySQL replication is not designed for transactions beyond
+  `max_allowed_packet`; they would rather make it a hard failure. The reporter
+  countered that gh-ost's own chunking (4 MB rows × chunk 1000) produces such a
+  transaction unavoidably. Do NOT cite this as "a tool that got it wrong" — it
+  is a documented design decision and an unresolved disagreement.
 
 **Reproduced** (BLACKHOLE table → ROW events to binlog with no InnoDB cost):
 ```sql
