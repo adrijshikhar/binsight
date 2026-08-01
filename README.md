@@ -72,19 +72,19 @@ Decode never blocks the UI. Everything the browser reads comes from the index.
 brew install adrijshikhar/tap/binsight
 ```
 
-> **macOS Gatekeeper:** the cask ships an unsigned binary, so on first run macOS may block it. Remove the quarantine attribute with `xattr -dr com.apple.quarantine "$(brew --prefix)/bin/binsight"`, or right-click the binary and choose Open.
+> **macOS Gatekeeper:** the binaries are not notarized, so macOS quarantines them. The cask clears this automatically on install (0.1.1+). If you install a **prebuilt binary** manually instead, Gatekeeper will kill it on first run — clear it with `xattr -dr com.apple.quarantine ./binsight`.
 
 ### Docker
 
 ```sh
 docker run --rm -p 8080:8080 -v /path/to/binlogs:/data \
-  ghcr.io/adrijshikhar/binsight:0.1.0 serve /data
+  ghcr.io/adrijshikhar/binsight:0.1.1 serve /data
 ```
 
 ### go install
 
 ```sh
-go install github.com/adrijshikhar/binsight/cmd/binsight@v0.1.0
+go install github.com/adrijshikhar/binsight/cmd/binsight@v0.1.1
 ```
 
 ### Prebuilt binaries

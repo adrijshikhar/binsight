@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"time"
 
 	"github.com/adrijshikhar/binsight/internal/adapter"
@@ -19,17 +20,43 @@ import (
 	"github.com/adrijshikhar/binsight/internal/store"
 )
 
+// version is stamped by -ldflags "-X main.version=…" in the GoReleaser and
+// Docker builds. A plain `go install` cannot pass ldflags, so it stays "dev"
+// there and resolveVersion falls back to the module version below.
 var version = "dev"
 
 func formatVersion(v string) string {
 	return "binsight " + v + "\n"
 }
 
+// resolveVersion picks the most trustworthy version available. stamped is the
+// ldflags value; buildRev is the module version from the build info, which Go
+// records for `go install module@vX.Y.Z` and sets to "(devel)" for a local
+// build from source.
+func resolveVersion(stamped, buildRev string) string {
+	if stamped != "dev" && stamped != "" {
+		return stamped
+	}
+	if buildRev != "" && buildRev != "(devel)" {
+		return buildRev
+	}
+	return stamped
+}
+
+// currentVersion resolves the version using this binary's real build info.
+func currentVersion() string {
+	var buildRev string
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		buildRev = bi.Main.Version
+	}
+	return resolveVersion(version, buildRev)
+}
+
 func main() {
 	if len(os.Args) >= 2 {
 		switch os.Args[1] {
 		case "version", "--version", "-v":
-			fmt.Print(formatVersion(version))
+			fmt.Print(formatVersion(currentVersion()))
 			os.Exit(0)
 		}
 	}

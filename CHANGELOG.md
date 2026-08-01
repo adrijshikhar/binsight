@@ -3,6 +3,18 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-08-01
+
+### Fixed
+
+- Homebrew on macOS: the installed binary was killed on first run (exit 137).
+  The binaries are not notarized, so Homebrew's download carried
+  `com.apple.quarantine` and Gatekeeper blocked it. The cask now strips the
+  attribute on install.
+- `go install` reported `dev` instead of the version. `go install` cannot pass
+  ldflags, so the version now falls back to the module version from the build
+  info.
+
 ## [0.1.0] - 2026-08-01
 
 First public release of **binsight**.
