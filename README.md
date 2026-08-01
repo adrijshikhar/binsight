@@ -66,13 +66,31 @@ Decode never blocks the UI. Everything the browser reads comes from the index.
 
 ## Install
 
+### Install script (macOS / Linux, amd64 / arm64)
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/adrijshikhar/binsight/main/install.sh | sh
+```
+
+Detects your OS and architecture, verifies the SHA-256 checksum, installs to
+`~/.local/bin` (never uses `sudo`), adds that directory to your `PATH` if needed,
+and clears the macOS quarantine attribute.
+
+Options: `BINSIGHT_VERSION=v0.1.1` to pin a version,
+`BINSIGHT_INSTALL_DIR=/somewhere` to change the location,
+`BINSIGHT_NO_MODIFY_PATH=1` to leave your shell config alone.
+
 ### Homebrew (macOS / Linux)
 
 ```sh
 brew install adrijshikhar/tap/binsight
 ```
 
-> **macOS Gatekeeper:** the binaries are not notarized, so macOS quarantines them. The cask clears this automatically on install (0.1.1+). If you install a **prebuilt binary** manually instead, Gatekeeper will kill it on first run — clear it with `xattr -dr com.apple.quarantine ./binsight`.
+> **macOS Gatekeeper:** the binaries are not notarized, so macOS quarantines
+> anything downloaded through a browser. The install script and the Homebrew cask
+> (0.1.1+) both clear this for you. If you download a tarball manually and macOS
+> kills it on first run, clear it with
+> `xattr -dr com.apple.quarantine ./binsight`.
 
 ### Docker
 
