@@ -107,6 +107,24 @@ has a wrapped (small) `end_log_pos`.
 This means the earlier review claim "a binlog file can't exceed 4 GiB" is
 **WRONG**. It can, via one big transaction.
 
+**Upstream bug reports (found 2026-08-01 — this is a known, unfixed MySQL bug,
+not a binsight-specific discovery):**
+- [#55231](https://bugs.mysql.com/bug.php?id=55231) — "COM_BINLOG_DUMP needs to
+  accept 64-bit positions else slaves can break". Filed **2010-07-13**,
+  severity **S2**, still *In progress*. The canonical bug; MySQL's own source
+  carries `/* TODO: The following has to be changed to an 8 byte integer */`.
+- [#95074](https://bugs.mysql.com/bug.php?id=95074) — "binlog: end_log_pos is
+  less than pos" (2019, 5.7.18). Closed as a **duplicate of #55231**.
+- [#112189](https://bugs.mysql.com/bug.php?id=112189) — "Binlog::EventHeader
+  position overflow", **Verified** against 8.0. Proposes an 8-byte position
+  field. Same diagnosis as ours: rotation deferred until COMMIT → >4 GiB file →
+  overflow.
+- [gh-ost#1366](https://github.com/github/gh-ost/issues/1366) — real-world data
+  loss. gh-ost skips events whose `end_log_pos <= last`, so after the wrap
+  (`4294962881` → `3601`) **every subsequent event is silently dropped**.
+  Evidence that a widely-deployed tool gets this wrong; a useful cross-check
+  that our accumulator approach is the right one.
+
 **Reproduced** (BLACKHOLE table → ROW events to binlog with no InnoDB cost):
 ```sql
 CREATE TABLE big (id INT PRIMARY KEY AUTO_INCREMENT, payload LONGBLOB) ENGINE=BLACKHOLE;
