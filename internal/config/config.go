@@ -1,5 +1,5 @@
 // Package config implements settings precedence:
-// env vars (BV_*) → persisted UI settings (SQLite) → built-in defaults.
+// env vars (BINSIGHT_*) → persisted UI settings (SQLite) → built-in defaults.
 package config
 
 import (
@@ -69,7 +69,7 @@ func (s Stream) Validate() error {
 func defaults() *Config {
 	return &Config{
 		Port:            8080,
-		DataDir:         "/var/lib/binlog-viewer",
+		DataDir:         "/var/lib/binsight",
 		WatchDir:        "/data",
 		MysqlbinlogPath: "mysqlbinlog",
 		PageSize:        500,
@@ -112,65 +112,65 @@ func Load(s *store.Store, getenv func(string) string) (*Config, error) {
 			return nil, fmt.Errorf("unmarshal config setting: %w", err)
 		}
 	}
-	if v := getenv("BV_PORT"); v != "" {
+	if v := getenv("BINSIGHT_PORT"); v != "" {
 		p, err := strconv.Atoi(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid BV_PORT %q: %w", v, err)
+			return nil, fmt.Errorf("invalid BINSIGHT_PORT %q: %w", v, err)
 		}
 		c.Port = p
 	}
-	if v := getenv("BV_DATA_DIR"); v != "" {
+	if v := getenv("BINSIGHT_DATA_DIR"); v != "" {
 		c.DataDir = v
 	}
-	if v := getenv("BV_WATCH_DIR"); v != "" {
+	if v := getenv("BINSIGHT_WATCH_DIR"); v != "" {
 		c.WatchDir = v
 	}
-	if v := getenv("BV_MYSQLBINLOG_PATH"); v != "" {
+	if v := getenv("BINSIGHT_MYSQLBINLOG_PATH"); v != "" {
 		c.MysqlbinlogPath = v
 	}
-	if v := getenv("BV_WATCH"); v != "" {
+	if v := getenv("BINSIGHT_WATCH"); v != "" {
 		if b, ok := parseBool(v); ok {
 			c.Watch = b
 		}
 	}
-	if v := getenv("BV_STREAM_ENABLED"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_ENABLED"); v != "" {
 		if b, ok := parseBool(v); ok {
 			c.Stream.Enabled = b
 		}
 	}
-	if v := getenv("BV_STREAM_HOST"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_HOST"); v != "" {
 		c.Stream.Host = v
 	}
-	if v := getenv("BV_STREAM_PORT"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_PORT"); v != "" {
 		p, err := strconv.Atoi(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid BV_STREAM_PORT %q: %w", v, err)
+			return nil, fmt.Errorf("invalid BINSIGHT_STREAM_PORT %q: %w", v, err)
 		}
 		c.Stream.Port = p
 	}
-	if v := getenv("BV_STREAM_USER"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_USER"); v != "" {
 		c.Stream.User = v
 	}
-	if v := getenv("BV_STREAM_PASSWORD"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_PASSWORD"); v != "" {
 		c.Stream.Password = v
 	}
-	if v := getenv("BV_STREAM_FLAVOR"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_FLAVOR"); v != "" {
 		c.Stream.Flavor = v
 	}
-	if v := getenv("BV_STREAM_SERVER_ID"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_SERVER_ID"); v != "" {
 		id, err := strconv.ParseUint(v, 10, 32)
 		if err != nil {
-			return nil, fmt.Errorf("invalid BV_STREAM_SERVER_ID %q: %w", v, err)
+			return nil, fmt.Errorf("invalid BINSIGHT_STREAM_SERVER_ID %q: %w", v, err)
 		}
 		c.Stream.ServerID = uint32(id)
 	}
-	if v := getenv("BV_STREAM_MAX_SPOOL_BYTES"); v != "" {
+	if v := getenv("BINSIGHT_STREAM_MAX_SPOOL_BYTES"); v != "" {
 		n, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("invalid BV_STREAM_MAX_SPOOL_BYTES %q: %w", v, err)
+			return nil, fmt.Errorf("invalid BINSIGHT_STREAM_MAX_SPOOL_BYTES %q: %w", v, err)
 		}
 		if n < 0 {
-			return nil, fmt.Errorf("invalid BV_STREAM_MAX_SPOOL_BYTES %q: must be >= 0", v)
+			return nil, fmt.Errorf("invalid BINSIGHT_STREAM_MAX_SPOOL_BYTES %q: must be >= 0", v)
 		}
 		c.Stream.MaxSpoolBytes = n
 	}

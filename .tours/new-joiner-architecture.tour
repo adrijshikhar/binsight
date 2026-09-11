@@ -13,7 +13,7 @@
       "file": "cmd/binlog-viewer/main.go",
       "pattern": "func main()",
       "title": "Entry point — wiring",
-      "description": "Situation: `binlog-viewer serve <dir>` boots here. Mechanism: open the SQLite store, load config, build the adapter Registry (register go-mysql + mysqlbinlog if present + any BV_EXEC_ADAPTERS), assign roles, then start the HTTP server and kick off an initial scan in a goroutine. Implication: this is the dependency-injection seam — everything downstream gets the store, registry, and config from here. Gotcha: it binds 127.0.0.1 by default (BV_BIND to override) because the UI exposes decoded row data with no auth."
+      "description": "Situation: `binsight serve <dir>` boots here. Mechanism: open the SQLite store, load config, build the adapter Registry (register go-mysql + mysqlbinlog if present + any BINSIGHT_EXEC_ADAPTERS), assign roles, then start the HTTP server and kick off an initial scan in a goroutine. Implication: this is the dependency-injection seam — everything downstream gets the store, registry, and config from here. Gotcha: it binds 127.0.0.1 by default (BINSIGHT_BIND to override) because the UI exposes decoded row data with no auth."
     },
     {
       "file": "internal/adapter/adapter.go",
@@ -101,7 +101,7 @@
     },
     {
       "title": "You can now trace a binlog end to end",
-      "description": "Disk → adapter (Decoder) → schema.Event → indexer/SQLite → HTTP API → React UI, with diff and hex as the cross-checking tools. To extend: implement Decoder (or drop in a JSON-lines exec adapter via BV_EXEC_ADAPTERS) and register a role — nothing else in the core needs to change. The architecture diagram is also viewable in-app via the sidebar's 'Architecture' link."
+      "description": "Disk → adapter (Decoder) → schema.Event → indexer/SQLite → HTTP API → React UI, with diff and hex as the cross-checking tools. To extend: implement Decoder (or drop in a JSON-lines exec adapter via BINSIGHT_EXEC_ADAPTERS) and register a role — nothing else in the core needs to change. The architecture diagram is also viewable in-app via the sidebar's 'Architecture' link."
     }
   ]
 }

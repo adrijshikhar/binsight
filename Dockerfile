@@ -1,10 +1,10 @@
 # stage 1: frontend
-FROM node:20-slim AS web
+FROM oven/bun:latest AS web
 WORKDIR /app/web
-COPY web/package.json web/package-lock.json* ./
-RUN npm install
+COPY web/package.json web/bun.lock* ./
+RUN bun install
 COPY web/ ./
-RUN npm run build
+RUN bun run build
 
 # stage 2: Go binary (pure Go — no cgo needed thanks to modernc.org/sqlite)
 FROM golang:1.26-bookworm AS build
@@ -27,8 +27,8 @@ RUN apt-get update \
 COPY --from=build /binsight /binsight
 # Bind 0.0.0.0 inside the container so the published port (-p) is reachable;
 # network isolation + the host's port mapping/firewall control real exposure.
-ENV BV_DATA_DIR=/var/lib/binlog-viewer BV_WATCH_DIR=/data BV_PORT=8080 BV_BIND=0.0.0.0
-VOLUME ["/data", "/var/lib/binlog-viewer"]
+ENV BINSIGHT_DATA_DIR=/var/lib/binsight BINSIGHT_WATCH_DIR=/data BINSIGHT_PORT=8080 BINSIGHT_BIND=0.0.0.0
+VOLUME ["/data", "/var/lib/binsight"]
 EXPOSE 8080
 ENTRYPOINT ["/binsight"]
 CMD ["serve", "/data"]

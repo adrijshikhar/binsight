@@ -90,13 +90,13 @@ brew install adrijshikhar/tap/binsight
 
 ```sh
 docker run --rm -p 8080:8080 -v /path/to/binlogs:/data \
-  ghcr.io/adrijshikhar/binsight:0.1.1 serve /data
+  ghcr.io/adrijshikhar/binsight:0.2.0 serve /data
 ```
 
 ### go install
 
 ```sh
-go install github.com/adrijshikhar/binsight/cmd/binsight@v0.1.1
+go install github.com/adrijshikhar/binsight/cmd/binsight@v0.2.0
 ```
 
 ### Prebuilt binaries
@@ -131,20 +131,20 @@ make sample
 
 | Variable | Default | Description |
 |---|---|---|
-| `BV_PORT` | `8080` | HTTP listen port |
-| `BV_BIND` | `127.0.0.1` | Bind address. Loopback by default (the UI has no auth); set `0.0.0.0` to deliberately expose it. |
-| `BV_DATA_DIR` | `/var/lib/binlog-viewer` | SQLite index + settings storage. On a local (non-Docker) install, set this to a writable path such as `~/.local/share/binsight`. |
-| `BV_WATCH_DIR` | `/data` | Binlog directory (overrides the CLI argument when set) |
-| `BV_WATCH` | `true` | Enable live file-watching (set `false` to disable) |
-| `BV_MYSQLBINLOG_PATH` | `mysqlbinlog` | Path to the `mysqlbinlog` binary (optional; enables the Diff adapter) |
-| `BV_STREAM_ENABLED` | `false` | Enable remote replication streaming |
-| `BV_STREAM_HOST` | _(unset)_ | MySQL/MariaDB host |
-| `BV_STREAM_PORT` | `3306` | MySQL/MariaDB port |
-| `BV_STREAM_USER` | _(unset)_ | Replication user |
-| `BV_STREAM_PASSWORD` | _(unset)_ | Replication user password |
-| `BV_STREAM_FLAVOR` | `mysql` | Source flavor: `mysql` or `mariadb` |
-| `BV_STREAM_SERVER_ID` | `51789` | server-id sent to source; must not collide with another replica |
-| `BV_STREAM_MAX_SPOOL_BYTES` | `2147483648` | Spool cap in bytes (2 GiB); oldest files pruned when exceeded |
+| `BINSIGHT_PORT` | `8080` | HTTP listen port |
+| `BINSIGHT_BIND` | `127.0.0.1` | Bind address. Loopback by default (the UI has no auth); set `0.0.0.0` to deliberately expose it. |
+| `BINSIGHT_DATA_DIR` | `/var/lib/binsight` | SQLite index + settings storage. On a local (non-Docker) install, set this to a writable path such as `~/.local/share/binsight`. |
+| `BINSIGHT_WATCH_DIR` | `/data` | Binlog directory (overrides the CLI argument when set) |
+| `BINSIGHT_WATCH` | `true` | Enable live file-watching (set `false` to disable) |
+| `BINSIGHT_MYSQLBINLOG_PATH` | `mysqlbinlog` | Path to the `mysqlbinlog` binary (optional; enables the Diff adapter) |
+| `BINSIGHT_STREAM_ENABLED` | `false` | Enable remote replication streaming |
+| `BINSIGHT_STREAM_HOST` | _(unset)_ | MySQL/MariaDB host |
+| `BINSIGHT_STREAM_PORT` | `3306` | MySQL/MariaDB port |
+| `BINSIGHT_STREAM_USER` | _(unset)_ | Replication user |
+| `BINSIGHT_STREAM_PASSWORD` | _(unset)_ | Replication user password |
+| `BINSIGHT_STREAM_FLAVOR` | `mysql` | Source flavor: `mysql` or `mariadb` |
+| `BINSIGHT_STREAM_SERVER_ID` | `51789` | server-id sent to source; must not collide with another replica |
+| `BINSIGHT_STREAM_MAX_SPOOL_BYTES` | `2147483648` | Spool cap in bytes (2 GiB); oldest files pruned when exceeded |
 
 ### Remote streaming (Phase 2)
 
@@ -162,10 +162,10 @@ GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'binsight'@'%';
 Enable in **Settings → Remote streaming**, or via env:
 
 ```sh
-BV_STREAM_ENABLED=true \
-BV_STREAM_HOST=db.internal \
-BV_STREAM_USER=binsight \
-BV_STREAM_PASSWORD=... \
+BINSIGHT_STREAM_ENABLED=true \
+BINSIGHT_STREAM_HOST=db.internal \
+BINSIGHT_STREAM_USER=binsight \
+BINSIGHT_STREAM_PASSWORD=... \
 binsight serve /data
 ```
 

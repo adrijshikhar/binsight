@@ -31,7 +31,7 @@ func New(name string, cmd []string, caps adapter.Capabilities) *Adapter {
 }
 
 // SetSupports installs a version predicate so a version-specific sidecar can
-// declare the server_version range it handles (parsed from BV_EXEC_ADAPTERS
+// declare the server_version range it handles (parsed from BINSIGHT_EXEC_ADAPTERS
 // config when sidecars are wired up). Returns the adapter for chaining.
 func (a *Adapter) SetSupports(pred func(string) bool) *Adapter {
 	a.supports = pred

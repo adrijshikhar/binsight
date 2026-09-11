@@ -100,7 +100,7 @@ func (srv *Server) handleGetSettings(w http.ResponseWriter, r *http.Request) {
 // omitting them can never zero them out. MysqlbinlogPath is ALSO intentionally
 // excluded: it names an executable the server runs, so letting the HTTP API set
 // it would be an arbitrary-command-execution vector. It is boot/env-only
-// (BV_MYSQLBINLOG_PATH).
+// (BINSIGHT_MYSQLBINLOG_PATH).
 // maxPageSize bounds the persisted PageSize; larger client values are clamped.
 const maxPageSize = 1000
 

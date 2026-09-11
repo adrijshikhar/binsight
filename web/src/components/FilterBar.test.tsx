@@ -91,7 +91,7 @@ describe('FilterBar', () => {
   it('onChange called when db MultiSelect option is selected', async () => {
     const onChange = vi.fn()
     wrap(<FilterBar {...makeProps({ onChange })} />)
-    const dbInput = screen.getByRole('textbox', { name: /db/i })
+    const dbInput = screen.getByRole('combobox', { name: /db/i })
     fireEvent.click(dbInput)
     await waitFor(() => {
       expect(screen.getByText('mydb')).toBeTruthy()

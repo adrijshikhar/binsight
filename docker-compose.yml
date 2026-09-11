@@ -12,10 +12,10 @@ services:
       #   BINLOG_DIR=/path/to/binlogs docker compose up
       - "${BINLOG_DIR:-./samples}:/data:ro"
       # SQLite index + settings, persisted across restarts
-      - viewer-state:/var/lib/binlog-viewer
+      - binsight-state:/var/lib/binsight
     restart: unless-stopped
     # Image binds 0.0.0.0 inside the container; real exposure is controlled by
     # the host port mapping above. Remove/scope the published port to limit it.
 
 volumes:
-  viewer-state:
+  binsight-state:

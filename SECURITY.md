@@ -36,7 +36,7 @@ interesting reports are:
 - **The API has no authentication. That is by design**, documented, and not a
   vulnerability on its own. binsight binds `127.0.0.1` by default and is intended
   as a local, single-user debugging tool.
-- **Exposing the server publicly via `BV_BIND=0.0.0.0`** without a reverse proxy
+- **Exposing the server publicly via `BINSIGHT_BIND=0.0.0.0`** without a reverse proxy
   or network controls. The README says not to; doing it anyway is a deployment
   choice, not a defect.
 - **Unsigned macOS binaries.** Releases are not Developer ID signed or notarized

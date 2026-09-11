@@ -52,9 +52,9 @@ func TestEnvOverridesAll(t *testing.T) {
 	s := newStore(t)
 	getenv := func(k string) string {
 		switch k {
-		case "BV_PORT":
+		case "BINSIGHT_PORT":
 			return "9999"
-		case "BV_MYSQLBINLOG_PATH":
+		case "BINSIGHT_MYSQLBINLOG_PATH":
 			return "/opt/bin/mysqlbinlog"
 		}
 		return ""
@@ -99,7 +99,7 @@ func TestBVWatchEnvEnables(t *testing.T) {
 		t.Run(v, func(t *testing.T) {
 			s := newStore(t)
 			c, err := Load(s, func(k string) string {
-				if k == "BV_WATCH" {
+				if k == "BINSIGHT_WATCH" {
 					return v
 				}
 				return ""
@@ -108,7 +108,7 @@ func TestBVWatchEnvEnables(t *testing.T) {
 				t.Fatal(err)
 			}
 			if !c.Watch {
-				t.Fatalf("BV_WATCH=%q must enable Watch", v)
+				t.Fatalf("BINSIGHT_WATCH=%q must enable Watch", v)
 			}
 		})
 	}
@@ -123,7 +123,7 @@ func TestBVWatchFalseOverridesPersistedTrue(t *testing.T) {
 				t.Fatal(err)
 			}
 			c, err := Load(s, func(k string) string {
-				if k == "BV_WATCH" {
+				if k == "BINSIGHT_WATCH" {
 					return v
 				}
 				return ""
@@ -132,7 +132,7 @@ func TestBVWatchFalseOverridesPersistedTrue(t *testing.T) {
 				t.Fatal(err)
 			}
 			if c.Watch {
-				t.Fatalf("BV_WATCH=%q must override persisted Watch=true to false", v)
+				t.Fatalf("BINSIGHT_WATCH=%q must override persisted Watch=true to false", v)
 			}
 		})
 	}
@@ -161,9 +161,9 @@ func TestStreamDefaults(t *testing.T) {
 func TestStreamEnvOverrides(t *testing.T) {
 	s := newStore(t)
 	env := map[string]string{
-		"BV_STREAM_ENABLED": "true", "BV_STREAM_HOST": "db.example", "BV_STREAM_PORT": "3307",
-		"BV_STREAM_USER": "repl", "BV_STREAM_PASSWORD": "secret", "BV_STREAM_FLAVOR": "mariadb",
-		"BV_STREAM_SERVER_ID": "99", "BV_STREAM_MAX_SPOOL_BYTES": "1024",
+		"BINSIGHT_STREAM_ENABLED": "true", "BINSIGHT_STREAM_HOST": "db.example", "BINSIGHT_STREAM_PORT": "3307",
+		"BINSIGHT_STREAM_USER": "repl", "BINSIGHT_STREAM_PASSWORD": "secret", "BINSIGHT_STREAM_FLAVOR": "mariadb",
+		"BINSIGHT_STREAM_SERVER_ID": "99", "BINSIGHT_STREAM_MAX_SPOOL_BYTES": "1024",
 	}
 	c, err := Load(s, func(k string) string { return env[k] })
 	if err != nil {
@@ -183,11 +183,11 @@ func TestBVStreamEnabledTruthy(t *testing.T) {
 			s := newStore(t)
 			c, err := Load(s, func(k string) string {
 				switch k {
-				case "BV_STREAM_ENABLED":
+				case "BINSIGHT_STREAM_ENABLED":
 					return v
-				case "BV_STREAM_HOST":
+				case "BINSIGHT_STREAM_HOST":
 					return "db.example"
-				case "BV_STREAM_USER":
+				case "BINSIGHT_STREAM_USER":
 					return "repl"
 				}
 				return ""
@@ -196,7 +196,7 @@ func TestBVStreamEnabledTruthy(t *testing.T) {
 				t.Fatal(err)
 			}
 			if !c.Stream.Enabled {
-				t.Fatalf("BV_STREAM_ENABLED=%q must enable Stream.Enabled", v)
+				t.Fatalf("BINSIGHT_STREAM_ENABLED=%q must enable Stream.Enabled", v)
 			}
 		})
 	}
@@ -212,7 +212,7 @@ func TestBVStreamEnabledFalsy(t *testing.T) {
 				t.Fatal(err)
 			}
 			c, err := Load(s, func(k string) string {
-				if k == "BV_STREAM_ENABLED" {
+				if k == "BINSIGHT_STREAM_ENABLED" {
 					return v
 				}
 				return ""
@@ -221,7 +221,7 @@ func TestBVStreamEnabledFalsy(t *testing.T) {
 				t.Fatal(err)
 			}
 			if c.Stream.Enabled {
-				t.Fatalf("BV_STREAM_ENABLED=%q must disable Stream.Enabled", v)
+				t.Fatalf("BINSIGHT_STREAM_ENABLED=%q must disable Stream.Enabled", v)
 			}
 		})
 	}
@@ -230,20 +230,20 @@ func TestBVStreamEnabledFalsy(t *testing.T) {
 func TestNegativeMaxSpoolBytesRejected(t *testing.T) {
 	s := newStore(t)
 	_, err := Load(s, func(k string) string {
-		if k == "BV_STREAM_MAX_SPOOL_BYTES" {
+		if k == "BINSIGHT_STREAM_MAX_SPOOL_BYTES" {
 			return "-1"
 		}
 		return ""
 	})
 	if err == nil {
-		t.Fatal("expected error for negative BV_STREAM_MAX_SPOOL_BYTES, got nil")
+		t.Fatal("expected error for negative BINSIGHT_STREAM_MAX_SPOOL_BYTES, got nil")
 	}
 }
 
 func TestZeroMaxSpoolBytesAllowed(t *testing.T) {
 	s := newStore(t)
 	c, err := Load(s, func(k string) string {
-		if k == "BV_STREAM_MAX_SPOOL_BYTES" {
+		if k == "BINSIGHT_STREAM_MAX_SPOOL_BYTES" {
 			return "0"
 		}
 		return ""
@@ -265,9 +265,9 @@ func TestSpoolDir(t *testing.T) {
 
 func TestStreamValidateEnabledRequiresHostUser(t *testing.T) {
 	s := newStore(t)
-	// BV_STREAM_ENABLED=true with empty host and user must error.
+	// BINSIGHT_STREAM_ENABLED=true with empty host and user must error.
 	_, err := Load(s, func(k string) string {
-		if k == "BV_STREAM_ENABLED" {
+		if k == "BINSIGHT_STREAM_ENABLED" {
 			return "true"
 		}
 		return ""
@@ -279,14 +279,14 @@ func TestStreamValidateEnabledRequiresHostUser(t *testing.T) {
 
 func TestStreamValidateEnabledWithHostUserOK(t *testing.T) {
 	s := newStore(t)
-	// BV_STREAM_ENABLED=true with host and user set must succeed.
+	// BINSIGHT_STREAM_ENABLED=true with host and user set must succeed.
 	c, err := Load(s, func(k string) string {
 		switch k {
-		case "BV_STREAM_ENABLED":
+		case "BINSIGHT_STREAM_ENABLED":
 			return "true"
-		case "BV_STREAM_HOST":
+		case "BINSIGHT_STREAM_HOST":
 			return "db.example"
-		case "BV_STREAM_USER":
+		case "BINSIGHT_STREAM_USER":
 			return "repl"
 		}
 		return ""
@@ -302,7 +302,7 @@ func TestStreamValidateEnabledWithHostUserOK(t *testing.T) {
 func TestStreamValidateInvalidFlavor(t *testing.T) {
 	s := newStore(t)
 	_, err := Load(s, func(k string) string {
-		if k == "BV_STREAM_FLAVOR" {
+		if k == "BINSIGHT_STREAM_FLAVOR" {
 			return "oracle"
 		}
 		return ""

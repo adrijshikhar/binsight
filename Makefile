@@ -24,14 +24,14 @@ run: build
 # The API is killed automatically when the Vite server exits.
 dev:
 	@echo "API → :8080   UI (hot reload) → http://localhost:5173"
-	@BV_PORT=8080 go run ./cmd/binsight serve $(DIR) & \
+	@BINSIGHT_PORT=8080 go run ./cmd/binsight serve $(DIR) & \
 	  API_PID=$$!; \
 	  trap "kill $$API_PID 2>/dev/null" EXIT INT TERM; \
 	  cd web && bun install && bun run dev
 
 # Individual halves, for running in separate terminals if preferred.
 dev-api:
-	BV_PORT=8080 go run ./cmd/binsight serve $(DIR)
+	BINSIGHT_PORT=8080 go run ./cmd/binsight serve $(DIR)
 
 dev-web:
 	cd web && bun install && bun run dev
@@ -60,7 +60,7 @@ fmt:
 	cd web && bun run format
 
 # clean-data wipes the persisted index so stale/old files stop showing in the
-# viewer. Honors BV_DATA_DIR; defaults to ~/.binlog-viewer.
+# viewer. Honors BINSIGHT_DATA_DIR; defaults to ~/.binsight.
 clean-data:
-	rm -rf "$${BV_DATA_DIR:-$$HOME/.binlog-viewer}"
+	rm -rf "$${BINSIGHT_DATA_DIR:-$$HOME/.binsight}"
 	@echo "cleared index data dir"

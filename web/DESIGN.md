@@ -1,4 +1,4 @@
-# binlog-viewer — Design System (as-built, pure-Mantine rewrite)
+# binsight — Design System (as-built, pure-Mantine rewrite)
 
 A local, read-only MySQL/MariaDB binlog inspector. Desktop web app (React + Vite +
 TypeScript; charts via Recharts). GitHub-inspired, with both **dark (default) and

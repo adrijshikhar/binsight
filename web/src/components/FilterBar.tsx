@@ -48,7 +48,7 @@ export interface FilterBarProps {
   onRemoveTxn: (id: number) => void
   onToggleGrouped: () => void
   onJump: (pos: number) => void
-  searchRef?: React.RefObject<HTMLInputElement>
+  searchRef?: React.RefObject<HTMLInputElement | null>
 }
 
 export default function FilterBar(props: FilterBarProps) {

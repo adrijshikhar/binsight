@@ -63,12 +63,12 @@ func crossOrigin(req *http.Request) bool {
 // guardBrowser refuses requests a hostile web page could aim at this
 // unauthenticated local server.
 //
-// The Host allowlist is dropped when BV_BIND is set: the operator has then
+// The Host allowlist is dropped when BINSIGHT_BIND is set: the operator has then
 // deliberately exposed the server behind a trusted network or reverse proxy,
 // where a non-loopback (or proxy-rewritten) Host is the norm. Making the check
 // unsatisfiable there would just break the documented deployment.
 func guardBrowser(next http.Handler) http.Handler {
-	checkHost := os.Getenv("BV_BIND") == "" // boot-time; see cmd/binsight/main.go
+	checkHost := os.Getenv("BINSIGHT_BIND") == "" // boot-time; see cmd/binsight/main.go
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if checkHost && !loopbackHost(req.Host) {
 			respondError(w, http.StatusForbidden, "host not allowed")

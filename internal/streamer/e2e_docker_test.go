@@ -22,8 +22,8 @@ import (
 
 func e2eGate(t *testing.T) {
 	t.Helper()
-	if os.Getenv("BV_E2E_DOCKER") != "1" {
-		t.Skip("set BV_E2E_DOCKER=1 to run docker e2e")
+	if os.Getenv("BINSIGHT_E2E_DOCKER") != "1" {
+		t.Skip("set BINSIGHT_E2E_DOCKER=1 to run docker e2e")
 	}
 	if _, err := exec.LookPath("docker"); err != nil {
 		t.Skip("docker not available")

@@ -24,7 +24,7 @@ go build ./...
 ## Running it
 
 ```sh
-export BV_DATA_DIR=$(mktemp -d)   # the default /var/lib/binlog-viewer isn't writable on a dev box
+export BINSIGHT_DATA_DIR=$(mktemp -d)   # the default /var/lib/binsight isn't writable on a dev box
 make dev DIR=samples              # Go API on :8080 + Vite hot reload on :5173
 ```
 

@@ -69,10 +69,10 @@ func main() {
 		watch = os.Args[2]
 	}
 
-	dataDir := os.Getenv("BV_DATA_DIR")
+	dataDir := os.Getenv("BINSIGHT_DATA_DIR")
 	if dataDir == "" {
 		home, _ := os.UserHomeDir()
-		dataDir = filepath.Join(home, ".binlog-viewer")
+		dataDir = filepath.Join(home, ".binsight")
 	}
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		log.Fatalf("create data dir: %v", err)
@@ -131,9 +131,9 @@ func main() {
 	srv.StartStream(context.Background())
 
 	// Bind loopback by default — the UI surfaces decoded binlog row data and
-	// has no authentication. Set BV_BIND=0.0.0.0 to deliberately expose it
+	// has no authentication. Set BINSIGHT_BIND=0.0.0.0 to deliberately expose it
 	// (only behind a trusted network / reverse proxy).
-	bind := os.Getenv("BV_BIND")
+	bind := os.Getenv("BINSIGHT_BIND")
 	if bind == "" {
 		bind = "127.0.0.1"
 	}
@@ -150,12 +150,12 @@ func main() {
 }
 
 // registerExecAdapters registers JSON-lines sidecar adapters declared via
-// BV_EXEC_ADAPTERS — the phase-2 path for connector-java/python parsers:
+// BINSIGHT_EXEC_ADAPTERS — the phase-2 path for connector-java/python parsers:
 //
-//	BV_EXEC_ADAPTERS='[{"name":"connector-java","cmd":["java","-jar","adapter.jar"],
+//	BINSIGHT_EXEC_ADAPTERS='[{"name":"connector-java","cmd":["java","-jar","adapter.jar"],
 //	  "capabilities":{"FullScan":true,"SeekDecode":true,"RowImages":true}}]'
 func registerExecAdapters(reg *adapter.Registry) {
-	raw := os.Getenv("BV_EXEC_ADAPTERS")
+	raw := os.Getenv("BINSIGHT_EXEC_ADAPTERS")
 	if raw == "" {
 		return
 	}
@@ -165,11 +165,11 @@ func registerExecAdapters(reg *adapter.Registry) {
 		Capabilities adapter.Capabilities `json:"capabilities"`
 	}
 	if err := json.Unmarshal([]byte(raw), &specs); err != nil {
-		log.Fatalf("BV_EXEC_ADAPTERS: invalid JSON: %v", err)
+		log.Fatalf("BINSIGHT_EXEC_ADAPTERS: invalid JSON: %v", err)
 	}
 	for _, sp := range specs {
 		if sp.Name == "" || len(sp.Cmd) == 0 {
-			log.Fatalf("BV_EXEC_ADAPTERS: each entry needs name and cmd")
+			log.Fatalf("BINSIGHT_EXEC_ADAPTERS: each entry needs name and cmd")
 		}
 		reg.Register(execadapter.New(sp.Name, sp.Cmd, sp.Capabilities))
 		log.Printf("registered exec adapter %q (%v)", sp.Name, sp.Cmd)

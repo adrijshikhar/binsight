@@ -3,6 +3,25 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-11
+
+### Changed
+
+- **Breaking:** Environment variables renamed from `BV_*` to `BINSIGHT_*`
+  (`BINSIGHT_PORT`, `BINSIGHT_BIND`, `BINSIGHT_DATA_DIR`, `BINSIGHT_WATCH_DIR`,
+  `BINSIGHT_WATCH`, `BINSIGHT_MYSQLBINLOG_PATH`, `BINSIGHT_STREAM_*`,
+  `BINSIGHT_EXEC_ADAPTERS`, `BINSIGHT_E2E_DOCKER`).
+- **Breaking:** Default data directory moved from `/var/lib/binlog-viewer` to
+  `/var/lib/binsight` (local dev fallback moved from `~/.binlog-viewer` to
+  `~/.binsight`).
+- Frontend upgraded to Mantine v9 and React 19.
+- Dockerfile frontend stage switched from npm to bun for toolchain consistency.
+
+### Added
+
+- Contributor Covenant Code of Conduct (`CODE_OF_CONDUCT.md`).
+- Race detector enabled in CI workflow (`go test -race`).
+
 ## [0.1.1] - 2026-08-01
 
 ### Fixed

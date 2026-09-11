@@ -257,8 +257,8 @@ zone.
 - **Web tooling: `bun`.** `make dev DIR=/path/to/binlogs` runs the Go API
   (:8080) + Vite hot-reload UI (:5173, proxies `/api`). `make ui` builds dist.
   `make run` builds + serves. `make fmt` = gofmt + prettier (via bun).
-- Set `BV_DATA_DIR` to a writable path when running ad-hoc (default
-  `/var/lib/binlog-viewer` is not writable on a dev box).
+- Set `BINSIGHT_DATA_DIR` to a writable path when running ad-hoc (default
+  `/var/lib/binsight` is not writable on a dev box).
 - Tests: `go test -race ./...`; web `bun run test`. Pre-commit hook runs gofmt +
   prettier; install once with `make hooks`.
 - Workflow norms: brainstorm → spec → plan → subagent-driven dev (two-stage

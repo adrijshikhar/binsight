@@ -25,9 +25,9 @@ import (
 func TestL2CrossAdapterHeaderAgreement(t *testing.T) {
 	m := loadCorpus(t)
 
-	// Resolve mysqlbinlog via BV_MYSQLBINLOG or PATH (New("") → PATH). Skip if
+	// Resolve mysqlbinlog via BINSIGHT_MYSQLBINLOG or PATH (New("") → PATH). Skip if
 	// it can't be spawned.
-	mbl := mysqlbinlog.New(os.Getenv("BV_MYSQLBINLOG"))
+	mbl := mysqlbinlog.New(os.Getenv("BINSIGHT_MYSQLBINLOG"))
 	if _, err := mbl.Available(); err != nil {
 		t.Skipf("mysqlbinlog not installed — skipping L2: %v", err)
 	}
