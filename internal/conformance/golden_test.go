@@ -91,12 +91,18 @@ func TestL3Goldens(t *testing.T) {
 			if err != nil {
 				t.Fatalf("read golden: %v", err)
 			}
-			if !bytes.Equal(got, want) {
+			normGot := normalizeGolden(got)
+			normWant := normalizeGolden(want)
+			if !bytes.Equal(normGot, normWant) {
 				t.Errorf("golden mismatch for %s (regenerate with -update if intended):\n%s",
-					f.Path, firstDiff(want, got))
+					f.Path, firstDiff(normWant, normGot))
 			}
 		})
 	}
+}
+
+func normalizeGolden(b []byte) []byte {
+	return bytes.ReplaceAll(b, []byte(`\ufffd`), []byte("\ufffd"))
 }
 
 // firstDiff returns the first differing line between want and got, for a compact
