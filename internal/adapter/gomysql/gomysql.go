@@ -233,6 +233,8 @@ func (a *Adapter) decodeResume(ctx context.Context, src adapter.Source, opts ada
 	return st, nil
 }
 
+var staticNativeGoMySQL = json.RawMessage(`{"adapter":"go-mysql"}`)
+
 // convert maps a go-mysql event into the normalized schema. nextPos is the
 // computed end offset (pos+size) — used instead of the raw LogPos so MariaDB
 // inline events with LogPos=0 still chain contiguously.
@@ -247,13 +249,17 @@ func convert(be *replication.BinlogEvent, pos, nextPos uint64) *schema.Event {
 		NextPos:   nextPos,
 		Flags:     be.Header.Flags,
 	}
-	ev := &schema.Event{SchemaVersion: schema.Version, Header: h, Confidence: schema.ConfidenceFull}
-	native := map[string]any{"adapter": "go-mysql", "go_type": fmt.Sprintf("%T", be.Event)}
+	ev := &schema.Event{
+		SchemaVersion: schema.Version,
+		Header:        h,
+		Confidence:    schema.ConfidenceFull,
+		Native:        staticNativeGoMySQL,
+	}
 
 	switch e := be.Event.(type) {
 	case *replication.FormatDescriptionEvent:
 		ev.Decoded = &schema.Decoded{SQL: fmt.Sprintf("binlog v%d, server %s", e.Version, e.ServerVersion)}
-		native["checksum_algorithm"] = e.ChecksumAlgorithm
+		ev.Native = fmt.Appendf(nil, `{"adapter":"go-mysql","checksum_algorithm":%d}`, e.ChecksumAlgorithm)
 	case *replication.QueryEvent:
 		ev.Decoded = &schema.Decoded{DB: string(e.Schema), SQL: string(e.Query)}
 	case *replication.XIDEvent:
@@ -270,7 +276,7 @@ func convert(be *replication.BinlogEvent, pos, nextPos uint64) *schema.Event {
 		// non-transactional statement (e.g. DDL) and must NOT open a txn — the
 		// indexer keys off native["maria_gtid_standalone"] to decide.
 		ev.Decoded = &schema.Decoded{GTID: e.GTID.String()}
-		native["maria_gtid_standalone"] = e.IsStandalone()
+		ev.Native = fmt.Appendf(nil, `{"adapter":"go-mysql","maria_gtid_standalone":%t}`, e.IsStandalone())
 	case *replication.TableMapEvent:
 		cols := make([]string, len(e.ColumnType))
 		for i, c := range e.ColumnType {
@@ -299,28 +305,29 @@ func convert(be *replication.BinlogEvent, pos, nextPos uint64) *schema.Event {
 		isDelete := h.TypeName == "DELETE_ROWS_V2" || h.TypeName == "DELETE_ROWS_V1"
 		if isUpdate {
 			// go-mysql emits update rows as [before, after, before, after, ...]
+			d.Rows = make([]schema.RowImage, 0, len(e.Rows)/2)
 			for i := 0; i+1 < len(e.Rows); i += 2 {
 				d.Rows = append(d.Rows, schema.RowImage{
 					Before: normalizeRow(e.Rows[i]), After: normalizeRow(e.Rows[i+1]),
 				})
 			}
 		} else if isDelete {
+			d.Rows = make([]schema.RowImage, 0, len(e.Rows))
 			for _, r := range e.Rows {
 				d.Rows = append(d.Rows, schema.RowImage{Before: normalizeRow(r)})
 			}
 		} else {
+			d.Rows = make([]schema.RowImage, 0, len(e.Rows))
 			for _, r := range e.Rows {
 				d.Rows = append(d.Rows, schema.RowImage{After: normalizeRow(r)})
 			}
 		}
 		ev.Decoded = d
-		native["rows_raw_types"] = rowGoTypes(e.Rows)
 	case *replication.RotateEvent:
 		ev.Decoded = &schema.Decoded{SQL: fmt.Sprintf("rotate to %s pos %d", e.NextLogName, e.Position)}
 	case *replication.RowsQueryEvent:
 		ev.Decoded = &schema.Decoded{SQL: string(e.Query)}
 	}
-	ev.Native, _ = json.Marshal(native)
 	return ev
 }
 
@@ -348,17 +355,6 @@ func normalizeRow(row []any) []any {
 		default:
 			out[i] = v
 		}
-	}
-	return out
-}
-
-func rowGoTypes(rows [][]any) []string {
-	if len(rows) == 0 {
-		return nil
-	}
-	out := make([]string, len(rows[0]))
-	for i, v := range rows[0] {
-		out[i] = fmt.Sprintf("%T", v)
 	}
 	return out
 }

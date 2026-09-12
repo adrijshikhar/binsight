@@ -58,3 +58,8 @@ samples/mysql-bin.000001
 
 # local agent/session artifacts
 .claude/
+.codex/
+.idea/
+*.test
+*.pprof
+.DS_Store
