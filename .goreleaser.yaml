@@ -28,6 +28,7 @@ homebrew_casks:
     homepage: "https://github.com/adrijshikhar/binsight"
     description: "A local MySQL & MariaDB binlog viewer and analyzer for developers"
     license: "MIT"
+    skip_upload: true
     # The binaries are not Developer ID signed or notarized, so Homebrew's
     # download carries com.apple.quarantine and Gatekeeper SIGKILLs the binary
     # on first run (exit 137, no message). Strip the attribute on install.
