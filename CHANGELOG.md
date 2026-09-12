@@ -3,6 +3,13 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1](https://github.com/adrijshikhar/binsight/compare/v0.2.0...v0.2.1) (2026-09-12)
+
+
+### Performance Improvements
+
+* optimize binlog event conversion and SQLite WAL indexing ([#13](https://github.com/adrijshikhar/binsight/issues/13)) ([58fea9e](https://github.com/adrijshikhar/binsight/commit/58fea9e48ba64f09b30ffdf58074106fa97b1b0b))
+
 ## [0.2.0] - 2026-09-11
 
 ### Changed
