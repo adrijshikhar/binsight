@@ -25,6 +25,7 @@ import SchemaView from './views/SchemaView'
 import SettingsView from './views/SettingsView'
 import ArchitectureView from './views/ArchitectureView'
 import Drawer from './components/Drawer'
+import { Agentation } from 'agentation'
 import styles from './App.module.css'
 
 export type MainTab = 'overview' | 'events' | 'txns' | 'tables' | 'anomalies' | 'schema' | 'settings' | 'architecture'
@@ -705,6 +706,15 @@ export default function App() {
           </AppShell.Aside>
         )}
       </AppShell>
+      {showAgentation && <Agentation endpoint="http://localhost:4747" />}
     </SSEContext.Provider>
   )
 }
+
+const showAgentation =
+  typeof window !== 'undefined' &&
+  import.meta.env.MODE !== 'test' &&
+  (import.meta.env.DEV ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1')
+

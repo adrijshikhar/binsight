@@ -24,6 +24,7 @@
     "@mantine/notifications": "^9",
     "@tabler/icons-react": "^3.44.0",
     "@tanstack/react-virtual": "^3.14.3",
+    "agentation": "^3.0.2",
     "react": "^19",
     "react-dom": "^19",
     "recharts": "^3.8.1"
