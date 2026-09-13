@@ -39,3 +39,23 @@ body {
     animation: none !important;
   }
 }
+
+/* High-contrast Alert and Badge styling across schemes */
+.mantine-Alert-root {
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+
+[data-mantine-color-scheme='dark'] .mantine-Alert-message {
+  color: var(--text) !important;
+}
+
+[data-mantine-color-scheme='light'] .mantine-Alert-message {
+  color: var(--text) !important;
+}
+
+.mantine-Badge-root[data-variant='light'] {
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+

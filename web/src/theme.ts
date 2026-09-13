@@ -1,4 +1,10 @@
-import { createTheme, type MantineColorsTuple, type CSSVariablesResolver } from '@mantine/core'
+import {
+  createTheme,
+  type MantineColorsTuple,
+  type CSSVariablesResolver,
+  defaultVariantColorsResolver,
+  type VariantColorsResolver,
+} from '@mantine/core'
 
 // Sky (Tailwind) — accent / interaction. primaryShade picks 4 in dark (bright),
 // 6 in light (darker for contrast on white).
@@ -91,11 +97,33 @@ const teal: MantineColorsTuple = [
   '#134e4a',
 ]
 
+/**
+ * Custom variant color resolver:
+ * Mantine's default light-variant formula in dark mode uses 15% opacity of shade 9,
+ * which results in muddy dark-brown/maroon sludge on dark surfaces without borders.
+ * We intercept `variant="light"` and route it to our calibrated semantic tokens
+ * that guarantee luminous, high-contrast ink and a crisp hairline border.
+ */
+const variantColorResolver: VariantColorsResolver = (input) => {
+  const defaultResolved = defaultVariantColorsResolver(input)
+  if (input.variant === 'light') {
+    const c = input.color || input.theme.primaryColor
+    return {
+      ...defaultResolved,
+      background: `var(--badge-${c}-bg, var(--mantine-color-${c}-light))`,
+      color: `var(--badge-${c}-text, var(--mantine-color-${c}-light-color))`,
+      border: `1px solid var(--badge-${c}-border, var(--mantine-color-${c}-light-border, transparent))`,
+    }
+  }
+  return defaultResolved
+}
+
 export const theme = createTheme({
   primaryColor: 'accent',
   primaryShade: { light: 6, dark: 4 },
   white: '#ffffff',
   colors: { accent, dark, green, orange, red, grape, teal },
+  variantColorResolver,
   autoContrast: true,
   fontFamily: '-apple-system, "Segoe UI", sans-serif',
   fontFamilyMonospace: "'SF Mono', ui-monospace, Menlo, monospace",
@@ -107,6 +135,28 @@ export const theme = createTheme({
     NumberInput: { defaultProps: { size: 'xs' } },
     Select: { defaultProps: { size: 'xs' } },
     MultiSelect: { defaultProps: { size: 'xs' } },
+    Alert: {
+      defaultProps: { radius: 'sm' },
+      styles: {
+        root: {
+          borderRadius: '6px',
+          fontSize: '12px',
+          padding: '8px 12px',
+        },
+        message: {
+          fontSize: '12px',
+          lineHeight: '1.45',
+        },
+      },
+    },
+    Badge: {
+      styles: {
+        root: {
+          fontWeight: 600,
+          letterSpacing: '0.35px',
+        },
+      },
+    },
     Tooltip: {
       defaultProps: { multiline: true },
       styles: {
@@ -178,13 +228,36 @@ const darkTokens = {
   sevMedium: '#fbbf24',
   sevLow: '#8794a0',
   warn: '#fbbf24',
-  warnBg: 'rgba(251,191,36,.13)',
-  warnRowBg: 'rgba(251,191,36,.13)',
-  warnRowHover: 'rgba(251,191,36,.20)',
+  warnBg: 'rgba(251,191,36,.14)',
+  warnRowBg: 'rgba(251,191,36,.14)',
+  warnRowHover: 'rgba(251,191,36,.22)',
   warnBorder: '#fbbf24',
   diffOk: '#34d399',
-  diffDisBg: 'rgba(251,113,133,.16)',
+  diffDisBg: 'rgba(244,63,94,.14)',
   diffDisBar: '#fb7185',
+
+  // Calibrated semantic badge & alert tokens (dark mode)
+  badgeRedBg: 'rgba(244,63,94,.14)',
+  badgeRedText: '#fb7185',
+  badgeRedBorder: 'rgba(244,63,94,.35)',
+  badgeOrangeBg: 'rgba(251,191,36,.14)',
+  badgeOrangeText: '#fbbf24',
+  badgeOrangeBorder: 'rgba(251,191,36,.35)',
+  badgeGreenBg: 'rgba(52,211,153,.14)',
+  badgeGreenText: '#34d399',
+  badgeGreenBorder: 'rgba(52,211,153,.35)',
+  badgeGrapeBg: 'rgba(167,139,250,.14)',
+  badgeGrapeText: '#c4b5fd',
+  badgeGrapeBorder: 'rgba(167,139,250,.35)',
+  badgeTealBg: 'rgba(45,212,191,.14)',
+  badgeTealText: '#2dd4bf',
+  badgeTealBorder: 'rgba(45,212,191,.35)',
+  badgeAccentBg: 'rgba(56,189,248,.14)',
+  badgeAccentText: '#38bdf8',
+  badgeAccentBorder: 'rgba(56,189,248,.35)',
+  badgeGrayBg: 'rgba(139,148,158,.14)',
+  badgeGrayText: '#c9d1d9',
+  badgeGrayBorder: 'rgba(139,148,158,.30)',
 } as const
 type Tokens = Record<keyof typeof darkTokens, string>
 const lightTokens: Tokens = {
@@ -219,6 +292,29 @@ const lightTokens: Tokens = {
   diffOk: '#059669',
   diffDisBg: '#fff1f2',
   diffDisBar: '#e11d48',
+
+  // Calibrated semantic badge & alert tokens (light mode)
+  badgeRedBg: '#fff1f2',
+  badgeRedText: '#be123c',
+  badgeRedBorder: 'rgba(225,29,72,.28)',
+  badgeOrangeBg: '#fffbeb',
+  badgeOrangeText: '#b45309',
+  badgeOrangeBorder: 'rgba(217,119,6,.28)',
+  badgeGreenBg: '#ecfdf5',
+  badgeGreenText: '#047857',
+  badgeGreenBorder: 'rgba(5,150,105,.28)',
+  badgeGrapeBg: '#f5f3ff',
+  badgeGrapeText: '#6d28d9',
+  badgeGrapeBorder: 'rgba(124,58,237,.28)',
+  badgeTealBg: '#f0fdfa',
+  badgeTealText: '#0f766e',
+  badgeTealBorder: 'rgba(13,148,136,.28)',
+  badgeAccentBg: '#f0f9ff',
+  badgeAccentText: '#0284c7',
+  badgeAccentBorder: 'rgba(2,132,199,.28)',
+  badgeGrayBg: '#f1f5f9',
+  badgeGrayText: '#3d4c59',
+  badgeGrayBorder: '#d6dee6',
 }
 function vars(t: Tokens, scheme: 'light' | 'dark'): Record<string, string> {
   return {
@@ -254,6 +350,52 @@ function vars(t: Tokens, scheme: 'light' | 'dark'): Record<string, string> {
     '--diff-ok': t.diffOk,
     '--diff-dis-bg': t.diffDisBg,
     '--diff-dis-bar': t.diffDisBar,
+
+    // Badge & Alert semantic tokens
+    '--badge-red-bg': t.badgeRedBg,
+    '--badge-red-text': t.badgeRedText,
+    '--badge-red-border': t.badgeRedBorder,
+    '--badge-orange-bg': t.badgeOrangeBg,
+    '--badge-orange-text': t.badgeOrangeText,
+    '--badge-orange-border': t.badgeOrangeBorder,
+    '--badge-green-bg': t.badgeGreenBg,
+    '--badge-green-text': t.badgeGreenText,
+    '--badge-green-border': t.badgeGreenBorder,
+    '--badge-grape-bg': t.badgeGrapeBg,
+    '--badge-grape-text': t.badgeGrapeText,
+    '--badge-grape-border': t.badgeGrapeBorder,
+    '--badge-teal-bg': t.badgeTealBg,
+    '--badge-teal-text': t.badgeTealText,
+    '--badge-teal-border': t.badgeTealBorder,
+    '--badge-accent-bg': t.badgeAccentBg,
+    '--badge-accent-text': t.badgeAccentText,
+    '--badge-accent-border': t.badgeAccentBorder,
+    '--badge-gray-bg': t.badgeGrayBg,
+    '--badge-gray-text': t.badgeGrayText,
+    '--badge-gray-border': t.badgeGrayBorder,
+
+    // Override Mantine built-in light-color vars directly for all components:
+    '--mantine-color-red-light': t.badgeRedBg,
+    '--mantine-color-red-light-color': t.badgeRedText,
+    '--mantine-color-red-light-border': t.badgeRedBorder,
+    '--mantine-color-orange-light': t.badgeOrangeBg,
+    '--mantine-color-orange-light-color': t.badgeOrangeText,
+    '--mantine-color-orange-light-border': t.badgeOrangeBorder,
+    '--mantine-color-green-light': t.badgeGreenBg,
+    '--mantine-color-green-light-color': t.badgeGreenText,
+    '--mantine-color-green-light-border': t.badgeGreenBorder,
+    '--mantine-color-grape-light': t.badgeGrapeBg,
+    '--mantine-color-grape-light-color': t.badgeGrapeText,
+    '--mantine-color-grape-light-border': t.badgeGrapeBorder,
+    '--mantine-color-teal-light': t.badgeTealBg,
+    '--mantine-color-teal-light-color': t.badgeTealText,
+    '--mantine-color-teal-light-border': t.badgeTealBorder,
+    '--mantine-color-accent-light': t.badgeAccentBg,
+    '--mantine-color-accent-light-color': t.badgeAccentText,
+    '--mantine-color-accent-light-border': t.badgeAccentBorder,
+    '--mantine-color-gray-light': t.badgeGrayBg,
+    '--mantine-color-gray-light-color': t.badgeGrayText,
+    '--mantine-color-gray-light-border': t.badgeGrayBorder,
   }
 }
 export const cssVariablesResolver: CSSVariablesResolver = () => ({

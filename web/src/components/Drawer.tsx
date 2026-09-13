@@ -180,7 +180,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
             The viewer reconstructs the true offset with a running byte accumulator, so positions stay monotonic. Using
             the raw wrapped value (as MySQL&apos;s own <code>mysqlbinlog</code> does) would make every event after this
             one collide with early-file positions and the file would re-index endlessly. Only files &gt; 4 GiB hit this
-            — and only a single transaction &gt; 4 GiB can produce such a file (rotation defers until COMMIT).
+            - and only a single transaction &gt; 4 GiB can produce such a file (rotation defers until COMMIT).
           </p>
         </div>
       )}
@@ -189,7 +189,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
       {err && (
         <Alert color="red" role="alert" mb={0} radius={0}>
           {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
+          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
             retry
           </Button>
         </Alert>

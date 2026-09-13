@@ -82,9 +82,9 @@ function RowGrid({ row, colTypes, index }: { row: RowImage; colTypes: string[]; 
         @{i + 1}
         <span>{colTypes[i] ?? ''}</span>
       </div>,
-      <div key={`b${i}`}>{row.before ? fmtVal(b) : '—'}</div>,
+      <div key={`b${i}`}>{row.before ? fmtVal(b) : '-'}</div>,
       <div key={`a${i}`} className={changed ? styles.changed : ''}>
-        {row.after ? fmtVal(a) : '—'}
+        {row.after ? fmtVal(a) : '-'}
       </div>,
     )
   }
@@ -120,7 +120,7 @@ export function KV({ pairs, note }: { pairs: [string, string][]; note?: string }
         {pairs.map(([k, v]) => (
           <Fragment key={k}>
             <div className={styles.col}>{k}</div>
-            <div>{v || '—'}</div>
+            <div>{v || '-'}</div>
           </Fragment>
         ))}
       </BaGrid>
@@ -220,7 +220,7 @@ function DiffRow({ field, adapters }: { field: DiffResult['fields'][0]; adapters
         <div className={styles.diffField}>{field.name}</div>
       </Tooltip>
       {adapters.map((a) => {
-        const raw = field.values[a] ?? '—'
+        const raw = field.values[a] ?? '-'
         // On a disagree row, the value that diverges from the oracle gets emphasis.
         // If there is no oracle value (or the adapter IS the oracle), no emphasis.
         const isChanged = !isAgree && oracleVal !== undefined && a !== ORACLE && raw !== oracleVal

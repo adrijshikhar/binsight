@@ -517,7 +517,7 @@ export default function EventsView(props: EventsViewProps) {
       {err && (
         <Alert color="red" role="alert" mb={0} radius={0} style={{ borderBottom: '1px solid var(--border)' }}>
           {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => load(0, false)}>
+          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => load(0, false)}>
             retry
           </Button>
         </Alert>

@@ -78,7 +78,7 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
       {err && (
         <Alert color="red" role="alert" radius={0} mb={0}>
           {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => setFetchKey((k) => k + 1)}>
+          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
@@ -117,12 +117,12 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
                   <Table.Td ff="monospace">{a.detector}</Table.Td>
                   <Table.Td>{[a.db_name, a.table_name].filter(Boolean).join('.')}</Table.Td>
                   <Table.Td style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
-                    {a.threshold > 0 ? `${a.metric.toLocaleString()} / ${a.threshold.toLocaleString()}` : '—'}
+                    {a.threshold > 0 ? `${a.metric.toLocaleString()} / ${a.threshold.toLocaleString()}` : '-'}
                   </Table.Td>
                   <Table.Td
                     style={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                   >
-                    {a.message || '—'}
+                    {a.message || '-'}
                   </Table.Td>
                   <Table.Td>
                     {a.txn_id ? (

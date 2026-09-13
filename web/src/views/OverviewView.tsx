@@ -154,7 +154,7 @@ export default function OverviewView({
           withBorder
           p="xs"
           style={{
-            borderLeft: total > 0 ? '3px solid var(--mantine-color-red-6)' : undefined,
+            borderLeft: total > 0 ? '3px solid var(--red)' : undefined,
             cursor: total > 0 ? 'pointer' : undefined,
           }}
           {...(total > 0 ? clickable(onShowAnomalies) : {})}
@@ -173,7 +173,7 @@ export default function OverviewView({
       {err && (
         <Alert color="red" role="alert">
           {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => setRetryKey((k) => k + 1)}>
+          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => setRetryKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
@@ -236,7 +236,7 @@ export default function OverviewView({
             <Card
               withBorder
               padding="sm"
-              style={{ minWidth: 160, borderColor: decodeWarn ? 'var(--mantine-color-orange-6)' : undefined }}
+              style={{ minWidth: 160, borderColor: decodeWarn ? 'var(--orange)' : undefined }}
             >
               <Text size="xs" c="dimmed">
                 decode

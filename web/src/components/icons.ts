@@ -55,7 +55,7 @@ export function kindBadgeStyle(kind: string): CSSProperties {
   return {
     '--badge-bg': `color-mix(in srgb, var(${v}) 14%, transparent)`,
     '--badge-color': `var(${v})`,
-    border: 'none',
+    border: `1px solid color-mix(in srgb, var(${v}) 32%, transparent)`,
     fontFamily: 'var(--mono)',
   } as CSSProperties
 }

@@ -163,15 +163,17 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
           <Title order={2} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
             <Code
               style={{
-                fontSize: 'inherit',
-                fontFamily: 'inherit',
-                color: 'var(--mantine-color-accent-6)',
-                background: 'transparent',
+                fontSize: 16,
+                padding: '2px 8px',
+                borderRadius: 4,
+                border: '1px solid var(--border)',
+                background: 'var(--panel2)',
+                color: 'var(--accent)',
               }}
             >
               binsight
             </Code>{' '}
-            — Pluggable Decoder Architecture
+            - Pluggable Decoder Architecture
           </Title>
           <Text size="sm" c="dimmed">
             Go core · no privileged library · adapters behind one interface · roles assigned by config
@@ -489,25 +491,25 @@ roles:
       {/* Legend */}
       <Group gap="xl" mt="md" pb="md" style={{ flexWrap: 'wrap' }}>
         <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-green-6)" size={10} radius={3} />
+          <ColorSwatch color="var(--green)" size={10} radius={3} />
           <Text size="xs" c="dimmed">
             builtin adapter (in-process)
           </Text>
         </Group>
         <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-orange-6)" size={10} radius={3} />
+          <ColorSwatch color="var(--orange)" size={10} radius={3} />
           <Text size="xs" c="dimmed">
             exec adapter (subprocess, JSON-lines)
           </Text>
         </Group>
         <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-grape-6)" size={10} radius={3} />
+          <ColorSwatch color="var(--grape)" size={10} radius={3} />
           <Text size="xs" c="dimmed">
             planned
           </Text>
         </Group>
         <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-accent-6)" size={10} radius={3} />
+          <ColorSwatch color="var(--accent)" size={10} radius={3} />
           <Text size="xs" c="dimmed">
             interface / schema contract
           </Text>

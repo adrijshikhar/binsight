@@ -39,7 +39,7 @@ function wrap(ui: React.ReactElement) {
 describe('ArchitectureView', () => {
   it('renders the architecture title', () => {
     wrap(<ArchitectureView onClose={() => {}} />)
-    expect(screen.getByText('— Pluggable Decoder Architecture')).toBeTruthy()
+    expect(screen.getByText(/- Pluggable Decoder Architecture/)).toBeTruthy()
   })
 
   it('renders the subtitle', () => {

@@ -99,7 +99,7 @@ export default function TxnsView(props: {
       {err && (
         <Alert color="red" role="alert" radius={0} mb={0}>
           {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => setFetchKey((k) => k + 1)}>
+          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
