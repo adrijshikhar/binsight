@@ -1,0 +1,76 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'dual-engine-concept', text: 'The Dual-Engine Oracle Concept' },
+  { depth: 2, slug: 'go-mysql-workhorse', text: 'Engine 1: Native go-mysql Workhorse' },
+  { depth: 2, slug: 'mysqlbinlog-oracle', text: 'Engine 2: mysqlbinlog Canonical Oracle' },
+  { depth: 2, slug: 'conformance-testing', text: 'L1 & L2 Conformance Harness' },
+];
+---
+
+<DocsLayout
+  title="Dual-Engine Architecture"
+  description="How Binsight combines pure Go high-throughput decoding with canonical mysqlbinlog oracle verification."
+  currentSlug="architecture"
+  headings={headings}
+>
+  <p>
+    Binary log formats in MySQL and MariaDB have evolved through dozens of micro-versions across the last 20 years. Minor edge cases in decimal encodings, spatial GIS coordinates, or temporal microsecond precision can cause third-party decoders to silently misinterpret column values.
+  </p>
+
+  <h2 id="dual-engine-concept">The Dual-Engine Oracle Concept</h2>
+  <p>
+    Binsight solves decode drift by implementing a <strong>dual-engine oracle architecture</strong>:
+  </p>
+  <div class="my-6 p-5 rounded-xl border border-[#2d3b4f] bg-[#11161d] font-mono text-xs space-y-4 not-prose">
+    <div class="flex items-center justify-between pb-3 border-b border-[#212c3d]">
+      <span class="text-[#38bdf8] font-bold">Dual-Engine Decode Pipeline</span>
+      <span class="text-[#8b949e]">Zero-Drift Guarantee</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="p-3 rounded bg-[#0b0f14] border border-[#212c3d]">
+        <div class="text-[#3fb950] font-bold text-sm mb-1">Engine 1: Workhorse (Pure Go)</div>
+        <div class="text-[#8b949e] text-[11px] leading-relaxed">
+          Decodes 80,000+ events/sec in memory. Zero external binary dependencies. Powers the live virtual table, SSE stream, and search filters.
+        </div>
+      </div>
+      <div class="p-3 rounded bg-[#0b0f14] border border-[#212c3d]">
+        <div class="text-[#38bdf8] font-bold text-sm mb-1">Engine 2: Oracle (mysqlbinlog)</div>
+        <div class="text-[#8b949e] text-[11px] leading-relaxed">
+          Invokes canonical MySQL client binary when present. Verifies row-image diffs against official MySQL reference output.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="go-mysql-workhorse">Engine 1: Native go-mysql Workhorse</h2>
+  <p>
+    The primary engine is implemented in pure Go using an optimized fork of <code>go-mysql</code>. It provides:
+  </p>
+  <ul>
+    <li>Blazing speed: Indexing over 80,000 events/sec on modern hardware.</li>
+    <li>Minimal memory RSS: Consumes &lt;45 MB of RAM even when indexing multi-gigabyte log archives.</li>
+    <li>Native MariaDB 10.6+ and MySQL 8.4 support without needing CGO or shared C libraries.</li>
+  </ul>
+
+  <h2 id="mysqlbinlog-oracle">Engine 2: mysqlbinlog Canonical Oracle</h2>
+  <p>
+    When you inspect a specific transaction or row diff, Binsight can optionally verify the decoded row against the local <code>mysqlbinlog</code> executable. If both engines agree on the byte-for-byte values, the UI displays a verified green badge:
+  </p>
+  <CodeBlock
+    code="[VERIFIED] Dual-Engine Oracle Agreement: 100% (go-mysql == mysqlbinlog)"
+    lang="text"
+    title="Verification Badge"
+  />
+
+  <h2 id="conformance-testing">L1 & L2 Conformance Harness</h2>
+  <p>
+    Binsight's continuous integration test suite runs two levels of automated conformance testing:
+  </p>
+  <ul>
+    <li><strong>Level 1 (Synthetic Fixtures):</strong> Tests against known binlog edge cases including GTID gaps, multi-table transactions, position wraps, and spatial types.</li>
+    <li><strong>Level 2 (Docker Conformance):</strong> Spins up official container instances of MySQL 5.7, 8.0, 8.4, and MariaDB 10.6, executes heavy random workloads, and validates Binsight's index against canonical database dumps.</li>
+  </ul>
+</DocsLayout>

@@ -1,0 +1,106 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'step-1-sample-logs', text: 'Step 1: Point to Binlogs' },
+  { depth: 2, slug: 'step-2-launch', text: 'Step 2: Start the Web UI' },
+  { depth: 2, slug: 'step-3-explore', text: 'Step 3: Explore the UI' },
+  { depth: 2, slug: 'step-4-shortcuts', text: 'Step 4: Keyboard Shortcuts' },
+];
+---
+
+<DocsLayout
+  title="Quickstart Guide"
+  description="Inspect your first MySQL or MariaDB binlog directory in under two minutes."
+  currentSlug="quickstart"
+  headings={headings}
+>
+  <p>
+    This guide walks through starting Binsight against a local directory containing one or more MySQL binlog files.
+  </p>
+
+  <h2 id="step-1-sample-logs">Step 1: Point to Binlogs</h2>
+  <p>
+    If you already have binlogs on disk (for example, at <code>/var/lib/mysql</code>, or downloaded from an Amazon RDS S3 binlog backup), locate the folder containing files named <code>mysql-bin.000001</code>, <code>binlog.000002</code>, or similar.
+  </p>
+  <p>
+    Alternatively, if you want to test Binsight with sample data right now, clone the repo and use the included test fixtures:
+  </p>
+  <CodeBlock
+    code={`git clone https://github.com/adrijshikhar/binsight.git
+cd binsight
+binsight serve internal/parser/testdata/`}
+    lang="bash"
+    title="Terminal"
+  />
+
+  <h2 id="step-2-launch">Step 2: Start the Web UI</h2>
+  <p>
+    Run <code>binsight serve</code> followed by the path to the binlog directory:
+  </p>
+  <CodeBlock
+    code="$ binsight serve /var/lib/mysql"
+    lang="bash"
+    title="Terminal"
+  />
+  <p>
+    Binsight will index the files, print its diagnostic banner, and bind to <code>http://127.0.0.1:8080</code>:
+  </p>
+  <CodeBlock
+    code={`[INFO] Discovered 4 binlog files in /var/lib/mysql
+[INFO] SQLite cache initialized at ~/.binsight/index.db
+[INFO] Indexing mysql-bin.000142 (124,591 events)... done in 240ms
+[INFO] Binsight web console running at http://127.0.0.1:8080`}
+    lang="text"
+    title="CLI Output"
+  />
+
+  <h2 id="step-3-explore">Step 3: Explore the UI</h2>
+  <p>
+    Open your browser to <a href="http://localhost:8080" target="_blank" rel="noopener noreferrer">http://localhost:8080</a>. You will see:
+  </p>
+  <ul>
+    <li><strong>Left Sidebar:</strong> List of discovered binlog files sorted chronologically, with file size and event count.</li>
+    <li><strong>Overview Tab:</strong> Summary metrics including total transactions, byte volume, mutation kind distribution (Insert vs. Update vs. Delete), and top mutated tables.</li>
+    <li><strong>Events Tab:</strong> Virtualized stream of decoded binlog events with instant filter by Table, Database, and Event Type.</li>
+    <li><strong>Drawer Inspector:</strong> Click any event row to slide open the forensics drawer containing row-image diffs, byte hex inspector, and metadata.</li>
+  </ul>
+
+  <h2 id="step-4-shortcuts">Step 4: Keyboard Shortcuts</h2>
+  <p>
+    Binsight is built keyboard-first for incident triage:
+  </p>
+  <div class="overflow-x-auto my-4 not-prose">
+    <table class="w-full text-xs font-mono border border-[#2d3b4f] rounded-xl overflow-hidden bg-[#11161d]">
+      <thead class="bg-[#161f2c] border-b border-[#2d3b4f] text-[#8b949e]">
+        <tr>
+          <th class="py-2.5 px-4 text-left">Key</th>
+          <th class="py-2.5 px-4 text-left">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#212c3d] text-[#c9d1d9]">
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">j / k</td>
+          <td class="py-2 px-4">Navigate next / previous event row</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">Enter</td>
+          <td class="py-2 px-4">Open inspection drawer for active row</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">Esc</td>
+          <td class="py-2 px-4">Close active drawer or modal</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">/</td>
+          <td class="py-2 px-4">Focus search filter bar</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">t</td>
+          <td class="py-2 px-4">Toggle between flat events and transaction grouping</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</DocsLayout>

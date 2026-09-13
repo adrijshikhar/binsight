@@ -1,0 +1,94 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'quick-run', text: 'Quick Run with Docker' },
+  { depth: 2, slug: 'compose', text: 'Docker Compose Setup' },
+  { depth: 2, slug: 'air-gapped-isolation', text: 'Air-Gapped Container Hardening' },
+];
+---
+
+<DocsLayout
+  title="Docker & Air-Gapped Setup"
+  description="How to deploy Binsight inside secure Docker containers and isolated offline networks."
+  currentSlug="docker"
+  headings={headings}
+>
+  <p>
+    Binsight is published to the GitHub Container Registry as <code>ghcr.io/adrijshikhar/binsight:latest</code> with multi-architecture support for <code>linux/amd64</code> and <code>linux/arm64</code>.
+  </p>
+
+  <h2 id="quick-run">Quick Run with Docker</h2>
+  <p>
+    Mount your binlog directory as a read-only volume and expose port <code>8080</code>:
+  </p>
+  <CodeBlock
+    code={`docker run -d \\
+  --name binsight \\
+  -p 8080:8080 \\
+  -v /var/log/mysql:/binlogs:ro \\
+  -v binsight-state:/var/lib/binsight \\
+  ghcr.io/adrijshikhar/binsight:latest /binlogs`}
+    lang="bash"
+    title="Terminal"
+  />
+
+  <h2 id="compose">Docker Compose Setup</h2>
+  <p>
+    For long-running staging environments or shared forensic workstations, define a <code>docker-compose.yml</code>:
+  </p>
+  <CodeBlock
+    code={`version: '3.8'
+
+services:
+  binsight:
+    image: ghcr.io/adrijshikhar/binsight:latest
+    container_name: binsight
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - BINSIGHT_BIND=0.0.0.0
+      - BINSIGHT_PORT=8080
+      - BINSIGHT_DATA_DIR=/var/lib/binsight
+    volumes:
+      # Mount binlogs strictly read-only (:ro)
+      - /data/mysql-binlogs:/binlogs:ro
+      # Persist SQLite index cache across container restarts
+      - binsight-state:/var/lib/binsight
+    command: ["/binlogs"]
+
+volumes:
+  binsight-state:`}
+    lang="yaml"
+    title="docker-compose.yml"
+  />
+
+  <h2 id="air-gapped-isolation">Air-Gapped Container Hardening</h2>
+  <p>
+    For defense, banking, or medical audits where zero outbound network access is permitted:
+  </p>
+  <ol>
+    <li>
+      <strong>Disable Container Networking:</strong> If only reading local files on disk, pass <code>--network host</code> or attach only to an internal loopback network.
+    </li>
+    <li>
+      <strong>Read-Only Root Filesystem:</strong> Pass <code>--read-only</code> to Docker. Binsight only requires write access to the mounted state volume at <code>/var/lib/binsight</code>.
+    </li>
+    <li>
+      <strong>Drop All Capabilities:</strong> Pass <code>--cap-drop=ALL</code>. Binsight runs as an unprivileged user and requires no Linux kernel capabilities.
+    </li>
+  </ol>
+  <CodeBlock
+    code={`docker run --rm \\
+  --cap-drop=ALL \\
+  --read-only \\
+  -p 127.0.0.1:8080:8080 \\
+  -v /data/binlogs:/binlogs:ro \\
+  -v /tmp/binsight-state:/var/lib/binsight \\
+  ghcr.io/adrijshikhar/binsight:latest /binlogs`}
+    lang="bash"
+    title="Hardened Execution"
+  />
+</DocsLayout>

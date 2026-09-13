@@ -1,0 +1,268 @@
+---
+import '../styles/global.css';
+import { SITE_CONFIG } from '../data/product';
+import { DOCS_NAVIGATION, type DocItem } from '../data/docs';
+import GitHubBadge from '../components/ui/GitHubBadge.astro';
+import CommandPalette from '../components/ui/CommandPalette.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  currentSlug: string;
+  headings?: { depth: number; slug: string; text: string }[];
+}
+
+const {
+  title,
+  description,
+  currentSlug,
+  headings = [],
+} = Astro.props;
+
+// Flatten docs to compute Prev / Next links
+const allItems: DocItem[] = DOCS_NAVIGATION.flatMap((sec) => sec.items);
+const currentIndex = allItems.findIndex((item) => item.slug === currentSlug);
+const prevItem = currentIndex > 0 ? allItems[currentIndex - 1] : null;
+const nextItem = currentIndex >= 0 && currentIndex < allItems.length - 1 ? allItems[currentIndex + 1] : null;
+
+const currentSection = DOCS_NAVIGATION.find((sec) =>
+  sec.items.some((item) => item.slug === currentSlug)
+);
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — Binsight Docs</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={`https://binsight.adrijshikhar.dev/docs/${currentSlug === 'index' ? '' : currentSlug}`} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={`${title} — Binsight Docs`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Binsight Documentation" />
+    <meta property="og:image" content="https://binsight.adrijshikhar.dev/og.png" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="color-scheme" content="dark" />
+  </head>
+
+  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8]">
+    <!-- Top Sticky Navigation Bar -->
+    <header class="sticky top-0 z-50 border-b border-[#212c3d] bg-[#0b0f14]/90 backdrop-blur-md px-4 sm:px-6 py-3">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <!-- Mobile Sidebar Toggle -->
+          <button
+            id="docs-mobile-sidebar-toggle"
+            class="lg:hidden p-1.5 rounded-md border border-[#2d3b4f] bg-[#161f2c] text-[#8b949e] hover:text-[#f0f6fc]"
+            aria-label="Toggle docs menu"
+          >
+            <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+          <!-- Brand -->
+          <a href="/" class="flex items-center gap-2.5 group">
+            <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] group-hover:border-[#38bdf8] transition-colors">
+              <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                <path d="M4 6h16M4 12h10M4 18h14" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="font-mono font-bold text-base text-[#f0f6fc] tracking-tight group-hover:text-[#38bdf8] transition-colors">binsight</span>
+            <span class="text-xs text-[#8b949e] font-sans font-normal border-l border-[#2d3b4f] pl-2.5 ml-0.5">docs</span>
+          </a>
+        </div>
+
+        <!-- Search & External Links -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button
+            id="cmd-palette-btn"
+            class="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-[#2d3b4f] bg-[#11161d] text-xs text-[#8b949e] hover:text-[#f0f6fc] hover:border-[#38bdf8]/40 transition-colors"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <span class="font-mono text-[11px]">Quick search</span>
+            <kbd class="px-1 py-0.5 text-[9px] font-mono rounded bg-[#161f2c] border border-[#2d3b4f] text-[#c9d1d9]">⌘K</kbd>
+          </button>
+
+          <a
+            href="/"
+            class="text-xs font-medium text-[#8b949e] hover:text-[#f0f6fc] transition-colors hidden md:inline-block px-2"
+          >
+            Home
+          </a>
+
+          <GitHubBadge size="sm" />
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Docs Frame -->
+    <div class="max-w-7xl mx-auto w-full flex-1 flex">
+      <!-- Left Sidebar Navigation -->
+      <aside
+        id="docs-sidebar"
+        class="fixed inset-y-0 left-0 z-40 w-64 pt-16 bg-[#0b0f14] border-r border-[#212c3d] lg:static lg:w-64 lg:pt-8 lg:bg-transparent shrink-0 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out overflow-y-auto px-4 sm:px-6 pb-12"
+      >
+        <div class="space-y-8">
+          {DOCS_NAVIGATION.map((section) => (
+            <div>
+              <h4 class="font-mono text-xs font-semibold text-[#f0f6fc] uppercase tracking-wider mb-3 px-2">
+                {section.title}
+              </h4>
+              <ul class="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = item.slug === currentSlug;
+                  return (
+                    <li>
+                      <a
+                        href={item.href}
+                        class={`block px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                          isActive
+                            ? 'bg-[#161f2c] text-[#38bdf8] font-semibold border-l-2 border-[#38bdf8]'
+                            : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#11161d]'
+                        }`}
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </aside>
+
+      <!-- Sidebar Backdrop for Mobile -->
+      <div
+        id="docs-sidebar-backdrop"
+        class="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm hidden lg:hidden"
+        aria-hidden="true"
+      ></div>
+
+      <!-- Main Reading Content Area -->
+      <main class="flex-1 min-w-0 px-4 sm:px-8 md:px-12 py-8 md:py-12">
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center gap-2 text-xs font-mono text-[#8b949e] mb-6" aria-label="Breadcrumb">
+          <a href="/docs" class="hover:text-[#f0f6fc] transition-colors">Docs</a>
+          {currentSection && (
+            <>
+              <span>/</span>
+              <span>{currentSection.title}</span>
+            </>
+          )}
+          <span>/</span>
+          <span class="text-[#38bdf8] font-medium">{title}</span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="mb-10 pb-6 border-b border-[#212c3d]">
+          <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-[#f0f6fc] mb-3">
+            {title}
+          </h1>
+          <p class="text-base sm:text-lg text-[#8b949e] leading-relaxed">
+            {description}
+          </p>
+        </header>
+
+        <!-- Article Body -->
+        <article class="prose prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[#f0f6fc] prose-h2:text-2xl prose-h2:border-b prose-h2:border-[#212c3d]/60 prose-h2:pb-2 prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3 prose-p:text-[#c9d1d9] prose-p:leading-relaxed prose-code:text-[#38bdf8] prose-code:font-mono prose-code:bg-[#161f2c] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-[#2d3b4f] prose-pre:bg-[#11161d] prose-pre:border prose-pre:border-[#2d3b4f] prose-pre:rounded-xl prose-li:text-[#c9d1d9] prose-strong:text-[#f0f6fc]">
+          <slot />
+        </article>
+
+        <!-- Prev / Next Navigation -->
+        <div class="mt-16 pt-8 border-t border-[#212c3d] grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {prevItem ? (
+            <a
+              href={prevItem.href}
+              class="group flex flex-col p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] hover:border-[#38bdf8]/50 transition-all text-left"
+            >
+              <span class="font-mono text-[10px] text-[#8b949e] uppercase tracking-wider mb-1 flex items-center gap-1">
+                &larr; Previous
+              </span>
+              <span class="text-sm font-semibold text-[#f0f6fc] group-hover:text-[#38bdf8] transition-colors">
+                {prevItem.title}
+              </span>
+            </a>
+          ) : <div />}
+
+          {nextItem ? (
+            <a
+              href={nextItem.href}
+              class="group flex flex-col p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] hover:border-[#38bdf8]/50 transition-all text-right sm:col-start-2"
+            >
+              <span class="font-mono text-[10px] text-[#8b949e] uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
+                Next &rarr;
+              </span>
+              <span class="text-sm font-semibold text-[#f0f6fc] group-hover:text-[#38bdf8] transition-colors">
+                {nextItem.title}
+              </span>
+            </a>
+          ) : <div />}
+        </div>
+      </main>
+
+      <!-- Right Column: Table of Contents (Desktop Only) -->
+      {headings.length > 0 && (
+        <aside class="hidden xl:block w-56 shrink-0 pt-12 pr-4 pl-6 text-xs sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
+          <h4 class="font-mono text-[11px] font-semibold text-[#8b949e] uppercase tracking-wider mb-3">
+            On this page
+          </h4>
+          <ul class="space-y-2 border-l border-[#212c3d] pl-3">
+            {headings.map((h) => (
+              <li class={h.depth === 3 ? 'pl-2.5' : ''}>
+                <a
+                  href={`#${h.slug}`}
+                  class="text-[#8b949e] hover:text-[#38bdf8] transition-colors line-clamp-1 block py-0.5"
+                >
+                  {h.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
+    </div>
+
+    <!-- Command Palette modal -->
+    <CommandPalette />
+
+    <!-- Mobile Sidebar Script -->
+    <script>
+      const btn = document.getElementById('docs-mobile-sidebar-toggle');
+      const sidebar = document.getElementById('docs-sidebar');
+      const backdrop = document.getElementById('docs-sidebar-backdrop');
+
+      function toggleSidebar() {
+        if (!sidebar || !backdrop) return;
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+        if (isOpen) {
+          sidebar.classList.add('-translate-x-full');
+          backdrop.classList.add('hidden');
+        } else {
+          sidebar.classList.remove('-translate-x-full');
+          backdrop.classList.remove('hidden');
+        }
+      }
+
+      btn?.addEventListener('click', toggleSidebar);
+      backdrop?.addEventListener('click', toggleSidebar);
+    </script>
+  </body>
+</html>

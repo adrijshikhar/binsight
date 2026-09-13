@@ -1,0 +1,81 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'what-is-binsight', text: 'What is Binsight?' },
+  { depth: 2, slug: 'the-problem', text: 'Why not mysqlbinlog | less?' },
+  { depth: 2, slug: 'key-capabilities', text: 'Key Capabilities' },
+  { depth: 2, slug: 'operating-modes', text: 'Two Operating Modes' },
+  { depth: 2, slug: 'next-steps', text: 'Next Steps' },
+];
+---
+
+<DocsLayout
+  title="Overview & Introduction"
+  description="Binsight is a local, read-only MySQL and MariaDB binlog visualizer, forensic inspector, and anomaly detection engine."
+  currentSlug="index"
+  headings={headings}
+>
+  <h2 id="what-is-binsight">What is Binsight?</h2>
+  <p>
+    <strong>Binsight</strong> is a zero-dependency, local-first developer tool built in pure Go that turns opaque binary log files into an interactive, visual console. It eliminates the frustration of manually decoding, paging, and grepping through gigabytes of raw binary logs during production incidents, forensic audits, and replication debugging.
+  </p>
+
+  <h2 id="the-problem">Why not mysqlbinlog | less?</h2>
+  <p>
+    For decades, diagnosing binlog data meant running <code>mysqlbinlog -v -v</code> and piping millions of lines into <code>less</code> or custom <code>awk</code> scripts. This workflow suffers from critical limitations:
+  </p>
+  <ul>
+    <li><strong>No Atomic Transaction Grouping:</strong> Events are printed as sequential, flat records. Finding where a transaction began and ended requires manually scanning for <code>XID</code> and <code>COMMIT</code> markers.</li>
+    <li><strong>No Visual Diffing:</strong> <code>UPDATE</code> events print <code>WHERE</code> clauses followed by <code>SET</code> clauses as raw text. Identifying which specific columns changed across 50-column rows is painfully slow.</li>
+    <li><strong>Unchecked Position Wraps:</strong> MySQL binlog positions are represented internally as 32-bit unsigned integers that wrap at <strong>4 GiB (4,294,967,295 bytes)</strong>. Raw CLI tools print wrapped positions, causing timeline miscalculations and broken replication lag metrics.</li>
+    <li><strong>Zero Aggregations:</strong> You cannot easily see the top mutated tables, transaction commit rates, or byte volume throughput without custom external data pipelines.</li>
+  </ul>
+
+  <h2 id="key-capabilities">Key Capabilities</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 not-prose">
+    <div class="p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d]">
+      <h3 class="text-sm font-semibold text-[#f0f6fc] mb-1">Dual-Engine Oracle</h3>
+      <p class="text-xs text-[#8b949e]">Fast native Go decoding tested against canonical <code>mysqlbinlog</code> oracle output for 100% byte fidelity.</p>
+    </div>
+    <div class="p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d]">
+      <h3 class="text-sm font-semibold text-[#f0f6fc] mb-1">64-Bit Monotonic Accumulator</h3>
+      <p class="text-xs text-[#8b949e]">Unwraps 32-bit 4 GiB position rollovers into continuous 64-bit coordinate space automatically.</p>
+    </div>
+    <div class="p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d]">
+      <h3 class="text-sm font-semibold text-[#f0f6fc] mb-1">Row-Image Diffs</h3>
+      <p class="text-xs text-[#8b949e]">Color-coded side-by-side or unified field comparisons for every <code>UPDATE</code>, <code>INSERT</code>, and <code>DELETE</code>.</p>
+    </div>
+    <div class="p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d]">
+      <h3 class="text-sm font-semibold text-[#f0f6fc] mb-1">Live SSE Streaming</h3>
+      <p class="text-xs text-[#8b949e]">Connects as a read-only replication client over MySQL protocol or tails local files via <code>fsnotify</code>.</p>
+    </div>
+  </div>
+
+  <h2 id="operating-modes">Two Operating Modes</h2>
+  <p>
+    Binsight adapts to your operational security posture with two distinct modes:
+  </p>
+  <ol>
+    <li>
+      <strong>Offline File Inspection (Air-Gapped):</strong> Point Binsight to a local directory of <code>mysql-bin.*</code> files or download a snapshot from your backup archive. Binsight indexes the files into a fast, temporary local SQLite cache with <em>zero database credentials</em> required.
+    </li>
+    <li>
+      <strong>Live Replication Streaming:</strong> Connect Binsight directly to a running MySQL or MariaDB primary or replica over standard port 3306. Binsight registers as a read-only replication client (<code>COM_BINLOG_DUMP</code>) and streams real-time change data capture directly into the browser over Server-Sent Events (SSE).
+    </li>
+  </ol>
+
+  <h2 id="next-steps">Next Steps</h2>
+  <p>
+    Ready to inspect your first binlog? Follow the installation and quickstart guides:
+  </p>
+  <div class="flex flex-wrap gap-3 my-4 not-prose">
+    <a href="/docs/installation" class="px-4 py-2 rounded-lg bg-[#38bdf8] text-[#0b0f14] font-semibold text-xs hover:bg-[#38bdf8]/90 transition-colors">
+      Install Binsight &rarr;
+    </a>
+    <a href="/docs/quickstart" class="px-4 py-2 rounded-lg bg-[#161f2c] border border-[#2d3b4f] text-[#f0f6fc] font-medium text-xs hover:border-[#38bdf8] transition-colors">
+      Quickstart Guide &rarr;
+    </a>
+  </div>
+</DocsLayout>
