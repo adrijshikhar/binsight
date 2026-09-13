@@ -28,7 +28,7 @@ jobs:
       releases_created: ${{ steps.release.outputs.releases_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +61,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.target.outputs.ref }}
           fetch-depth: 0
@@ -70,13 +70,13 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
-          go-version: "1.26"
-          cache: true
+          go-version-file: 'go.mod'
+          cache: false
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: "~> v2"
@@ -175,7 +175,7 @@ jobs:
     environment: release # Maintainer Approval Gate
     steps:
       - name: Checkout Homebrew Tap
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: 'adrijshikhar/homebrew-tap'
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
@@ -227,12 +227,6 @@ jobs:
             end
 
             binary "binsight"
-
-            postflight do
-              if system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
-                system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/binsight"]
-              end
-            end
           end
           EOF
 
@@ -276,7 +270,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.verify-asset.outputs.tag }}
 
