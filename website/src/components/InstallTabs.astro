@@ -17,18 +17,18 @@ import CopyButton from './ui/CopyButton.astro';
     </div>
 
     <!-- Step 1: Install -->
-    <div data-anime="reveal" class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 shadow-xl mb-6">
-      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#212c3d]">
+    <div data-anime="reveal" class="rounded-xl border border-[#212c3d] bg-[#10151d] p-4 sm:p-6 shadow-xl mb-6 overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-[#212c3d]">
         <div class="flex items-center gap-2 text-sm font-bold text-[#f0f6fc]">
-          <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono">1</span>
+          <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono shrink-0">1</span>
           <span>Install Binsight</span>
         </div>
         <!-- Tabs Header -->
-        <div class="flex items-center gap-1.5 p-1 bg-[#161f2c] rounded-lg border border-[#212c3d] text-xs font-mono">
+        <div class="grid grid-cols-2 sm:flex sm:items-center gap-1.5 p-1 bg-[#161f2c] rounded-lg border border-[#212c3d] text-xs font-mono w-full sm:w-auto">
           {INSTALL_OPTIONS.map((opt, i) => (
             <button
               type="button"
-              class={`install-tab-btn px-2.5 py-1 rounded transition-colors ${i === 0 ? 'bg-[#212c3d] text-[#f0f6fc] font-semibold' : 'text-[#8b949e] hover:text-[#f0f6fc]'}`}
+              class={`install-tab-btn px-2.5 py-1.5 sm:py-1 rounded text-center transition-colors w-full sm:w-auto ${i === 0 ? 'bg-[#212c3d] text-[#f0f6fc] font-semibold' : 'text-[#8b949e] hover:text-[#f0f6fc]'}`}
               data-tab={opt.id}
             >
               {opt.label}
@@ -41,32 +41,36 @@ import CopyButton from './ui/CopyButton.astro';
       {INSTALL_OPTIONS.map((opt, i) => (
         <div id={`tab-panel-${opt.id}`} class={`install-panel ${i === 0 ? '' : 'hidden'}`}>
           <div class="text-xs text-[#8b949e] mb-3">{opt.description}</div>
-          <div class="flex items-center justify-between rounded-lg border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm">
-            <div class="flex items-center gap-2 overflow-x-auto text-left">
+          <div class="flex items-center justify-between gap-2 rounded-lg border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm">
+            <div class="flex items-center gap-2 overflow-x-auto text-left min-w-0 flex-1">
               <span class="text-[#8b949e] select-none">$</span>
-              <span class="text-[#f0f6fc] select-all">{opt.command}</span>
+              <span class="text-[#f0f6fc] select-all truncate sm:overflow-visible">{opt.command}</span>
             </div>
-            <CopyButton text={opt.command} />
+            <div class="shrink-0">
+              <CopyButton text={opt.command} />
+            </div>
           </div>
         </div>
       ))}
     </div>
 
     <!-- Step 2: Run -->
-    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 shadow-xl">
+    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-4 sm:p-6 shadow-xl overflow-hidden">
       <div class="flex items-center gap-2 text-sm font-bold text-[#f0f6fc] mb-4">
-        <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono">2</span>
+        <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono shrink-0">2</span>
         <span>Point it at your binlog directory</span>
       </div>
-      <div class="flex items-center justify-between rounded-lg border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm mb-4">
-        <div class="flex items-center gap-2 overflow-x-auto text-left">
+      <div class="flex items-center justify-between gap-2 rounded-lg border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm mb-4">
+        <div class="flex items-center gap-2 overflow-x-auto text-left min-w-0 flex-1">
           <span class="text-[#8b949e] select-none">$</span>
-          <span class="text-[#f0f6fc] select-all">{SITE_CONFIG.startCommand}</span>
+          <span class="text-[#f0f6fc] select-all truncate sm:overflow-visible">{SITE_CONFIG.startCommand}</span>
         </div>
-        <CopyButton text={SITE_CONFIG.startCommand} />
+        <div class="shrink-0">
+          <CopyButton text={SITE_CONFIG.startCommand} />
+        </div>
       </div>
 
-      <div class="flex items-center justify-between px-4 py-3 rounded-lg bg-[#161f2c]/70 border border-[#212c3d] text-xs font-mono">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-3 rounded-lg bg-[#161f2c]/70 border border-[#212c3d] text-xs font-mono">
         <span class="text-[#8b949e]">Console URL:</span>
         <a
           href={`http://localhost:${SITE_CONFIG.defaultPort}`}

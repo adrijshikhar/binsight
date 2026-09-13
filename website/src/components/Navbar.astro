@@ -6,17 +6,17 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 <header class="sticky top-0 z-50 border-b border-[#212c3d] bg-[#0b0f14]/90 backdrop-blur-md px-4 sm:px-6 py-3 relative">
   <div class="max-w-6xl mx-auto flex items-center justify-between">
     <!-- Brand -->
-    <a href="#" class="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] rounded">
+    <a href="#" class="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] rounded shrink-0">
       <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] group-hover:border-[#38bdf8] transition-colors">
-        <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-          <path d="M4 6h16M4 12h10M4 18h14" stroke-linecap="round"/>
+        <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+          <path d="M4 17l6-6-6-6M12 19h8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <span class="font-mono font-bold text-lg text-[#f0f6fc] tracking-tight group-hover:text-[#38bdf8] transition-colors">binsight</span>
     </a>
 
-    <!-- Desktop Nav Links -->
-    <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+    <!-- Desktop Nav Links (Visible on lg: 1024px+) -->
+    <nav class="hidden lg:flex items-center gap-6 text-sm font-medium">
       {NAV_LINKS.map((link) => (
         <a
           href={link.href}
@@ -28,11 +28,11 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </nav>
 
     <!-- Actions / Search & GitHub -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- Command Palette Trigger -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <!-- Command Palette Trigger (md: and up) -->
       <button
         id="cmd-palette-btn"
-        class="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#2d3b4f] bg-[#11161d] text-xs text-[#8b949e] hover:text-[#f0f6fc] hover:border-[#38bdf8]/40 transition-colors"
+        class="hidden md:inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#2d3b4f] bg-[#11161d] text-xs text-[#8b949e] hover:text-[#f0f6fc] hover:border-[#38bdf8]/40 transition-colors"
         title="Open Command Palette"
       >
         <svg class="w-3.5 h-3.5 text-[#8b949e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       <!-- Mobile Menu Toggle Button -->
       <button
         id="mobile-menu-btn"
-        class="md:hidden p-1.5 rounded-md border border-[#2d3b4f] bg-[#161f2c] text-[#8b949e] hover:text-[#f0f6fc]"
+        class="lg:hidden p-1.5 rounded-md border border-[#2d3b4f] bg-[#161f2c] text-[#8b949e] hover:text-[#f0f6fc]"
         aria-label="Toggle Navigation Menu"
         aria-expanded="false"
       >
@@ -58,8 +58,8 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </div>
   </div>
 
-  <!-- Mobile Dropdown -->
-  <div id="mobile-menu" class="hidden md:hidden border-t border-[#212c3d] mt-3 pt-3 flex flex-col gap-2">
+  <!-- Mobile / Tablet Dropdown -->
+  <div id="mobile-menu" class="hidden lg:hidden border-t border-[#212c3d] mt-3 pt-3 flex flex-col gap-2">
     {NAV_LINKS.map((link) => (
       <a
         href={link.href}
