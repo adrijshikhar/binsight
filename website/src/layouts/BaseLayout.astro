@@ -38,10 +38,10 @@ const jsonLd = {
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth overflow-x-hidden max-w-full">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
@@ -82,7 +82,7 @@ const jsonLd = {
     <!-- Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
-  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8]">
+  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8] overflow-x-hidden max-w-full">
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#38bdf8] focus:text-[#0b0f14] focus:font-semibold focus:rounded-md focus:shadow-lg"
@@ -100,7 +100,7 @@ const jsonLd = {
     <div class="fixed inset-0 pointer-events-none bg-noise-grain opacity-35 z-0 mix-blend-screen" aria-hidden="true"></div>
 
     <!-- Main App Container -->
-    <div class="relative z-10 flex flex-col flex-1 w-full min-h-screen">
+    <div class="relative z-10 flex flex-col flex-1 w-full min-h-screen overflow-x-hidden max-w-full">
       <slot />
     </div>
 

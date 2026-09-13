@@ -31,10 +31,10 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth overflow-x-hidden max-w-full">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>{title} — Binsight Docs</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={`https://binsight.adrijshikhar.dev/docs/${currentSlug === 'index' ? '' : currentSlug}`} />
@@ -59,7 +59,7 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
     <meta name="color-scheme" content="dark" />
   </head>
 
-  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8] relative">
+  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8] relative overflow-x-hidden max-w-full">
     <!-- Atmospheric Top Lighting Wash -->
     <div class="fixed inset-0 pointer-events-none bg-docs-radiance z-0" aria-hidden="true"></div>
 
@@ -87,8 +87,8 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
           <!-- Brand -->
           <a href="/" class="flex items-center gap-2.5 group">
             <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] group-hover:border-[#38bdf8] transition-colors">
-              <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                <path d="M4 6h16M4 12h10M4 18h14" stroke-linecap="round"/>
+              <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                <path d="M4 17l6-6-6-6M12 19h8" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
             <span class="font-mono font-bold text-base text-[#f0f6fc] tracking-tight group-hover:text-[#38bdf8] transition-colors">binsight</span>

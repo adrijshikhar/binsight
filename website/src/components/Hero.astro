@@ -26,12 +26,12 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 
     <!-- Canonical Install Box with Keyboard Hint -->
     <div data-anime="reveal" class="w-full max-w-xl mb-10">
-      <div class="relative flex items-center justify-between rounded-xl border border-[#2d3b4f] bg-[#11161d] p-3.5 sm:px-5 font-mono text-sm shadow-xl hover:border-[#38bdf8]/50 transition-colors">
-        <div class="flex items-center gap-2 overflow-x-auto text-left py-0.5">
+      <div class="relative flex items-center justify-between gap-2 rounded-xl border border-[#2d3b4f] bg-[#11161d] p-3.5 sm:px-5 font-mono text-sm shadow-xl hover:border-[#38bdf8]/50 transition-colors">
+        <div class="flex items-center gap-2 overflow-x-auto text-left py-0.5 min-w-0 flex-1">
           <span class="text-[#8b949e] select-none">$</span>
-          <span class="text-[#f0f6fc] select-all font-medium">{SITE_CONFIG.heroCommand}</span>
+          <span class="text-[#f0f6fc] select-all font-medium truncate sm:overflow-visible">{SITE_CONFIG.heroCommand}</span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 shrink-0">
           <CopyButton text={SITE_CONFIG.heroCommand} />
         </div>
       </div>
@@ -59,7 +59,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </div>
 
     <!-- Zed-Inspired Interactive Showcase Workbench -->
-    <div data-anime="reveal" class="w-full max-w-5xl rounded-xl border border-[#2d3b4f] bg-[#11161d] p-1.5 sm:p-2 shadow-2xl relative text-left">
+    <div data-anime="reveal" class="w-full max-w-5xl rounded-xl border border-[#2d3b4f] bg-[#11161d] p-1.5 sm:p-2 shadow-2xl relative text-left overflow-hidden">
       <!-- App Chrome Bar -->
       <div class="flex flex-wrap items-center justify-between px-3 py-2.5 bg-[#161f2c] rounded-t-lg border-b border-[#212c3d] text-xs font-mono text-[#8b949e] gap-2">
         <div class="flex items-center gap-1.5">
@@ -83,7 +83,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       </div>
 
       <!-- Workbench Feature Switcher Tabs (Dev-Tool Style) -->
-      <div class="flex border-b border-[#212c3d] bg-[#0f151f] text-xs font-mono overflow-x-auto" id="showcase-tabs" role="tablist">
+      <div class="flex border-b border-[#212c3d] bg-[#0f151f] text-xs font-mono overflow-x-auto max-w-full scrollbar-none" id="showcase-tabs" role="tablist">
         <button
           class="showcase-tab active px-4 py-2.5 border-b-2 border-[#38bdf8] text-[#f0f6fc] font-semibold bg-[#161f2c]/70 flex items-center gap-2 whitespace-nowrap transition-colors"
           data-tab="events"
