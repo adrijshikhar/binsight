@@ -44,8 +44,10 @@ export const SITE_CONFIG = {
 export const NAV_LINKS: NavLink[] = [
   { label: 'Features', href: '#features' },
   { label: 'Diff Spotlight', href: '#diff' },
+  { label: 'Benchmarks', href: '#benchmarks' },
   { label: 'Architecture', href: '#architecture' },
   { label: 'Install', href: '#install' },
+  { label: 'Docs', href: '#install' },
 ];
 
 export const INSTALL_OPTIONS: InstallOption[] = [

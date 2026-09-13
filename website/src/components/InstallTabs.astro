@@ -3,15 +3,21 @@ import { INSTALL_OPTIONS, SITE_CONFIG } from '../data/product';
 import CopyButton from './ui/CopyButton.astro';
 ---
 
-<section id="install" class="py-20 md:py-28 px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
+<section id="install" class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
+  <div class="corner-diamond left-0 top-0"></div>
+  <div class="corner-diamond left-full top-0"></div>
+
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="text-center mb-12">
-      <h2 class="text-xs font-mono uppercase tracking-widest text-[#38bdf8] mb-3">Get Started</h2>
-      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
-        Up and running in seconds.
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
+        <span>ZERO DEPENDENCIES</span>
+      </div>
+      <h3 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
+        <span class="italic">Up and running</span>
+        <span class="font-sans font-bold text-[#38bdf8] px-1">in seconds.</span>
       </h3>
-      <p class="text-base text-[#8b949e]">
+      <p class="text-base text-[#8b949e] font-sans">
         Binsight ships as a single static binary with zero external runtime dependencies.
       </p>
     </div>

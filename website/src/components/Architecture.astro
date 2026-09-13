@@ -2,15 +2,21 @@
 import { SITE_CONFIG } from '../data/product';
 ---
 
-<section id="architecture" class="py-20 md:py-28 px-6 border-t border-[#212c3d] bg-[#0b0f14]/50">
+<section id="architecture" class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/50">
+  <div class="corner-diamond left-0 top-0"></div>
+  <div class="corner-diamond left-full top-0"></div>
+
   <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <div class="text-center max-w-3xl mx-auto mb-16">
-      <h2 class="text-xs font-mono uppercase tracking-widest text-[#58a6ff] mb-3">Under the Hood</h2>
-      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
-        Local-first, high-throughput streaming.
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#58a6ff] mb-4">
+        <span>INTERNALS & PIPELINE</span>
+      </div>
+      <h3 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
+        <span class="italic">Local-first</span>,
+        <span class="font-sans font-bold text-[#58a6ff] px-1">high-throughput streaming.</span>
       </h3>
-      <p class="text-base sm:text-lg text-[#8b949e]">
+      <p class="text-base sm:text-lg text-[#8b949e] font-sans">
         Decode never blocks the user interface. Everything the browser displays queries a fast, local SQLite index.
       </p>
     </div>
