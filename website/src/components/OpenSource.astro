@@ -1,5 +1,6 @@
 ---
 import { SITE_CONFIG } from '../data/product';
+import GitHubBadge from './ui/GitHubBadge.astro';
 ---
 
 <section class="py-20 px-6 border-t border-[#212c3d]">
@@ -17,14 +18,7 @@ import { SITE_CONFIG } from '../data/product';
     </p>
 
     <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-mono">
-      <a
-        href={SITE_CONFIG.repoUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="px-4 py-2 rounded-lg bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] transition-colors flex items-center gap-2"
-      >
-        <span>GitHub Repository</span>
-      </a>
+      <GitHubBadge size="sm" label="Repository" />
       <a
         href={`${SITE_CONFIG.repoUrl}/releases`}
         target="_blank"

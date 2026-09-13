@@ -37,6 +37,8 @@ export const SITE_CONFIG = {
   defaultBind: '127.0.0.1',
   startCommand: 'binsight serve /path/to/binlogs',
   heroCommand: 'brew install adrijshikhar/tap/binsight',
+  starsCount: 1,
+  forksCount: 1,
 };
 
 export const NAV_LINKS: NavLink[] = [

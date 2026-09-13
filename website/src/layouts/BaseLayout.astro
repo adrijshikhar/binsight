@@ -88,5 +88,45 @@ const jsonLd = {
     <div class="relative z-10 flex flex-col flex-1">
       <slot />
     </div>
+
+    <!-- Live GitHub Metrics Sync (session-cached, zero layout shift) -->
+    <script is:inline>
+      (function () {
+        try {
+          var KEY = 'binsight_gh_stats';
+          var now = Date.now();
+          var cached = sessionStorage.getItem(KEY);
+          if (cached) {
+            var data = JSON.parse(cached);
+            if (now - data.time < 1800000 && data.stars != null) {
+              updateDOM(data.stars, data.forks);
+              return;
+            }
+          }
+          fetch('https://api.github.com/repos/adrijshikhar/binsight')
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (repo) {
+              if (repo && typeof repo.stargazers_count === 'number') {
+                updateDOM(repo.stargazers_count, repo.forks_count);
+                sessionStorage.setItem(KEY, JSON.stringify({
+                  stars: repo.stargazers_count,
+                  forks: repo.forks_count,
+                  time: now
+                }));
+              }
+            })
+            .catch(function () {});
+
+          function updateDOM(stars, forks) {
+            document.querySelectorAll('.gh-stars-count').forEach(function (el) {
+              el.textContent = String(stars);
+            });
+            document.querySelectorAll('.gh-forks-count').forEach(function (el) {
+              el.textContent = String(forks);
+            });
+          }
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>
