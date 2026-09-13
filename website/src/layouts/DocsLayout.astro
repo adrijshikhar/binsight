@@ -59,7 +59,16 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
     <meta name="color-scheme" content="dark" />
   </head>
 
-  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8]">
+  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8] relative">
+    <!-- Atmospheric Top Lighting Wash -->
+    <div class="fixed inset-0 pointer-events-none bg-docs-radiance z-0" aria-hidden="true"></div>
+
+    <!-- Technical Blueprint Coordinate Grid -->
+    <div class="fixed inset-0 pointer-events-none bg-docs-grid opacity-60 z-0" aria-hidden="true"></div>
+
+    <!-- Organic Tactile Film Grain -->
+    <div class="fixed inset-0 pointer-events-none bg-noise-grain opacity-30 z-0 mix-blend-screen" aria-hidden="true"></div>
+
     <!-- Top Sticky Navigation Bar -->
     <header class="sticky top-0 z-50 border-b border-[#212c3d] bg-[#0b0f14]/90 backdrop-blur-md px-4 sm:px-6 py-3">
       <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
