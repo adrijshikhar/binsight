@@ -38,14 +38,6 @@ Decode never blocks the UI. Everything the browser reads comes from the index.
 
 ---
 
-## Demo
-
-![binsight demo](docs/demo.gif)
-
-> *Full demo GIF coming soon.*
-
----
-
 ## Features
 
 | Feature | Detail |
