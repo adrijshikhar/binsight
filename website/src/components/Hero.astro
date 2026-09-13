@@ -4,7 +4,7 @@ import CopyButton from './ui/CopyButton.astro';
 import GitHubBadge from './ui/GitHubBadge.astro';
 ---
 
-<section class="relative pt-20 pb-28 md:pt-32 md:pb-44 px-4 sm:px-6 overflow-hidden">
+<section class="relative pt-16 pb-24 md:pt-20 md:pb-36 px-4 sm:px-6 overflow-hidden">
   <!-- Corner Diamond Intersections -->
   <div class="corner-diamond left-0 top-0"></div>
   <div class="corner-diamond left-full top-0"></div>
@@ -20,18 +20,14 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       <span class="text-[#8b949e]">zero-cgo pure go</span>
     </div>
 
-    <!-- Editorial Serif + Monospace Headline -->
-    <h1 data-anime="reveal" class="text-4xl sm:text-6xl md:text-7xl font-serif text-[#f0f6fc] tracking-tight leading-[1.14] mb-8 max-w-4xl text-center">
-      <span class="italic">See what's</span>
-      <span class="font-sans font-extrabold not-italic text-[#38bdf8] px-1">really happening</span>
-      <br class="hidden sm:inline" />
-      <span class="italic">inside your binlogs.</span>
+    <!-- Unified Display Headline (No mixed font families) -->
+    <h1 data-anime="reveal" class="text-4xl sm:text-6xl md:text-7xl font-sans font-extrabold text-[#f0f6fc] tracking-tight leading-[1.12] mb-6 max-w-4xl text-center">
+      See what's <span class="text-[#38bdf8]">really happening</span> inside your binlogs.
     </h1>
 
-    <!-- Subtitle -->
-    <p data-anime="reveal" class="text-base sm:text-lg md:text-xl text-[#8b949e] max-w-3xl mx-auto leading-relaxed mb-12 font-sans">
-      Binsight is a local, read-only visual explorer for MySQL and MariaDB binlogs.
-      Inspect transactions, understand row-level changes, catch anomalies, and follow schema mutations without piping through raw pager output.
+    <!-- Subtitle (18 words, fits in ≤ 20 word budget) -->
+    <p data-anime="reveal" class="text-base sm:text-lg md:text-xl text-[#8b949e] max-w-3xl mx-auto leading-relaxed mb-10 font-sans">
+      A local, read-only visual forensic explorer for MySQL and MariaDB binlogs. Inspect transactions, row diffs, and replication anomalies.
     </p>
 
     <!-- Canonical Install Box with Keyboard Hint -->
@@ -76,7 +72,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
           <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]/70"></span>
           <span class="w-2.5 h-2.5 rounded-full bg-[#eab308]/70"></span>
           <span class="w-2.5 h-2.5 rounded-full bg-[#22c55e]/70"></span>
-          <span class="ml-3 text-[#c9d1d9] font-sans">binsight — http://localhost:8080</span>
+          <span class="ml-3 text-[#c9d1d9] font-sans">binsight: http://localhost:8080</span>
         </div>
         <div class="flex items-center gap-3">
           <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-[#8b949e]">
@@ -131,7 +127,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
         <div id="pane-events" class="showcase-pane block relative">
           <img
             src="/screenshots/events-dark.png"
-            alt="Binsight Events view — grouped MySQL binlog events with transaction bounds and anomaly highlights"
+            alt="Binsight Events view: grouped MySQL binlog events with transaction bounds and anomaly highlights"
             width="1512"
             height="805"
             class="w-full h-auto object-cover"
@@ -154,7 +150,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
         <div id="pane-diff" class="showcase-pane hidden relative">
           <img
             src="/screenshots/diff-dark.png"
-            alt="Binsight Row Diff view — before and after row values with column-level highlighting"
+            alt="Binsight Row Diff view: before and after row values with column-level highlighting"
             width="1512"
             height="805"
             class="w-full h-auto object-cover"
@@ -177,7 +173,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
         <div id="pane-overview" class="showcase-pane hidden relative">
           <img
             src="/screenshots/overview-dark.png"
-            alt="Binsight Overview view — event distribution charts, top tables by traffic, and schema mutation breakdown"
+            alt="Binsight Overview view: event distribution charts, top tables by traffic, and schema mutation breakdown"
             width="1512"
             height="805"
             class="w-full h-auto object-cover"

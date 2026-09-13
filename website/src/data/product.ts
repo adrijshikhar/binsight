@@ -25,7 +25,7 @@ export interface CompatMatrixItem {
 
 export const SITE_CONFIG = {
   name: 'Binsight',
-  title: "Binsight — See what's really happening inside your binlogs",
+  title: "Binsight: See what's really happening inside your binlogs",
   description: 'A local, read-only visual explorer for MySQL and MariaDB binary logs. Inspect transactions, understand row changes, catch anomalies, and trace schema changes without digging through raw mysqlbinlog output.',
   url: 'https://binsight.adrijshikhar.dev',
   repoUrl: 'https://github.com/adrijshikhar/binsight',
