@@ -54,6 +54,7 @@ bin/
 
 # stray screenshot captures
 bv-events.png
+screenshots/
 .superpowers/
 
 # large demo binlog — shipped as a GitHub release asset, not in git
