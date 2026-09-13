@@ -1,0 +1,95 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'homebrew', text: 'Homebrew (macOS & Linux)' },
+  { depth: 2, slug: 'docker', text: 'Docker Container' },
+  { depth: 2, slug: 'curl-install', text: 'One-Line Shell Installer' },
+  { depth: 2, slug: 'tarballs', text: 'Pre-built Tarball Archives' },
+  { depth: 2, slug: 'go-install', text: 'Compile from Source (Go 1.24+)' },
+  { depth: 2, slug: 'verifying-installation', text: 'Verifying Installation' },
+];
+---
+
+<DocsLayout
+  title="Installation"
+  description="How to install the official Binsight binary on macOS, Linux, Docker, or build from source."
+  currentSlug="installation"
+  headings={headings}
+>
+  <p>
+    Binsight is distributed as a single statically-linked binary with zero external dependencies (pure Go, <code>CGO_ENABLED=0</code>). Choose your preferred installation method below.
+  </p>
+
+  <h2 id="homebrew">Homebrew (macOS & Linux)</h2>
+  <p>
+    The recommended installation path for macOS and Linux workstations is via the official Homebrew tap:
+  </p>
+  <CodeBlock
+    code="brew install adrijshikhar/tap/binsight"
+    lang="bash"
+    title="Terminal"
+  />
+  <p class="text-xs text-[#8b949e] mt-2">
+    To upgrade to future releases, run <code>brew update && brew upgrade binsight</code>.
+  </p>
+
+  <h2 id="docker">Docker Container</h2>
+  <p>
+    Multi-architecture Docker images (amd64 and arm64) are published automatically to the GitHub Container Registry (GHCR):
+  </p>
+  <CodeBlock
+    code="docker run --rm -p 8080:8080 -v /path/to/binlogs:/binlogs:ro ghcr.io/adrijshikhar/binsight:latest /binlogs"
+    lang="bash"
+    title="Terminal"
+  />
+  <div class="p-3 my-4 rounded-lg bg-[#161f2c] border border-[#2d3b4f] text-xs text-[#8b949e]">
+    <strong class="text-[#38bdf8]">Security Note:</strong> Notice the <code>:ro</code> read-only mount flag. Binsight is strictly read-only and never writes to or modifies your binlog files.
+  </div>
+
+  <h2 id="curl-install">One-Line Shell Installer</h2>
+  <p>
+    For CI/CD runners, staging VMs, or quick remote testing without Homebrew:
+  </p>
+  <CodeBlock
+    code="curl -fsSL https://raw.githubusercontent.com/adrijshikhar/binsight/main/install.sh | bash"
+    lang="bash"
+    title="Terminal"
+  />
+  <p class="text-xs text-[#8b949e] mt-2">
+    The script auto-detects your OS and processor architecture, downloads the verified GitHub release archive, checks integrity, and installs the binary to <code>/usr/local/bin/binsight</code> (or <code>~/.local/bin</code>).
+  </p>
+
+  <h2 id="tarballs">Pre-built Tarball Archives</h2>
+  <p>
+    Standalone tarballs with SHA-256 checksums are available on the <a href="https://github.com/adrijshikhar/binsight/releases" target="_blank" rel="noopener noreferrer">GitHub Releases</a> page for:
+  </p>
+  <ul>
+    <li><code>binsight_Linux_x86_64.tar.gz</code></li>
+    <li><code>binsight_Linux_arm64.tar.gz</code></li>
+    <li><code>binsight_Darwin_x86_64.tar.gz</code> (macOS Intel)</li>
+    <li><code>binsight_Darwin_arm64.tar.gz</code> (macOS Apple Silicon M-series)</li>
+  </ul>
+
+  <h2 id="go-install">Compile from Source (Go 1.24+)</h2>
+  <p>
+    If you have Go 1.24 or later installed on your machine:
+  </p>
+  <CodeBlock
+    code="go install github.com/adrijshikhar/binsight/cmd/binsight@latest"
+    lang="bash"
+    title="Terminal"
+  />
+
+  <h2 id="verifying-installation">Verifying Installation</h2>
+  <p>
+    Confirm that the binary is installed correctly in your shell <code>$PATH</code>:
+  </p>
+  <CodeBlock
+    code={`$ binsight version
+binsight v0.2.1 (built with go1.24)`}
+    lang="bash"
+    title="Terminal"
+  />
+</DocsLayout>

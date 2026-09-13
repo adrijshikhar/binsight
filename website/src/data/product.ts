@@ -47,7 +47,7 @@ export const NAV_LINKS: NavLink[] = [
   { label: 'Benchmarks', href: '#benchmarks' },
   { label: 'Architecture', href: '#architecture' },
   { label: 'Install', href: '#install' },
-  { label: 'Docs', href: '#install' },
+  { label: 'Docs', href: '/docs' },
 ];
 
 export const INSTALL_OPTIONS: InstallOption[] = [

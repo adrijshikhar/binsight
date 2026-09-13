@@ -1,0 +1,73 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'anomaly-categories', text: 'Detected Anomaly Categories' },
+  { depth: 2, slug: '4gib-position-wraps', text: 'The 4 GiB Position Wrap Bug' },
+  { depth: 2, slug: 'monotonic-accumulator', text: 'How the 64-bit Accumulator Works' },
+  { depth: 2, slug: 'schema-churn', text: 'Catching DDL Schema Churn' },
+];
+---
+
+<DocsLayout
+  title="Anomaly Engine & 4 GiB Wraps"
+  description="Automated detection for huge transactions, replication lag spikes, schema churn, and 4 GiB position wraps."
+  currentSlug="anomalies"
+  headings={headings}
+>
+  <p>
+    Production database incidents often originate from subtle binlog anomalies: a batch job updating 500,000 rows in a single uncommitted transaction, schema alterations flooding the log, or position offset roll-overs breaking replication monitors.
+  </p>
+
+  <h2 id="anomaly-categories">Detected Anomaly Categories</h2>
+  <p>
+    Binsight's analyzer scans binlogs during indexing and flags the following patterns:
+  </p>
+  <ul>
+    <li><strong>Huge Transactions:</strong> Single transactions containing &gt;10,000 row events or spanning &gt;50 MB of binary payload.</li>
+    <li><strong>Long-Running Transactions:</strong> Transactions with elapsed duration &gt;30 seconds between <code>BEGIN</code> and <code>XID</code>, which hold locks and cause replication lag.</li>
+    <li><strong>Schema Churn:</strong> Rapid succession of DDL statements (<code>ALTER TABLE</code>, <code>CREATE TABLE</code>, <code>DROP TABLE</code>) that invalidate replica table maps.</li>
+    <li><strong>Rolled-Back Mutations:</strong> Statements touching non-transactional tables inside an aborting transaction.</li>
+  </ul>
+
+  <h2 id="4gib-position-wraps">The 4 GiB Position Wrap Bug</h2>
+  <p>
+    In MySQL binary log format v4, the event header stores the <code>next_position</code> offset as an <strong>unsigned 32-bit integer (uint32)</strong>:
+  </p>
+  <CodeBlock
+    code="Max uint32 = 4,294,967,295 bytes (4 GiB - 1 byte)"
+    lang="text"
+    title="Specification"
+  />
+  <p>
+    When a single binlog file exceeds 4 GiB (which occurs during large analytical queries, bulk imports, or delayed file rotations), the position counter silently wraps back to zero:
+  </p>
+  <CodeBlock
+    code={`Event at 4,294,967,200 (Length: 150 B)
+  -> Next Position wraps to: 54`}
+    lang="text"
+    title="Position Rollover"
+  />
+  <p>
+    Standard CLI tools and legacy monitoring agents print position <code>54</code>, interpreting the stream as moving backwards in time or resetting to the beginning of the file.
+  </p>
+
+  <h2 id="monotonic-accumulator">How the 64-bit Accumulator Works</h2>
+  <p>
+    Binsight tracks byte offset progression using a monotonic 64-bit coordinate space:
+  </p>
+  <CodeBlock
+    code={`Global 64-Bit Offset = (WrapCount * 4 GiB) + uint32_position`}
+    lang="text"
+    title="Calculation Formula"
+  />
+  <p>
+    When a rollover is detected, Binsight increments the wrap count, preserves continuous monotonic ordering, and surfaces an anomaly badge in the UI showing both the raw wrapped position and the canonical 64-bit offset.
+  </p>
+
+  <h2 id="schema-churn">Catching DDL Schema Churn</h2>
+  <p>
+    When an <code>ALTER TABLE</code> executes on a primary, subsequent row events reference a new internal <code>table_id</code> mapping. Binsight tracks table ID lineage across rotations, allowing you to trace column additions and drops directly within the event timeline.
+  </p>
+</DocsLayout>

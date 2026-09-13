@@ -1,0 +1,73 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'how-streaming-works', text: 'How Streaming Mode Works' },
+  { depth: 2, slug: 'configuration', text: 'Enabling Live Replication' },
+  { depth: 2, slug: 'user-privileges', text: 'Required MySQL User Privileges' },
+  { depth: 2, slug: 'memory-management', text: 'In-Memory Ring Buffer & Spooling' },
+];
+---
+
+<DocsLayout
+  title="Live Replication Streaming"
+  description="Connect Binsight as a read-only replication client to stream binlog events over MySQL protocol."
+  currentSlug="streaming-mode"
+  headings={headings}
+>
+  <p>
+    In addition to reading static files on disk, Binsight can connect directly to an active MySQL 5.7, MySQL 8.0/8.4, or MariaDB 10.6+ cluster and tail changes in real-time as a read-only replica.
+  </p>
+
+  <h2 id="how-streaming-works">How Streaming Mode Works</h2>
+  <p>
+    Binsight connects to the MySQL network socket (port 3306), completes the replica handshake, and issues the standard <code>COM_BINLOG_DUMP</code> (or <code>COM_BINLOG_DUMP_GTID</code>) command. As the database primary writes transactions, it pushes binary log packets directly to Binsight:
+  </p>
+  <ul>
+    <li>Binsight decodes replication packets in memory without writing files to production storage.</li>
+    <li>Events are pushed into the web UI over an HTTP Server-Sent Events (SSE) channel.</li>
+    <li>The web interface displays a pulsing green <code>LIVE</code> indicator with real-time TPS and mutation rates.</li>
+  </ul>
+
+  <h2 id="configuration">Enabling Live Replication</h2>
+  <p>
+    Configure streaming mode using CLI flags or environment variables:
+  </p>
+  <CodeBlock
+    code={`binsight serve \\
+  --stream.enabled=true \\
+  --stream.host=10.0.1.25 \\
+  --stream.port=3306 \\
+  --stream.user=binsight_reader \\
+  --stream.password=SecretPass123 \\
+  --stream.flavor=mysql`}
+    lang="bash"
+    title="Terminal"
+  />
+
+  <h2 id="user-privileges">Required MySQL User Privileges</h2>
+  <p>
+    To connect as a replication client, the database user requires only read-only replication privileges. <strong>No table read or write privileges are needed:</strong>
+  </p>
+  <CodeBlock
+    code={`CREATE USER 'binsight_reader'@'%' IDENTIFIED BY 'SecretPass123';
+GRANT REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'binsight_reader'@'%';
+FLUSH PRIVILEGES;`}
+    lang="sql"
+    title="MySQL Shell"
+  />
+
+  <h2 id="memory-management">In-Memory Ring Buffer & Spooling</h2>
+  <p>
+    To protect the host machine from running out of RAM during sudden high-throughput database bursts, Binsight implements a bounded in-memory spooler governed by:
+  </p>
+  <CodeBlock
+    code="--stream.max-spool-bytes=536870912  # Defaults to 512 MB"
+    lang="bash"
+    title="Terminal"
+  />
+  <p class="text-xs text-[#8b949e] mt-2">
+    When the buffer reaches capacity, oldest read events are flushed to temporary local scratch files and automatically pruned when the session ends.
+  </p>
+</DocsLayout>

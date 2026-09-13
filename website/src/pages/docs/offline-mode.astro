@@ -1,0 +1,72 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'how-it-works', text: 'How Offline Mode Works' },
+  { depth: 2, slug: 'file-naming', text: 'Binlog Discovery & Naming' },
+  { depth: 2, slug: 'sqlite-index', text: 'Zero-Config SQLite Index' },
+  { depth: 2, slug: 'air-gapped', text: 'Air-Gapped Compliance' },
+];
+---
+
+<DocsLayout
+  title="Offline File Inspection"
+  description="How to analyze local binlog files on disk with zero active database connection."
+  currentSlug="offline-mode"
+  headings={headings}
+>
+  <p>
+    Offline Mode is Binsight's core operational posture. It allows site reliability engineers, security auditors, and database administrators to inspect binary logs without requiring network access or read credentials on production database clusters.
+  </p>
+
+  <h2 id="how-it-works">How Offline Mode Works</h2>
+  <p>
+    When you invoke <code>binsight serve /path/to/binlogs</code>:
+  </p>
+  <ol>
+    <li>
+      <strong>Scanner Pass:</strong> Binsight traverses the target directory and parses binlog file headers (verifying the magic 4-byte binlog header <code>0xfe 0x62 0x69 0x6e</code>).
+    </li>
+    <li>
+      <strong>Index Creation:</strong> It creates a lightweight SQLite index file located at <code>~/.binsight/index.db</code> (or the path set via <code>BINSIGHT_DATA_DIR</code>).
+    </li>
+    <li>
+      <strong>Zero-Copy Header Cache:</strong> Only event metadata (file offset, end position, timestamp, server ID, event kind, and table ID) are indexed into SQLite. Large row payloads, before/after images, and raw SQL queries are read lazily from disk on demand when you click a specific event.
+    </li>
+    <li>
+      <strong>File Watching:</strong> If new binlog files are written or rotated into the directory, Binsight's background <code>fsnotify</code> watcher detects changes and updates the event timeline automatically.
+    </li>
+  </ol>
+
+  <h2 id="file-naming">Binlog Discovery & Naming</h2>
+  <p>
+    Binsight recognizes common MySQL and MariaDB binlog naming patterns out of the box:
+  </p>
+  <ul>
+    <li><code>mysql-bin.[0-9]+</code> (e.g. <code>mysql-bin.000142</code>)</li>
+    <li><code>binlog.[0-9]+</code> (MySQL 8.0 default)</li>
+    <li><code>mariadb-bin.[0-9]+</code></li>
+    <li>Gzipped archives if pre-extracted to disk</li>
+  </ul>
+
+  <h2 id="sqlite-index">Zero-Config SQLite Index</h2>
+  <p>
+    The index lives in your user home directory and requires zero configuration. To wipe the cache and force a complete re-index of a directory:
+  </p>
+  <CodeBlock
+    code="binsight serve --clean-index /var/lib/mysql"
+    lang="bash"
+    title="Terminal"
+  />
+
+  <h2 id="air-gapped">Air-Gapped Compliance</h2>
+  <p>
+    In high-compliance or forensic scenarios (SOC2, PCI-DSS, HIPAA, or air-gapped defense networks):
+  </p>
+  <ul>
+    <li>Binsight opens binlog files with <code>O_RDONLY</code> permissions.</li>
+    <li>Binsight makes zero outbound telemetry or analytics calls.</li>
+    <li>The web UI assets (HTML, CSS, JS, fonts) are embedded directly into the Go binary at compile time—no CDN requests are performed during execution.</li>
+  </ul>
+</DocsLayout>

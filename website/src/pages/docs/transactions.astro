@@ -1,0 +1,60 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'transaction-boundaries', text: 'How MySQL Groups Transactions' },
+  { depth: 2, slug: 'xid-boundaries', text: 'XID & Two-Phase Commit Boundaries' },
+  { depth: 2, slug: 'grouped-view', text: 'Flat View vs. Grouped View' },
+  { depth: 2, slug: 'rolled-back-txns', text: 'Identifying Rolled-Back Transactions' },
+];
+---
+
+<DocsLayout
+  title="Transaction Grouping"
+  description="Understand atomic transaction grouping, XID boundaries, and statement sequences."
+  currentSlug="transactions"
+  headings={headings}
+>
+  <p>
+    In raw MySQL binlogs, a single logical transaction (e.g. updating an order, deducting inventory, and inserting an audit log) is written across dozens of individual low-level events: <code>QUERY (BEGIN)</code>, <code>TABLE_MAP</code>, <code>UPDATE_ROWS</code>, <code>WRITE_ROWS</code>, and finally an <code>XID</code> (or <code>COMMIT</code>) event.
+  </p>
+
+  <h2 id="transaction-boundaries">How MySQL Groups Transactions</h2>
+  <p>
+    Scanning binlogs linearly makes it nearly impossible to tell which row changes belonged to which transaction. Binsight reconstructs logical transactions automatically by tracking:
+  </p>
+  <ul>
+    <li><strong>GTID (Global Transaction Identifier):</strong> For clusters running with GTID mode enabled, every transaction is grouped by its unique UUID + sequence number.</li>
+    <li><strong>Anonymous Transactions (XID):</strong> For non-GTID setups, Binsight groups all events starting from <code>BEGIN</code> up to the terminating <code>XID_EVENT</code>.</li>
+  </ul>
+
+  <h2 id="xid-boundaries">XID & Two-Phase Commit Boundaries</h2>
+  <p>
+    The <code>XID</code> event marks the exact instant a transaction achieved two-phase commit durability on the InnoDB storage engine. Binsight correlates all table maps and row mutations that shared the same internal transaction ID:
+  </p>
+  <CodeBlock
+    code={`Transaction #918239 (2 statements, 4 row mutations)
+  ├── TABLE_MAP #108 -> shop.orders
+  ├── UPDATE_ROWS (1 row modified)
+  ├── TABLE_MAP #109 -> shop.order_items
+  ├── WRITE_ROWS (3 rows inserted)
+  └── XID: 918239 (COMMITTED in 14ms)`}
+    lang="text"
+    title="Transaction Timeline"
+  />
+
+  <h2 id="grouped-view">Flat View vs. Grouped View</h2>
+  <p>
+    In the Binsight web console, press the <kbd class="px-1.5 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#38bdf8] font-mono text-xs">t</kbd> key to instantly toggle between:
+  </p>
+  <ul>
+    <li><strong>Flat View:</strong> Shows every individual raw binlog event sequentially, ideal for checking protocol-level markers like <code>FORMAT_DESCRIPTION</code>, <code>ROTATE</code>, and <code>HEARTBEAT</code>.</li>
+    <li><strong>Grouped View:</strong> Collapses all events into expandable transaction cards showing total rows affected, execution latency, and table distribution.</li>
+  </ul>
+
+  <h2 id="rolled-back-txns">Identifying Rolled-Back Transactions</h2>
+  <p>
+    When an explicit <code>ROLLBACK</code> occurs in InnoDB, transactional row changes are not written to the binlog. However, changes to non-transactional tables (such as MyISAM or temporary tables) modified within a rolled-back transaction <em>are</em> recorded. Binsight flags these anomalies with a warning pill.
+  </p>
+</DocsLayout>

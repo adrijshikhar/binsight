@@ -1,0 +1,75 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'binlog-row-images', text: 'Binlog Row Image Formats' },
+  { depth: 2, slug: 'side-by-side-diffs', text: 'Side-by-Side & Unified Diffs' },
+  { depth: 2, slug: 'unaltered-columns', text: 'Filtering Unaltered Columns' },
+  { depth: 2, slug: 'null-handling', text: 'NULL & Blank String Detections' },
+];
+---
+
+<DocsLayout
+  title="Row-Image Diffs"
+  description="Visual diffing for UPDATE, INSERT, and DELETE rows with syntax-highlighted column changes."
+  currentSlug="diffs"
+  headings={headings}
+>
+  <p>
+    When MySQL executes an <code>UPDATE</code> in Row-Based Replication (RBR), it logs a "Before Image" (the row state before modification) and an "After Image" (the row state after modification). Reading this in a terminal requires comparing two blocks of text column-by-column.
+  </p>
+
+  <h2 id="binlog-row-images">Binlog Row Image Formats</h2>
+  <p>
+    MySQL's <code>binlog_row_image</code> setting determines what data appears in the binlog:
+  </p>
+  <ul>
+    <li><code>FULL</code> (default): The binlog logs all columns in both before-image and after-image.</li>
+    <li><code>MINIMAL</code>: The before-image logs only primary key / unique index columns; the after-image logs only modified columns.</li>
+    <li><code>NOBLOB</code>: Similar to FULL, but excludes unreferenced BLOB and TEXT columns.</li>
+  </ul>
+  <p>
+    Binsight automatically parses all three row image modes and correlates the schema table map to give you accurate column names.
+  </p>
+
+  <h2 id="side-by-side-diffs">Side-by-Side & Unified Diffs</h2>
+  <p>
+    Clicking any mutation event in Binsight slides open the Diff View:
+  </p>
+  <div class="my-6 p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] font-mono text-xs not-prose">
+    <div class="flex items-center justify-between pb-3 border-b border-[#212c3d] text-[#8b949e]">
+      <span>Table: shop.orders #108</span>
+      <span class="text-[#38bdf8]">UPDATE_ROWS</span>
+    </div>
+    <div class="grid grid-cols-2 gap-4 pt-3">
+      <div class="p-2.5 rounded bg-[#0b0f14] border border-[#212c3d]">
+        <div class="text-[10px] text-[#8b949e] uppercase mb-1">Before Image</div>
+        <div class="text-[#8b949e]">id: 48382</div>
+        <div class="text-[#e3b341] bg-[#e3b341]/10 px-1 rounded">status: 'PENDING'</div>
+        <div class="text-[#8b949e]">amount: 119.20</div>
+      </div>
+      <div class="p-2.5 rounded bg-[#0b0f14] border border-[#212c3d]">
+        <div class="text-[10px] text-[#8b949e] uppercase mb-1">After Image</div>
+        <div class="text-[#8b949e]">id: 48382</div>
+        <div class="text-[#3fb950] bg-[#3fb950]/10 px-1 rounded font-semibold">status: 'COMPLETED'</div>
+        <div class="text-[#8b949e]">amount: 119.20</div>
+      </div>
+    </div>
+  </div>
+
+  <h2 id="unaltered-columns">Filtering Unaltered Columns</h2>
+  <p>
+    For production tables with 60+ columns, comparing before and after images causes cognitive overload. Binsight includes a toggle to <strong>Hide Unmodified Columns</strong>, instantly filtering down to only the 1 or 2 fields that actually changed during the transaction.
+  </p>
+
+  <h2 id="null-handling">NULL & Blank String Detections</h2>
+  <p>
+    Binsight clearly distinguishes between:
+  </p>
+  <ul>
+    <li>An explicit SQL <code>NULL</code> (rendered as a distinct italicized pill).</li>
+    <li>An empty string <code>""</code>.</li>
+    <li>A zero integer <code>0</code>.</li>
+  </ul>
+</DocsLayout>

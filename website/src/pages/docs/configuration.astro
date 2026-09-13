@@ -1,0 +1,132 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import CodeBlock from '../../components/ui/CodeBlock.astro';
+
+const headings = [
+  { depth: 2, slug: 'cli-flags', text: 'Command Line Flags' },
+  { depth: 2, slug: 'environment-variables', text: 'Environment Variables (BINSIGHT_*)' },
+  { depth: 2, slug: 'precedence', text: 'Configuration Precedence' },
+];
+---
+
+<DocsLayout
+  title="CLI & Environment Variables"
+  description="Complete configuration reference for Binsight command line flags and environment variables."
+  currentSlug="configuration"
+  headings={headings}
+>
+  <p>
+    Binsight follows 12-factor application design principles. Every configuration option can be passed via command line flags or defined as environment variables prefixed with <code>BINSIGHT_</code>.
+  </p>
+
+  <h2 id="cli-flags">Command Line Flags</h2>
+  <div class="overflow-x-auto my-4 not-prose">
+    <table class="w-full text-xs font-mono border border-[#2d3b4f] rounded-xl overflow-hidden bg-[#11161d]">
+      <thead class="bg-[#161f2c] border-b border-[#2d3b4f] text-[#8b949e]">
+        <tr>
+          <th class="py-2.5 px-4 text-left">Flag</th>
+          <th class="py-2.5 px-4 text-left">Default</th>
+          <th class="py-2.5 px-4 text-left">Description</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#212c3d] text-[#c9d1d9]">
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--bind</td>
+          <td class="py-2 px-4">127.0.0.1</td>
+          <td class="py-2 px-4">Network interface to listen on. Use 0.0.0.0 inside containers.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--port</td>
+          <td class="py-2 px-4">8080</td>
+          <td class="py-2 px-4">HTTP server port for the visual console.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--data-dir</td>
+          <td class="py-2 px-4">~/.binsight</td>
+          <td class="py-2 px-4">Directory where the local SQLite index cache is stored.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--clean-index</td>
+          <td class="py-2 px-4">false</td>
+          <td class="py-2 px-4">Wipes the SQLite index on startup and forces a re-index.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--stream.enabled</td>
+          <td class="py-2 px-4">false</td>
+          <td class="py-2 px-4">Enables live MySQL replication streaming over port 3306.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--stream.host</td>
+          <td class="py-2 px-4">127.0.0.1</td>
+          <td class="py-2 px-4">Remote MySQL primary / replica hostname or IP.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--stream.port</td>
+          <td class="py-2 px-4">3306</td>
+          <td class="py-2 px-4">Remote MySQL server port.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--stream.user</td>
+          <td class="py-2 px-4">root</td>
+          <td class="py-2 px-4">Replication user account name.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">--stream.flavor</td>
+          <td class="py-2 px-4">mysql</td>
+          <td class="py-2 px-4">Protocol dialect: <code>mysql</code> or <code>mariadb</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="environment-variables">Environment Variables (BINSIGHT_*)</h2>
+  <p>
+    For Docker and systemd deployments, configure options via environment variables:
+  </p>
+  <div class="overflow-x-auto my-4 not-prose">
+    <table class="w-full text-xs font-mono border border-[#2d3b4f] rounded-xl overflow-hidden bg-[#11161d]">
+      <thead class="bg-[#161f2c] border-b border-[#2d3b4f] text-[#8b949e]">
+        <tr>
+          <th class="py-2.5 px-4 text-left">Environment Variable</th>
+          <th class="py-2.5 px-4 text-left">Equivalent Flag</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#212c3d] text-[#c9d1d9]">
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">BINSIGHT_BIND</td>
+          <td class="py-2 px-4">--bind</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">BINSIGHT_PORT</td>
+          <td class="py-2 px-4">--port</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">BINSIGHT_DATA_DIR</td>
+          <td class="py-2 px-4">--data-dir</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">BINSIGHT_STREAM_ENABLED</td>
+          <td class="py-2 px-4">--stream.enabled</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">BINSIGHT_STREAM_HOST</td>
+          <td class="py-2 px-4">--stream.host</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-4 text-[#38bdf8] font-bold">BINSIGHT_STREAM_PASSWORD</td>
+          <td class="py-2 px-4">--stream.password</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="precedence">Configuration Precedence</h2>
+  <p>
+    When options are defined in multiple locations, Binsight evaluates them in the following order:
+  </p>
+  <ol>
+    <li>Command line flags (highest precedence)</li>
+    <li>Environment variables (<code>BINSIGHT_*</code>)</li>
+    <li>Built-in application defaults (lowest precedence)</li>
+  </ol>
+</DocsLayout>
