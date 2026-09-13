@@ -10,31 +10,36 @@
 /* Underline tabs — matches the Drawer's Mantine Tabs (one tab style app-wide). */
 .tabs {
   display: flex;
-  gap: 4px;
-  padding: 0 14px;
+  gap: 2px;
+  padding: 0 16px;
   border-bottom: 1px solid var(--border);
   background: var(--panel);
 }
 
 .tab {
-  padding: 10px 14px;
+  padding: 10px 16px;
   cursor: pointer;
   color: var(--muted);
   font-size: var(--fs-base);
+  font-weight: 500;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
+  border-radius: 4px 4px 0 0;
   transition:
-    color 150ms,
-    border-color 150ms;
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
 }
 
 .tab:hover:not(.active) {
-  color: var(--text);
+  color: var(--text2);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .tab.active {
   color: var(--text);
   border-bottom-color: var(--accent);
+  background: var(--surface-active);
 }
 
 /* tabpanel wrapper — fills the remaining flex space so inner table-wrap

@@ -14,19 +14,19 @@ const accent: MantineColorsTuple = [
   '#075985',
   '#0c4a6e',
 ]
-// Slate surface ladder for the DARK scheme (Mantine uses this tuple in dark).
+// Dark surface ladder: aligned with the Binsight technical palette.
 // index: 0 text … 5 border, 6 panel2, 7 panel, 8 bg, 9 deepest.
 const dark: MantineColorsTuple = [
-  '#e8eef3',
-  '#b4c2cc',
-  '#8794a0',
-  '#5c6b76',
-  '#3a4650',
-  '#2b343d',
-  '#1f2730',
-  '#161c22',
-  '#0e1216',
-  '#070b0e',
+  '#f0f6fc',
+  '#c9d1d9',
+  '#8b949e',
+  '#6e7681',
+  '#445875',
+  '#2d3b4f',
+  '#212c3d',
+  '#161f2c',
+  '#10151d',
+  '#0b0f14',
 ]
 // Semantic scales (Tailwind Emerald/Amber/Rose/Violet/Teal) — badges use
 // `color={name} variant="light"`; Mantine derives the per-scheme tint.
@@ -118,19 +118,19 @@ export const theme = createTheme({
 })
 
 const darkTokens = {
-  bg: '#0e1216',
-  panel: '#161c22',
-  panel2: '#1f2730',
-  elev: '#26303a',
-  border: '#2b343d',
-  borderSubtle: '#222b33',
-  text: '#e8eef3',
-  text2: '#b4c2cc',
+  bg: '#0b0f14',
+  panel: '#10151d',
+  panel2: '#161f2c',
+  elev: '#1c2736',
+  border: '#2d3b4f',
+  borderSubtle: '#212c3d',
+  text: '#f0f6fc',
+  text2: '#c9d1d9',
   muted: '#8794a0',
   accent: '#38bdf8',
   accentHi: '#7dd3fc',
-  accentSoft: 'rgba(56,189,248,.14)',
-  surfaceActive: '#15303d',
+  accentSoft: 'rgba(56,189,248,.12)',
+  surfaceActive: 'rgba(56,189,248,.08)',
   green: '#34d399',
   orange: '#fbbf24',
   red: '#fb7185',

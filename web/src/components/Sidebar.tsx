@@ -343,8 +343,11 @@ export default function Sidebar({
                   aria-label={f.error ? `${fileName} — error: ${f.error}` : `${fileName} — ${f.state}`}
                   styles={{
                     root: {
-                      paddingLeft: 14,
+                      paddingLeft: 12,
                       paddingRight: 8,
+                      margin: '1px 6px',
+                      borderRadius: 6,
+                      background: isActive ? 'var(--surface-active)' : 'transparent',
                       borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
                     },
                   }}
@@ -357,20 +360,20 @@ export default function Sidebar({
       </Stack>
 
       {/* Bottom nav links */}
-      <Box style={{ borderTop: '1px solid var(--border)', flexShrink: 0 }}>
+      <Box style={{ borderTop: '1px solid var(--border)', flexShrink: 0, padding: '4px 6px' }}>
         <NavLink
           label="Architecture"
           leftSection={<IconDatabase size={14} />}
           onClick={onArchitecture}
           aria-label="Open architecture overview"
-          styles={{ root: { padding: '10px 14px' } }}
+          styles={{ root: { padding: '8px 10px', borderRadius: 6 } }}
         />
         <NavLink
           label="Settings"
           leftSection={<IconSettings size={14} />}
           onClick={onSettings}
           aria-label="Open settings"
-          styles={{ root: { padding: '10px 14px' } }}
+          styles={{ root: { padding: '8px 10px', borderRadius: 6 } }}
         />
       </Box>
     </Stack>

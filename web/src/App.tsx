@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
-import { AppShell, Button, Group, Text, Alert } from '@mantine/core'
+import { AppShell, Button, Group, Text, Alert, Box } from '@mantine/core'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { api } from './lib/api'
 import type { Anomaly, BinlogFile, EventRow, Severity, StreamStatus } from './lib/types'
@@ -364,14 +364,67 @@ export default function App() {
         }}
       >
         <AppShell.Header>
-          <Group h="100%" px="md" gap="sm">
-            <Text fw={700} c="accent" ff="monospace" size="sm" style={{ flexShrink: 0 }}>
-              binsight
-            </Text>
-            <Text c="dimmed" size="sm" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {file ? file.path : 'no file selected'}
-            </Text>
-            <ThemeToggle />
+          <Group h="100%" px="md" justify="space-between" wrap="nowrap">
+            <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+              <Box
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  flexShrink: 0,
+                  padding: '3px 9px',
+                  borderRadius: 6,
+                  background: 'var(--panel2)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: 'var(--accent)',
+                    display: 'inline-block',
+                    boxShadow: '0 0 8px var(--accent)',
+                  }}
+                />
+                <Text fw={700} c="text" ff="monospace" size="xs" style={{ letterSpacing: '0.5px' }}>
+                  binsight
+                </Text>
+              </Box>
+
+              {file && (
+                <Box
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                    background: 'var(--bg)',
+                    border: '1px solid var(--border-subtle)',
+                    minWidth: 0,
+                  }}
+                >
+                  <Text size="xs" c="dimmed" ff="monospace" style={{ flexShrink: 0 }}>
+                    {file.path.split('/').slice(0, -1).join('/') || '/'} /
+                  </Text>
+                  <Text
+                    size="xs"
+                    fw={600}
+                    c="text"
+                    ff="monospace"
+                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  >
+                    {file.path.split('/').pop()}
+                  </Text>
+                </Box>
+              )}
+            </Group>
+
+            <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
+              <ThemeToggle />
+            </Group>
           </Group>
         </AppShell.Header>
 
