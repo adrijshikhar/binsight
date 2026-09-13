@@ -42,6 +42,9 @@ internal/server/dist/*
 web/node_modules/
 web/dist/
 web/tsconfig.tsbuildinfo
+website/node_modules/
+website/dist/
+website/.astro/
 bin/
 
 # GoReleaser output (snapshot / release artifacts)

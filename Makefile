@@ -64,3 +64,11 @@ fmt:
 clean-data:
 	rm -rf "$${BINSIGHT_DATA_DIR:-$$HOME/.binsight}"
 	@echo "cleared index data dir"
+
+# website targets
+website-dev:
+	cd website && bun install && bun run dev
+
+website-build:
+	cd website && bun install && bun run build
+
