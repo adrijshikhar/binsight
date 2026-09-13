@@ -7,7 +7,7 @@
     <div data-anime="reveal" class="text-center max-w-3xl mx-auto mb-20">
       <h2 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Stop reading binlogs</span>
-        <span class="font-sans font-bold text-[#ef4444] px-1">like this.</span>
+        <span class="font-sans font-bold text-[#c9d1d9] px-1">in raw text pagers.</span>
       </h2>
       <p class="text-base sm:text-lg text-[#8b949e] leading-relaxed font-sans">
         Paging through gigabytes of raw decoder text in a terminal during a 2 AM production incident is slow, error-prone, and painful.
@@ -17,10 +17,10 @@
     <!-- Comparison Grid -->
     <div data-anime="stagger" class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-stretch">
       <!-- Old Way: Raw mysqlbinlog pager -->
-      <div class="flex flex-col rounded-xl border border-[#ef4444]/30 bg-[#10151d] overflow-hidden shadow-xl">
+      <div class="flex flex-col rounded-xl border border-[#2d3b4f] bg-[#10151d] overflow-hidden shadow-xl">
         <div class="flex items-center justify-between px-4 py-2.5 bg-[#161f2c] border-b border-[#212c3d] text-xs font-mono">
-          <div class="flex items-center gap-2 text-[#ef4444]">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span>
+          <div class="flex items-center gap-2 text-[#8b949e]">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#8b949e]/60"></span>
             <span>terminal (mysqlbinlog | less)</span>
           </div>
           <span class="text-[#8b949e]">1.2 GB text stream</span>
@@ -45,9 +45,9 @@
           <div class="text-[#6e7681] mt-3">(END) - press q to exit, / to search regex</div>
         </div>
         <div class="px-4 py-3 bg-[#161f2c]/50 border-t border-[#212c3d] text-xs text-[#8b949e] flex items-center justify-between">
-          <span class="text-[#ef4444]">✕ No transaction grouping</span>
-          <span class="text-[#ef4444]">✕ No diff visualization</span>
-          <span class="text-[#ef4444]">✕ Manual awk scripts</span>
+          <span class="text-[#8b949e]">No transaction grouping</span>
+          <span class="text-[#8b949e]">No diff visualization</span>
+          <span class="text-[#8b949e]">Manual text scanning</span>
         </div>
       </div>
 
