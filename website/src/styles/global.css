@@ -30,23 +30,5 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Technical Blueprint Utilities */
-.corner-diamond {
-  position: absolute;
-  width: 7px;
-  height: 7px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  border: 1px solid #2d3b4f;
-  background-color: #0b0f14;
-  z-index: 20;
-}
 
-.ruler-pattern {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    rgba(45, 59, 79, 0.4) 0px,
-    rgba(45, 59, 79, 0.4) 1px,
-    transparent 1px,
-    transparent 16px
-  );
-}
+
