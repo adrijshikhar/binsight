@@ -109,7 +109,7 @@ export default function OverviewView({
   return (
     <Stack p="md" gap="md" style={{ width: '100%', overflowY: 'auto' }}>
       <Group justify="space-between" align="flex-start" gap="sm">
-        <Title order={2} ff="monospace" c="blue.4" style={{ overflowWrap: 'anywhere' }}>
+        <Title order={2} ff="monospace" c="var(--accent)" style={{ overflowWrap: 'anywhere' }}>
           {file.path.split('/').pop()}
         </Title>
         <Button

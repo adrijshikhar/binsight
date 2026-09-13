@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
+import { useState, useEffect } from 'react'
+import { MantineProvider, Switch } from '@mantine/core'
 import EventsView from './EventsView'
 import { SSEContext, type IndexEvent } from '../lib/sse'
 import type { EventRow, Severity } from '../lib/types'
@@ -68,14 +69,38 @@ function baseProps(fileId = ACTIVE_FILE) {
   }
 }
 
-function wrapEv(ev: IndexEvent | null, fileId = ACTIVE_FILE) {
+function EventsViewHarness({ ev, fileId = ACTIVE_FILE }: { ev: IndexEvent | null; fileId?: number }) {
+  const [live, setLive] = useState(false)
+  const [currentFileId, setCurrentFileId] = useState(fileId)
+
+  useEffect(() => {
+    if (fileId !== currentFileId) {
+      setCurrentFileId(fileId)
+      setLive(false)
+    }
+  }, [fileId, currentFileId])
+
   return (
     <MantineProvider defaultColorScheme="dark">
       <SSEContext.Provider value={ev}>
-        <EventsView {...baseProps(fileId)} />
+        <Switch
+          checked={live}
+          onChange={(e) => setLive(e.currentTarget.checked)}
+          label="Live"
+          aria-label="Follow new events as they are indexed"
+        />
+        <EventsView
+          {...baseProps(fileId)}
+          live={live}
+          onToggleLive={setLive}
+        />
       </SSEContext.Provider>
     </MantineProvider>
   )
+}
+
+function wrapEv(ev: IndexEvent | null, fileId = ACTIVE_FILE) {
+  return <EventsViewHarness ev={ev} fileId={fileId} />
 }
 
 function renderView(ev: IndexEvent | null, fileId = ACTIVE_FILE) {

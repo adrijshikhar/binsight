@@ -65,9 +65,12 @@ export interface EventsViewProps {
   posSeverity: Map<number, Severity>
   onConsumeFilters: () => void
   onRemoveTxn: (id: number) => void
+  live: boolean
+  onToggleLive: (live: boolean) => void
 }
 
 export default function EventsView(props: EventsViewProps) {
+  const { live, onToggleLive } = props
   const [filters, setFilters] = useState<Filters>(initialFilters)
   const [events, setEvents] = useState<EventRow[]>([])
   const [nextCursor, setNextCursor] = useState(0)
@@ -76,7 +79,6 @@ export default function EventsView(props: EventsViewProps) {
   const [collapsed, setCollapsed] = useState<Set<number>>(new Set())
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
-  const [live, setLive] = useState(false)
   // refs forwarded into EventsTable so the parent can drive virtualizer + scroll
   const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element> | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -132,11 +134,6 @@ export default function EventsView(props: EventsViewProps) {
   // Reset collapsed groups on file switch
   useEffect(() => {
     setCollapsed(new Set())
-  }, [props.fileId])
-
-  // Live/follow is per-file: switching files must reset it
-  useEffect(() => {
-    setLive(false)
   }, [props.fileId])
 
   // Sync filter state to URL
@@ -506,8 +503,6 @@ export default function EventsView(props: EventsViewProps) {
   return (
     <>
       <FilterBar
-        live={live}
-        onToggleLive={setLive}
         filters={filters}
         grouped={grouped}
         txnIds={props.txnIds}

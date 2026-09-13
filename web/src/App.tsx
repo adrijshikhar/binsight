@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
-import { AppShell, Button, Group, Text, Alert, Box } from '@mantine/core'
+import { AppShell, Button, Group, Text, Alert, Box, Switch, Tooltip } from '@mantine/core'
 import { IconAlertTriangle } from '@tabler/icons-react'
 import { api } from './lib/api'
 import type { Anomaly, BinlogFile, EventRow, Severity, StreamStatus } from './lib/types'
@@ -71,8 +71,14 @@ export default function App() {
   const [lastIndexEvent, setLastIndexEvent] = useState<IndexEvent | null>(null)
   const [streamStatus, setStreamStatus] = useState<StreamStatus | null>(null)
   const [anomalies, setAnomalies] = useState<Anomaly[]>([])
+  const [live, setLive] = useState(false)
   // Monotonic SSE sequence; starts at 1 on first event (0 = "no event yet" sentinel).
   const sseSeqRef = useRef(0)
+
+  // Live follow mode is per-file: reset when active file changes
+  useEffect(() => {
+    setLive(false)
+  }, [fileId])
 
   // Sidebar layout: collapsed (icon rail) + expanded width, persisted to
   // localStorage so the layout survives reloads.
@@ -366,60 +372,22 @@ export default function App() {
       >
         <AppShell.Header>
           <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-            <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
-              <Box
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  flexShrink: 0,
-                  padding: '3px 9px',
-                  borderRadius: 6,
-                  background: 'var(--panel2)',
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <span
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    background: 'var(--accent)',
-                    display: 'inline-block',
-                    boxShadow: '0 0 8px var(--accent)',
-                  }}
-                />
-                <Text fw={700} c="text" ff="monospace" size="xs" style={{ letterSpacing: '0.5px' }}>
-                  binsight
-                </Text>
-              </Box>
+            <Group gap="md" wrap="nowrap" style={{ minWidth: 0 }}>
+              <Text fw={700} c="var(--accent)" ff="monospace" size="sm" style={{ letterSpacing: '0.5px', flexShrink: 0 }}>
+                binsight
+              </Text>
 
               {file && (
-                <Box
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '2px 8px',
-                    borderRadius: 6,
-                    background: 'var(--bg)',
-                    border: '1px solid var(--border-subtle)',
-                    minWidth: 0,
-                  }}
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  ff="monospace"
+                  style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                 >
-                  <Text size="xs" c="dimmed" ff="monospace" style={{ flexShrink: 0 }}>
-                    {file.path.split('/').slice(0, -1).join('/') || '/'} /
-                  </Text>
-                  <Text
-                    size="xs"
-                    fw={600}
-                    c="text"
-                    ff="monospace"
-                    style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                  >
-                    {file.path.split('/').pop()}
-                  </Text>
-                </Box>
+                  {file.path.split('/').slice(0, -1).join('/') || '/'}
+                  <span style={{ margin: '0 5px', opacity: 0.6 }}>/</span>
+                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>{file.path.split('/').pop()}</span>
+                </Text>
               )}
             </Group>
 
@@ -543,6 +511,40 @@ export default function App() {
                     {tabLabel(t)}
                   </div>
                 ))}
+                {tab === 'events' && (
+                  <div className={styles.tabLiveControl}>
+                    <Tooltip
+                      label={
+                        live
+                          ? 'Stop following new events (Live mode is ON)'
+                          : 'Follow new events as they are indexed (Live mode is OFF)'
+                      }
+                      withArrow
+                      position="bottom-end"
+                      offset={8}
+                    >
+                      <Switch
+                        checked={live}
+                        onChange={(e) => setLive(e.currentTarget.checked)}
+                        label="Live"
+                        size="xs"
+                        color="green"
+                        aria-label="Follow new events as they are indexed"
+                        styles={{
+                          root: { display: 'flex', alignItems: 'center' },
+                          label: {
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            letterSpacing: '0.04em',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            color: live ? 'var(--text)' : 'var(--muted)',
+                          },
+                        }}
+                      />
+                    </Tooltip>
+                  </div>
+                )}
               </div>
             )}
             {files.length === 0 && !filesErr && !FULL_PAGE_TABS.has(tab) && (
@@ -612,6 +614,8 @@ export default function App() {
                     setTypeFilter('')
                   }}
                   onRemoveTxn={(id) => setTxnIds((ids) => ids.filter((i) => i !== id))}
+                  live={live}
+                  onToggleLive={setLive}
                 />
               </div>
             )}

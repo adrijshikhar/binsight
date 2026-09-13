@@ -67,3 +67,18 @@
 [role='tabpanel']:focus:not(:focus-visible) {
   outline: none;
 }
+
+/* Far-right control slot in the tab strip (e.g. Live toggle) */
+.tabLiveControl {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+/* Agentation visual-review widget: keep above table controls and docked cleanly */
+:global(.agentation-toolbar) {
+  bottom: 14px !important;
+  right: 18px !important;
+  z-index: 1000 !important;
+}

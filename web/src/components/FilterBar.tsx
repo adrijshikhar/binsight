@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import type React from 'react'
-import { Group, MultiSelect, TextInput, Button, SegmentedControl, Pill, Stack, Box, Switch, Tooltip, Divider } from '@mantine/core'
+import { Group, MultiSelect, TextInput, Button, SegmentedControl, Pill, Stack, Box } from '@mantine/core'
 import { useHotkeys } from '@mantine/hooks'
 import { IconSearch } from '@tabler/icons-react'
 
@@ -49,8 +49,6 @@ export interface FilterBarProps {
   onToggleGrouped: () => void
   onJump: (pos: number) => void
   searchRef?: React.RefObject<HTMLInputElement | null>
-  live?: boolean
-  onToggleLive?: (live: boolean) => void
 }
 
 export default function FilterBar(props: FilterBarProps) {
@@ -77,41 +75,6 @@ export default function FilterBar(props: FilterBarProps) {
   return (
     <Stack gap={0}>
       <Group gap="xs" px="md" py={6} align="center" wrap="wrap" style={{ borderBottom: '1px solid var(--border)' }}>
-        {props.onToggleLive !== undefined && (
-          <>
-            <Tooltip
-              label={
-                props.live
-                  ? 'Stop following new events (Live mode is ON)'
-                  : 'Follow new events as they are indexed (Live mode is OFF)'
-              }
-              withArrow
-              position="bottom-start"
-              offset={8}
-            >
-              <Switch
-                checked={props.live}
-                onChange={(e) => props.onToggleLive?.(e.currentTarget.checked)}
-                label="Live"
-                size="xs"
-                color="green"
-                aria-label="Follow new events as they are indexed"
-                styles={{
-                  root: { display: 'flex', alignItems: 'center' },
-                  label: {
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                  },
-                }}
-              />
-            </Tooltip>
-            <Divider orientation="vertical" size="xs" h={20} />
-          </>
-        )}
         <MultiSelect
           aria-label="type"
           placeholder="type"

@@ -107,6 +107,7 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
           gap: '12px',
+          maxWidth: 1200,
         }}
       >
         {tables.map((t) => {

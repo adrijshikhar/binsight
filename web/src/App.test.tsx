@@ -167,4 +167,23 @@ describe('App — AppShell + tab routing', () => {
       expect(labels).not.toContain('Transactions')
     })
   })
+
+  it('renders Live switch on tab strip only when Events tab is active', async () => {
+    await renderApp()
+    // Overview tab is active by default; Live switch must not be present
+    expect(screen.queryByRole('switch', { name: /follow new events as they are indexed/i })).toBeNull()
+
+    // Switch to Events tab
+    const eventsTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Events')!
+    fireEvent.click(eventsTab)
+
+    // Live switch should now appear in the tab strip
+    const switchEl = screen.getByRole('switch', { name: /follow new events as they are indexed/i })
+    expect(switchEl).toBeTruthy()
+    expect((switchEl as HTMLInputElement).checked).toBe(false)
+
+    // Toggling the switch updates its state
+    fireEvent.click(switchEl)
+    expect((switchEl as HTMLInputElement).checked).toBe(true)
+  })
 })
