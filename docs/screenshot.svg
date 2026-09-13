@@ -10,7 +10,7 @@
   <!-- topbar -->
   <rect width="1100" height="40" fill="#161b22"/>
   <line x1="0" y1="40" x2="1100" y2="40" stroke="#30363d"/>
-  <text x="16" y="25" class="mono acc" font-size="14" font-weight="700">binlog-viewer</text>
+  <text x="16" y="25" class="mono acc" font-size="14" font-weight="700">binsight</text>
   <text x="150" y="25" class="muted" font-size="12">/data ▸ binlog.000003</text>
 
   <!-- sidebar -->
