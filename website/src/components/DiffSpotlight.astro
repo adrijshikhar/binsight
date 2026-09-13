@@ -1,0 +1,67 @@
+---
+---
+
+<section id="diff" class="py-20 md:py-28 px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <!-- Text content -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#38bdf8]/30 bg-[#38bdf8]/10 text-xs font-mono text-[#38bdf8]">
+          Dual-Engine Oracle
+        </div>
+
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight leading-tight">
+          Decode with complete confidence.
+        </h2>
+
+        <p class="text-base text-[#8b949e] leading-relaxed">
+          MySQL's binary log format has evolved over 25 years—GTIDs, row formats, charset alterations, and partial JSON updates. How can you be sure a third-party parser decoded every byte faithfully?
+        </p>
+
+        <p class="text-base text-[#8b949e] leading-relaxed">
+          Binsight introduces a <strong class="text-[#f0f6fc]">Dual-Engine Diff View</strong>: it runs its ultra-fast pure-Go parser alongside the official <code class="text-[#38bdf8] font-mono">mysqlbinlog</code> utility as an independent oracle.
+        </p>
+
+        <div class="space-y-3 pt-2">
+          <div class="flex items-start gap-3">
+            <span class="text-[#3fb950] font-bold mt-0.5">✓</span>
+            <div class="text-sm text-[#c9d1d9]">
+              <strong class="text-[#f0f6fc]">Per-field divergence highlighting:</strong> Any disagreement in decoded database, table, or column payload is visually flagged in red.
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="text-[#3fb950] font-bold mt-0.5">✓</span>
+            <div class="text-sm text-[#c9d1d9]">
+              <strong class="text-[#f0f6fc]">Zero external dependency:</strong> Runs pure Go by default; activates the <code class="text-[#38bdf8] font-mono">mysqlbinlog</code> oracle whenever the binary is present on your system.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screenshot Showcase -->
+      <div class="lg:col-span-7">
+        <div class="rounded-xl border border-[#2d3b4f] bg-[#11161d] p-1.5 sm:p-2 shadow-2xl relative group">
+          <div class="flex items-center justify-between px-3 py-2 bg-[#161f2c] rounded-t-lg border-b border-[#212c3d] text-xs font-mono text-[#8b949e]">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#eab308]/70"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#22c55e]/70"></span>
+              <span class="ml-3 text-[#c9d1d9] font-sans">Diff Drawer — go-mysql vs mysqlbinlog</span>
+            </div>
+            <span class="text-[#e3b341]">1 disagreement detected</span>
+          </div>
+          <div class="overflow-hidden rounded-b-lg bg-[#0b0f14]">
+            <img
+              src="/screenshots/diff-dark.png"
+              alt="Binsight Diff view showing side-by-side go-mysql and mysqlbinlog event decoder comparison"
+              width="1512"
+              height="805"
+              class="w-full h-auto object-cover rounded-b-lg"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

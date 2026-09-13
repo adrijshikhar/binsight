@@ -1,0 +1,44 @@
+---
+import { SITE_CONFIG } from '../data/product';
+import CopyButton from './ui/CopyButton.astro';
+---
+
+<section class="py-24 px-6 border-t border-[#212c3d] bg-gradient-to-b from-[#0b0f14] to-[#11161d] text-center">
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-3xl sm:text-5xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+      Your binlogs already have the answer.
+    </h2>
+    <p class="text-lg text-[#8b949e] mb-10">
+      Binsight helps you find it.
+    </p>
+
+    <!-- Canonical command -->
+    <div class="max-w-lg mx-auto mb-8">
+      <div class="flex items-center justify-between rounded-xl border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm shadow-xl">
+        <div class="flex items-center gap-2 overflow-x-auto text-left">
+          <span class="text-[#8b949e] select-none">$</span>
+          <span class="text-[#f0f6fc] select-all">{SITE_CONFIG.heroCommand}</span>
+        </div>
+        <CopyButton text={SITE_CONFIG.heroCommand} />
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex flex-wrap items-center justify-center gap-4">
+      <a
+        href="#install"
+        class="px-6 py-3 rounded-lg bg-[#38bdf8] text-[#0b0f14] font-semibold text-sm hover:bg-[#38bdf8]/90 transition-all shadow-lg shadow-[#38bdf8]/15"
+      >
+        Get Started
+      </a>
+      <a
+        href={SITE_CONFIG.repoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-6 py-3 rounded-lg bg-[#151d28] border border-[#2d3b4f] hover:border-[#58a6ff] text-[#f0f6fc] font-medium text-sm transition-all"
+      >
+        View on GitHub
+      </a>
+    </div>
+  </div>
+</section>

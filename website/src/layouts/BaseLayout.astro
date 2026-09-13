@@ -1,0 +1,87 @@
+---
+import '../styles/global.css';
+import { SITE_CONFIG } from '../data/product';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = SITE_CONFIG.title,
+  description = SITE_CONFIG.description,
+} = Astro.props;
+
+const canonicalUrl = SITE_CONFIG.url;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Binsight',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  description: description,
+  url: canonicalUrl,
+  codeRepository: SITE_CONFIG.repoUrl,
+  license: 'https://opensource.org/licenses/MIT',
+  author: {
+    '@type': 'Person',
+    name: SITE_CONFIG.author,
+    url: SITE_CONFIG.authorUrl,
+  },
+};
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content="Binsight" />
+    <meta property="og:image" content={`${canonicalUrl}/screenshots/events-dark.png`} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={`${canonicalUrl}/screenshots/events-dark.png`} />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#0b0f14" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8]">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#38bdf8] focus:text-[#0b0f14] focus:font-semibold focus:rounded-md focus:shadow-lg"
+    >
+      Skip to content
+    </a>
+
+    <!-- Subtle radial grid texture -->
+    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25 z-0"></div>
+
+    <div class="relative z-10 flex flex-col flex-1">
+      <slot />
+    </div>
+  </body>
+</html>

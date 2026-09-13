@@ -1,169 +1,32 @@
 ---
-import '../styles/global.css';
-
-const title = "Binsight — See what's really happening inside your binlogs";
-const description = "A local, read-only visual explorer for MySQL and MariaDB binary logs. Inspect transactions, understand row changes, catch anomalies, and trace schema changes without digging through raw mysqlbinlog output.";
-const repoUrl = "https://github.com/adrijshikhar/binsight";
-const installCmd = "brew install adrijshikhar/tap/binsight";
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Comparison from '../components/Comparison.astro';
+import FeatureGrid from '../components/FeatureGrid.astro';
+import DiffSpotlight from '../components/DiffSpotlight.astro';
+import SafetyTrust from '../components/SafetyTrust.astro';
+import Architecture from '../components/Architecture.astro';
+import CompatibilityMatrix from '../components/CompatibilityMatrix.astro';
+import InstallTabs from '../components/InstallTabs.astro';
+import OpenSource from '../components/OpenSource.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Footer from '../components/Footer.astro';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href="https://binsight.adrijshikhar.dev/" />
-
-    <!-- Open Graph -->
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content="https://binsight.adrijshikhar.dev/" />
-    <meta property="og:type" content="website" />
-
-    <!-- Theme -->
-    <meta name="theme-color" content="#0b0f14" />
-  </head>
-  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col justify-between selection:bg-[#38bdf8]/20 selection:text-[#38bdf8]">
-    <!-- Background grid decoration -->
-    <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25"></div>
-
-    <!-- Header -->
-    <header class="relative z-10 border-b border-[#212c3d] bg-[#0b0f14]/80 backdrop-blur-md px-6 py-4">
-      <div class="max-w-5xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="font-mono font-bold text-lg text-[#38bdf8] tracking-tight">binsight</span>
-          <span class="text-xs px-2 py-0.5 rounded border border-[#2d3b4f] bg-[#151d28] text-[#8b949e] font-mono">v0.2.1</span>
-        </div>
-        <div class="flex items-center gap-4">
-          <a
-            href={repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-xs font-mono text-[#8b949e] hover:text-[#f0f6fc] transition-colors flex items-center gap-1.5"
-          >
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-            </svg>
-            GitHub
-          </a>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main hero -->
-    <main class="relative z-10 max-w-4xl mx-auto px-6 py-24 text-center flex-1 flex flex-col items-center justify-center">
-      <!-- Tag -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-8">
-        <span class="w-1.5 h-1.5 rounded-full bg-[#3fb950] animate-pulse"></span>
-        mysqlbinlog, but visual.
-      </div>
-
-      <!-- Main Headline -->
-      <h1 class="text-4xl sm:text-6xl font-extrabold text-[#f0f6fc] tracking-tight leading-tight mb-6">
-        See what's <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#38bdf8] to-[#58a6ff]">really happening</span> inside your binlogs.
-      </h1>
-
-      <!-- Subtitle -->
-      <p class="text-base sm:text-lg text-[#8b949e] max-w-2xl mx-auto leading-relaxed mb-10">
-        A local, read-only visual explorer for MySQL and MariaDB binary logs.
-        Inspect transactions, row-level diffs, hex forensics, and live replication streams without manually decoding raw pager output.
-      </p>
-
-      <!-- Install box -->
-      <div class="w-full max-w-xl mb-8">
-        <div class="relative flex items-center justify-between rounded-lg border border-[#2d3b4f] bg-[#11161d] px-4 py-3 font-mono text-sm shadow-xl">
-          <div class="flex items-center gap-2 overflow-x-auto text-left">
-            <span class="text-[#8b949e] select-none">$</span>
-            <span class="text-[#f0f6fc] select-all">{installCmd}</span>
-          </div>
-          <button
-            id="copy-btn"
-            class="ml-3 px-2.5 py-1 text-xs rounded bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#8b949e] hover:text-[#f0f6fc] transition-colors flex items-center gap-1.5 select-none shrink-0"
-            data-command={installCmd}
-          >
-            <span id="copy-text">Copy</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- CTAs -->
-      <div class="flex flex-wrap items-center justify-center gap-4">
-        <a
-          href={repoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="px-5 py-2.5 rounded-lg bg-[#38bdf8] text-[#0b0f14] font-semibold text-sm hover:bg-[#38bdf8]/90 transition-colors flex items-center gap-2 shadow-lg shadow-[#38bdf8]/10"
-        >
-          View on GitHub
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-          </svg>
-        </a>
-        <a
-          href="https://adrijshikhar.dev/blogs/building-a-pure-go-binlog-analyzer"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="px-5 py-2.5 rounded-lg bg-[#151d28] border border-[#2d3b4f] hover:border-[#32425a] text-[#f0f6fc] font-medium text-sm transition-colors"
-        >
-          Read Architecture Deep Dive →
-        </a>
-      </div>
-
-      <!-- Local trust badge -->
-      <div class="mt-16 flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-[#8b949e]">
-        <div class="flex items-center gap-1.5">
-          <span class="text-[#3fb950]">✓</span> Local by design
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="text-[#3fb950]">✓</span> Read-only by default
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="text-[#3fb950]">✓</span> Zero CGO / Embedded SQLite
-        </div>
-        <div class="flex items-center gap-1.5">
-          <span class="text-[#3fb950]">✓</span> MySQL 5.5–8.4 & MariaDB 10.6–11.4
-        </div>
-      </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="relative z-10 border-t border-[#212c3d] px-6 py-6 text-xs text-[#8b949e]">
-      <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          Binsight is open-source under the <a href={`${repoUrl}/blob/main/LICENSE`} class="text-[#c9d1d9] hover:underline">MIT License</a>.
-        </div>
-        <div class="flex items-center gap-4 font-mono">
-          <a href="https://adrijshikhar.dev" class="hover:text-[#f0f6fc] transition-colors">adrijshikhar.dev</a>
-          <span>·</span>
-          <a href={repoUrl} class="hover:text-[#f0f6fc] transition-colors">GitHub</a>
-          <span>·</span>
-          <a href={`${repoUrl}/releases`} class="hover:text-[#f0f6fc] transition-colors">Releases</a>
-        </div>
-      </div>
-    </footer>
-
-    <!-- Vanilla Copy Interaction -->
-    <script>
-      const btn = document.getElementById('copy-btn');
-      const text = document.getElementById('copy-text');
-      if (btn && text) {
-        btn.addEventListener('click', async () => {
-          const cmd = btn.getAttribute('data-command') || '';
-          try {
-            await navigator.clipboard.writeText(cmd);
-            text.textContent = 'Copied!';
-            btn.classList.add('text-[#3fb950]', 'border-[#3fb950]');
-            setTimeout(() => {
-              text.textContent = 'Copy';
-              btn.classList.remove('text-[#3fb950]', 'border-[#3fb950]');
-            }, 2000);
-          } catch (e) {
-            console.error('Copy failed', e);
-          }
-        });
-      }
-    </script>
-  </body>
-</html>
+<BaseLayout>
+  <Navbar />
+  <main id="main-content">
+    <Hero />
+    <Comparison />
+    <FeatureGrid />
+    <DiffSpotlight />
+    <SafetyTrust />
+    <Architecture />
+    <CompatibilityMatrix />
+    <InstallTabs />
+    <OpenSource />
+    <FinalCTA />
+  </main>
+  <Footer />
+</BaseLayout>

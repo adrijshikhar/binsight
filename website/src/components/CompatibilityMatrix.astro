@@ -1,0 +1,39 @@
+---
+import { COMPATIBILITY } from '../data/product';
+---
+
+<section class="py-20 md:py-28 px-6 border-t border-[#212c3d]">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="text-center max-w-2xl mx-auto mb-16">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-[#38bdf8] mb-3">Compatibility</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+        Battle-tested conformance.
+      </h3>
+      <p class="text-base text-[#8b949e]">
+        Binsight is continuously validated against authentic multi-version Docker fixture corpuses in CI.
+      </p>
+    </div>
+
+    <!-- Matrix Table -->
+    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] overflow-hidden shadow-xl">
+      <div class="divide-y divide-[#212c3d]">
+        {COMPATIBILITY.map((item) => (
+          <div class="p-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <span class="w-2 h-2 rounded-full bg-[#3fb950]"></span>
+              <span class="font-bold text-[#f0f6fc] text-sm font-mono">{item.name}</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              {item.versions.map((v) => (
+                <span class="px-2.5 py-1 rounded bg-[#161f2c] border border-[#2d3b4f] text-xs font-mono text-[#c9d1d9]">
+                  {v}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

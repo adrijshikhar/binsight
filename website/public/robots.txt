@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://binsight.adrijshikhar.dev/sitemap-index.xml

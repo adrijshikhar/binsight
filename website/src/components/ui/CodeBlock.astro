@@ -1,0 +1,33 @@
+---
+import CopyButton from './CopyButton.astro';
+
+interface Props {
+  code: string;
+  lang?: string;
+  title?: string;
+  showPrompt?: boolean;
+}
+
+const { code, title = '', showPrompt = false } = Astro.props;
+---
+
+<div class="rounded-lg border border-[#212c3d] bg-[#11161d] overflow-hidden text-sm font-mono shadow-xl">
+  {title && (
+    <div class="flex items-center justify-between px-4 py-2 bg-[#161f2c] border-b border-[#212c3d] text-xs text-[#8b949e]">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]/60"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#eab308]/60"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#22c55e]/60"></span>
+        <span class="ml-2 font-mono text-[#c9d1d9]">{title}</span>
+      </div>
+      <CopyButton text={code} />
+    </div>
+  )}
+  <div class="p-4 flex items-center justify-between gap-4 overflow-x-auto">
+    <div class="flex items-center gap-2 text-left whitespace-pre">
+      {showPrompt && <span class="text-[#8b949e] select-none">$</span>}
+      <span class="text-[#f0f6fc] select-all">{code}</span>
+    </div>
+    {!title && <CopyButton text={code} />}
+  </div>
+</div>
