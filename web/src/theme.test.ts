@@ -35,8 +35,8 @@ describe('cssVariablesResolver', () => {
 
   it('uses correct dark scheme values', () => {
     const dark = cssVariablesResolver(stubTheme).dark as Record<string, string>
-    expect(dark['--accent']).toBe('#38bdf8')
-    expect(dark['--green']).toBe('#34d399')
+    expect(dark['--accent']).toBe('#87d68d')
+    expect(dark['--green']).toBe('#87d68d')
     expect(dark['--red']).toBe('#fb7185')
     expect(dark['--orange']).toBe('#fbbf24')
     expect(dark['--warn']).toBe('#fbbf24')
@@ -44,8 +44,8 @@ describe('cssVariablesResolver', () => {
 
   it('uses correct light scheme values', () => {
     const light = cssVariablesResolver(stubTheme).light as Record<string, string>
-    expect(light['--accent']).toBe('#0284c7')
-    expect(light['--green']).toBe('#059669')
+    expect(light['--accent']).toBe('#2f8e3a')
+    expect(light['--green']).toBe('#2f8e3a')
     expect(light['--red']).toBe('#e11d48')
     expect(light['--orange']).toBe('#d97706')
     expect(light['--warn']).toBe('#d97706')
