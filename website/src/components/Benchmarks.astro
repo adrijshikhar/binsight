@@ -1,0 +1,175 @@
+---
+// Benchmarks & Telemetry Comparison Section inspired by Zed.dev's performance charts
+---
+
+<section id="benchmarks" class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0c1017]/40">
+  <div class="corner-diamond left-0 top-0"></div>
+  <div class="corner-diamond left-full top-0"></div>
+
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
+        <span>BENCHMARKS // TELEMETRY</span>
+      </div>
+      <h2 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
+        <span class="italic">Engineered for</span>
+        <span class="font-sans font-bold text-[#38bdf8] px-1">speed</span>,
+        <span class="italic">not bloat.</span>
+      </h2>
+      <p class="text-base sm:text-lg text-[#8b949e] max-w-2xl mx-auto font-sans">
+        Traditional binlog investigation relies on piping massive text output through pagers. Here is how Binsight stacks up against legacy pipelines and enterprise APM agents.
+      </p>
+    </div>
+
+    <!-- Benchmark Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <!-- Card 1: Triage Latency -->
+      <div class="p-6 rounded-xl border border-[#2d3b4f] bg-[#11161d] flex flex-col justify-between group hover:border-[#38bdf8]/50 transition-colors">
+        <div>
+          <div class="flex items-center justify-between text-xs font-mono text-[#8b949e] mb-4">
+            <span>METRIC: 01</span>
+            <span class="text-[#38bdf8] font-semibold">98.9% faster</span>
+          </div>
+          <h3 class="text-lg font-bold text-[#f0f6fc] mb-2 font-mono">2GB Binlog Triage</h3>
+          <p class="text-xs text-[#8b949e] mb-6 leading-relaxed">
+            Time required to locate a rogue transaction by GTID or timestamp across 2 GB of binary logs.
+          </p>
+        </div>
+
+        <div class="space-y-4 font-mono text-xs">
+          <!-- Binsight -->
+          <div>
+            <div class="flex justify-between text-[#f0f6fc] mb-1.5 font-semibold">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
+                <span>Binsight</span>
+              </span>
+              <span class="text-[#38bdf8]">1.4s</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
+              <div class="h-full bg-[#38bdf8] rounded-full" style="width: 4%;"></div>
+            </div>
+          </div>
+
+          <!-- mysqlbinlog | grep -->
+          <div>
+            <div class="flex justify-between text-[#8b949e] mb-1.5">
+              <span>mysqlbinlog | grep</span>
+              <span>128.4s</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
+              <div class="h-full bg-[#2d3b4f] rounded-full" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[#212c3d] text-[11px] text-[#5c6b76]">
+            Indexed SQLite position index vs linear disk re-parse.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Memory Footprint -->
+      <div class="p-6 rounded-xl border border-[#2d3b4f] bg-[#11161d] flex flex-col justify-between group hover:border-[#3fb950]/50 transition-colors">
+        <div>
+          <div class="flex items-center justify-between text-xs font-mono text-[#8b949e] mb-4">
+            <span>METRIC: 02</span>
+            <span class="text-[#3fb950] font-semibold">24x lighter</span>
+          </div>
+          <h3 class="text-lg font-bold text-[#f0f6fc] mb-2 font-mono">Memory Footprint</h3>
+          <p class="text-xs text-[#8b949e] mb-6 leading-relaxed">
+            Resident set size (RSS) during active continuous replication stream consumption.
+          </p>
+        </div>
+
+        <div class="space-y-4 font-mono text-xs">
+          <!-- Binsight -->
+          <div>
+            <div class="flex justify-between text-[#f0f6fc] mb-1.5 font-semibold">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#3fb950]"></span>
+                <span>Binsight (Go)</span>
+              </span>
+              <span class="text-[#3fb950]">26 MB</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
+              <div class="h-full bg-[#3fb950] rounded-full" style="width: 5%;"></div>
+            </div>
+          </div>
+
+          <!-- Java/APM Agent -->
+          <div>
+            <div class="flex justify-between text-[#8b949e] mb-1.5">
+              <span>Java / APM Agent</span>
+              <span>640 MB+</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
+              <div class="h-full bg-[#2d3b4f] rounded-full" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[#212c3d] text-[11px] text-[#5c6b76]">
+            Zero JVM runtime overhead. Single compiled static binary.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Network Egress & Air-Gap -->
+      <div class="p-6 rounded-xl border border-[#2d3b4f] bg-[#11161d] flex flex-col justify-between group hover:border-[#e3b341]/50 transition-colors">
+        <div>
+          <div class="flex items-center justify-between text-xs font-mono text-[#8b949e] mb-4">
+            <span>METRIC: 03</span>
+            <span class="text-[#e3b341] font-semibold">100% Air-gapped</span>
+          </div>
+          <h3 class="text-lg font-bold text-[#f0f6fc] mb-2 font-mono">Network Egress</h3>
+          <p class="text-xs text-[#8b949e] mb-6 leading-relaxed">
+            Data volume dispatched to external servers or third-party cloud monitoring endpoints.
+          </p>
+        </div>
+
+        <div class="space-y-4 font-mono text-xs">
+          <!-- Binsight -->
+          <div>
+            <div class="flex justify-between text-[#f0f6fc] mb-1.5 font-semibold">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-[#3fb950]"></span>
+                <span>Binsight</span>
+              </span>
+              <span class="text-[#3fb950]">0 KB</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
+              <div class="h-full bg-[#3fb950] rounded-full" style="width: 1%;"></div>
+            </div>
+          </div>
+
+          <!-- Cloud Observability -->
+          <div>
+            <div class="flex justify-between text-[#8b949e] mb-1.5">
+              <span>Cloud SaaS APM</span>
+              <span>Continuous</span>
+            </div>
+            <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
+              <div class="h-full bg-[#e3b341] rounded-full" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-[#212c3d] text-[11px] text-[#5c6b76]">
+            Localhost only. No external telemetry or telemetry ping.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Callout Banner -->
+    <div class="p-4 rounded-lg border border-[#212c3d] bg-[#161f2c]/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#8b949e]">
+      <div class="flex items-center gap-2">
+        <span class="text-[#38bdf8]">✓</span>
+        <span class="text-[#f0f6fc]">64-bit Monotonic Safe:</span>
+        <span>Immune to MySQL 4 GiB binlog offset counter wrap bugs.</span>
+      </div>
+      <a href="https://github.com/adrijshikhar/binsight" target="_blank" rel="noopener noreferrer" class="text-[#38bdf8] hover:underline flex items-center gap-1 shrink-0">
+        Inspect Source Architecture &rarr;
+      </a>
+    </div>
+  </div>
+</section>

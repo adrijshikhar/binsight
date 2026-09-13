@@ -1,0 +1,17 @@
+---
+import { SITE_CONFIG } from '../data/product';
+---
+
+<div class="relative w-full border-b border-[#212c3d] bg-gradient-to-r from-transparent via-[#38bdf8]/10 to-transparent py-2 px-4 select-none" aria-label="Announcement">
+  <div class="corner-diamond left-0 bottom-0"></div>
+  <div class="corner-diamond left-full bottom-0"></div>
+
+  <div class="max-w-6xl mx-auto flex items-center justify-center gap-2 text-xs font-mono">
+    <span class="px-1.5 py-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] font-semibold text-[10px] tracking-wide uppercase">New v{SITE_CONFIG.version}</span>
+    <span class="text-[#c9d1d9] hidden sm:inline">Monotonic 64-bit position accumulator & remote replica live streaming</span>
+    <span class="text-[#c9d1d9] sm:hidden">Monotonic 64-bit & live streaming</span>
+    <a href="https://github.com/adrijshikhar/binsight/releases" target="_blank" rel="noopener noreferrer" class="text-[#38bdf8] hover:underline font-semibold flex items-center gap-1 ml-1">
+      Release notes <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+</div>
