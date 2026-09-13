@@ -2,27 +2,27 @@
 import { SITE_CONFIG } from '../data/product';
 ---
 
-<section id="architecture" class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/50">
+<section id="architecture" class="relative py-28 md:py-36 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/50">
   <div class="corner-diamond left-0 top-0"></div>
   <div class="corner-diamond left-full top-0"></div>
 
   <div class="max-w-6xl mx-auto">
     <!-- Header -->
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#58a6ff] mb-4">
+    <div data-anime="reveal" class="text-center max-w-3xl mx-auto mb-20">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
         <span>INTERNALS & PIPELINE</span>
       </div>
       <h3 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Local-first</span>,
-        <span class="font-sans font-bold text-[#58a6ff] px-1">high-throughput streaming.</span>
+        <span class="font-sans font-bold text-[#38bdf8] px-1">high-throughput streaming.</span>
       </h3>
-      <p class="text-base sm:text-lg text-[#8b949e] font-sans">
+      <p class="text-base sm:text-lg text-[#8b949e] font-sans leading-relaxed">
         Decode never blocks the user interface. Everything the browser displays queries a fast, local SQLite index.
       </p>
     </div>
 
     <!-- Architecture Flow Diagram -->
-    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 sm:p-8 shadow-xl mb-8">
+    <div data-anime="reveal" class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 sm:p-8 shadow-xl mb-8">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative">
         <!-- Node 1 -->
         <div class="rounded-lg border border-[#2d3b4f] bg-[#161f2c] p-4 flex flex-col justify-between text-center">

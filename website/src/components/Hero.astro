@@ -4,7 +4,7 @@ import CopyButton from './ui/CopyButton.astro';
 import GitHubBadge from './ui/GitHubBadge.astro';
 ---
 
-<section class="relative pt-16 pb-20 md:pt-24 md:pb-32 px-4 sm:px-6 overflow-hidden">
+<section class="relative pt-20 pb-28 md:pt-32 md:pb-44 px-4 sm:px-6 overflow-hidden">
   <!-- Corner Diamond Intersections -->
   <div class="corner-diamond left-0 top-0"></div>
   <div class="corner-diamond left-full top-0"></div>
@@ -13,7 +13,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 
   <div class="max-w-5xl mx-auto text-center flex flex-col items-center">
     <!-- Tagline Badge -->
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-8 shadow-sm">
+    <div data-anime="reveal" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-8 shadow-sm">
       <span class="w-1.5 h-1.5 rounded-full bg-[#3fb950] animate-pulse"></span>
       <span>mysqlbinlog, but visual.</span>
       <span class="w-px h-3 bg-[#2d3b4f]"></span>
@@ -21,7 +21,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </div>
 
     <!-- Editorial Serif + Monospace Headline -->
-    <h1 class="text-4xl sm:text-6xl md:text-7xl font-serif text-[#f0f6fc] tracking-tight leading-[1.12] mb-6 max-w-4xl text-center">
+    <h1 data-anime="reveal" class="text-4xl sm:text-6xl md:text-7xl font-serif text-[#f0f6fc] tracking-tight leading-[1.14] mb-8 max-w-4xl text-center">
       <span class="italic">See what's</span>
       <span class="font-sans font-extrabold not-italic text-[#38bdf8] px-1">really happening</span>
       <br class="hidden sm:inline" />
@@ -29,14 +29,14 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </h1>
 
     <!-- Subtitle -->
-    <p class="text-base sm:text-lg md:text-xl text-[#8b949e] max-w-3xl mx-auto leading-relaxed mb-10 font-sans">
+    <p data-anime="reveal" class="text-base sm:text-lg md:text-xl text-[#8b949e] max-w-3xl mx-auto leading-relaxed mb-12 font-sans">
       Binsight is a local, read-only visual explorer for MySQL and MariaDB binlogs.
       Inspect transactions, understand row-level changes, catch anomalies, and follow schema mutations without piping through raw pager output.
     </p>
 
     <!-- Canonical Install Box with Keyboard Hint -->
-    <div class="w-full max-w-xl mb-8">
-      <div class="relative flex items-center justify-between rounded-xl border border-[#2d3b4f] bg-[#11161d] p-3 sm:px-4 font-mono text-sm shadow-xl hover:border-[#38bdf8]/50 transition-colors">
+    <div data-anime="reveal" class="w-full max-w-xl mb-10">
+      <div class="relative flex items-center justify-between rounded-xl border border-[#2d3b4f] bg-[#11161d] p-3.5 sm:px-5 font-mono text-sm shadow-xl hover:border-[#38bdf8]/50 transition-colors">
         <div class="flex items-center gap-2 overflow-x-auto text-left py-0.5">
           <span class="text-[#8b949e] select-none">$</span>
           <span class="text-[#f0f6fc] select-all font-medium">{SITE_CONFIG.heroCommand}</span>
@@ -48,10 +48,10 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </div>
 
     <!-- CTAs with Dev-Tool Keyboard Hints -->
-    <div class="flex flex-wrap items-center justify-center gap-4 mb-16">
+    <div data-anime="reveal" class="flex flex-wrap items-center justify-center gap-4 mb-20">
       <a
         href="#install"
-        class="px-6 py-3 rounded-lg bg-[#38bdf8] text-[#0b0f14] font-semibold text-sm hover:bg-[#38bdf8]/90 transition-all flex items-center gap-2"
+        class="px-6 py-3.5 rounded-lg bg-[#38bdf8] text-[#0b0f14] font-semibold text-sm hover:bg-[#38bdf8]/90 transition-all flex items-center gap-2"
       >
         <span>Install Now</span>
         <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -60,7 +60,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       </a>
       <a
         href="#benchmarks"
-        class="px-5 py-3 rounded-lg bg-[#151d28] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] font-medium text-sm transition-all flex items-center gap-2"
+        class="px-5 py-3.5 rounded-lg bg-[#151d28] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] font-medium text-sm transition-all flex items-center gap-2"
       >
         <span>Telemetry & Benchmarks</span>
         <span class="text-xs text-[#38bdf8] font-mono">⚡ 1.4s</span>
@@ -69,9 +69,9 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     </div>
 
     <!-- Zed-Inspired Interactive Showcase Workbench -->
-    <div class="w-full max-w-5xl rounded-xl border border-[#2d3b4f] bg-[#11161d] p-1.5 sm:p-2 shadow-2xl relative text-left">
+    <div data-anime="reveal" class="w-full max-w-5xl rounded-xl border border-[#2d3b4f] bg-[#11161d] p-1.5 sm:p-2 shadow-2xl relative text-left">
       <!-- App Chrome Bar -->
-      <div class="flex flex-wrap items-center justify-between px-3 py-2 bg-[#161f2c] rounded-t-lg border-b border-[#212c3d] text-xs font-mono text-[#8b949e] gap-2">
+      <div class="flex flex-wrap items-center justify-between px-3 py-2.5 bg-[#161f2c] rounded-t-lg border-b border-[#212c3d] text-xs font-mono text-[#8b949e] gap-2">
         <div class="flex items-center gap-1.5">
           <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]/70"></span>
           <span class="w-2.5 h-2.5 rounded-full bg-[#eab308]/70"></span>
@@ -100,11 +100,13 @@ import GitHubBadge from './ui/GitHubBadge.astro';
           role="tab"
           aria-selected="true"
         >
-          <span class="text-[#38bdf8]">01</span>
-          <span>Events & Timeline</span>
+          <svg class="w-3.5 h-3.5 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round"/>
+          </svg>
+          <span>Virtual Table</span>
         </button>
         <button
-          class="showcase-tab px-4 py-2.5 border-b-2 border-transparent text-[#8b949e] hover:text-[#c9d1d9] hover:bg-[#161f2c]/30 flex items-center gap-2 whitespace-nowrap transition-colors"
+          class="showcase-tab px-4 py-2.5 border-b-2 border-transparent text-[#8b949e] hover:text-[#f0f6fc] flex items-center gap-2 whitespace-nowrap transition-colors"
           data-tab="diff"
           role="tab"
           aria-selected="false"
@@ -198,48 +200,68 @@ import GitHubBadge from './ui/GitHubBadge.astro';
   </div>
 </section>
 
-<script is:inline>
-  (function () {
-    var tabs = document.querySelectorAll('.showcase-tab');
-    var panes = {
-      events: document.getElementById('pane-events'),
-      diff: document.getElementById('pane-diff'),
-      overview: document.getElementById('pane-overview')
-    };
+<script>
+  import { animate, stagger } from 'animejs';
 
-    function selectTab(name) {
-      tabs.forEach(function (tab) {
-        var match = tab.getAttribute('data-tab') === name;
-        tab.classList.toggle('active', match);
-        tab.classList.toggle('border-[#38bdf8]', match);
-        tab.classList.toggle('text-[#f0f6fc]', match);
-        tab.classList.toggle('bg-[#161f2c]/70', match);
-        tab.classList.toggle('border-transparent', !match);
-        tab.classList.toggle('text-[#8b949e]', !match);
-        tab.setAttribute('aria-selected', match ? 'true' : 'false');
-      });
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.showcase-tab');
+  const panes: Record<string, HTMLElement | null> = {
+    events: document.getElementById('pane-events'),
+    diff: document.getElementById('pane-diff'),
+    overview: document.getElementById('pane-overview'),
+  };
 
-      for (var key in panes) {
-        if (panes[key]) {
-          panes[key].classList.toggle('hidden', key !== name);
-          panes[key].classList.toggle('block', key === name);
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function selectTab(name: string) {
+    tabs.forEach((tab) => {
+      const match = tab.getAttribute('data-tab') === name;
+      tab.classList.toggle('active', match);
+      tab.classList.toggle('border-[#38bdf8]', match);
+      tab.classList.toggle('text-[#f0f6fc]', match);
+      tab.classList.toggle('bg-[#161f2c]/70', match);
+      tab.classList.toggle('border-transparent', !match);
+      tab.classList.toggle('text-[#8b949e]', !match);
+      tab.setAttribute('aria-selected', match ? 'true' : 'false');
+    });
+
+    for (const key in panes) {
+      const pane = panes[key];
+      if (pane) {
+        const isSelected = key === name;
+        if (isSelected) {
+          pane.classList.remove('hidden');
+          pane.classList.add('block');
+          if (!prefersReducedMotion) {
+            const items = pane.querySelectorAll('tr, .rounded');
+            if (items.length > 0) {
+              animate(items, {
+                opacity: [0, 1],
+                translateY: [6, 0],
+                delay: stagger(20),
+                duration: 250,
+                ease: 'outQuad',
+              });
+            }
+          }
+        } else {
+          pane.classList.remove('block');
+          pane.classList.add('hidden');
         }
       }
     }
+  }
 
-    tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        var name = tab.getAttribute('data-tab');
-        if (name) selectTab(name);
-      });
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const name = tab.getAttribute('data-tab');
+      if (name) selectTab(name);
     });
+  });
 
-    // Keyboard shortcuts: 1, 2, 3 to switch tabs when not typing
-    window.addEventListener('keydown', function (e) {
-      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-      if (e.key === '1') selectTab('events');
-      if (e.key === '2') selectTab('diff');
-      if (e.key === '3') selectTab('overview');
-    });
-  })();
+  window.addEventListener('keydown', (e) => {
+    if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
+    if (e.key === '1') selectTab('events');
+    if (e.key === '2') selectTab('diff');
+    if (e.key === '3') selectTab('overview');
+  });
 </script>

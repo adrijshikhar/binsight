@@ -143,16 +143,24 @@ const jsonLd = {
             })
             .catch(function () {});
 
-          function updateDOM(stars, forks) {
+          function updateDOM(stars) {
             document.querySelectorAll('.gh-stars-count').forEach(function (el) {
               el.textContent = String(stars);
-            });
-            document.querySelectorAll('.gh-forks-count').forEach(function (el) {
-              el.textContent = String(forks);
             });
           }
         } catch (e) {}
       })();
+    </script>
+
+    <!-- Anime.js Scroll & Stagger Animations -->
+    <script>
+      import { setupScrollAnimations } from '../scripts/animations';
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setupScrollAnimations());
+      } else {
+        setupScrollAnimations();
+      }
     </script>
   </body>
 </html>

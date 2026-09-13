@@ -3,13 +3,13 @@ import { INSTALL_OPTIONS, SITE_CONFIG } from '../data/product';
 import CopyButton from './ui/CopyButton.astro';
 ---
 
-<section id="install" class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
+<section id="install" class="relative py-28 md:py-36 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
   <div class="corner-diamond left-0 top-0"></div>
   <div class="corner-diamond left-full top-0"></div>
 
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
-    <div class="text-center mb-12">
+    <div data-anime="reveal" class="text-center mb-20">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
         <span>ZERO DEPENDENCIES</span>
       </div>
@@ -17,13 +17,13 @@ import CopyButton from './ui/CopyButton.astro';
         <span class="italic">Up and running</span>
         <span class="font-sans font-bold text-[#38bdf8] px-1">in seconds.</span>
       </h3>
-      <p class="text-base text-[#8b949e] font-sans">
+      <p class="text-base sm:text-lg text-[#8b949e] font-sans leading-relaxed">
         Binsight ships as a single static binary with zero external runtime dependencies.
       </p>
     </div>
 
     <!-- Step 1: Install -->
-    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 shadow-xl mb-6">
+    <div data-anime="reveal" class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 shadow-xl mb-6">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#212c3d]">
         <div class="flex items-center gap-2 text-sm font-bold text-[#f0f6fc]">
           <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono">1</span>
