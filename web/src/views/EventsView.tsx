@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Virtualizer } from '@tanstack/react-virtual'
-import { Alert, Badge, Button, Switch, Table, Tooltip } from '@mantine/core'
+import { Alert, Badge, Button, Table, Tooltip } from '@mantine/core'
 import { IconChevronRight } from '@tabler/icons-react'
 import '../components/table-utils.module.css'
 import { api } from '../lib/api'
@@ -505,28 +505,9 @@ export default function EventsView(props: EventsViewProps) {
 
   return (
     <>
-      <div className="events-toolbar">
-        <Tooltip
-          label={
-            live
-              ? 'Stop following new events (Live mode is ON)'
-              : 'Follow new events as they are indexed (Live mode is OFF)'
-          }
-          withArrow
-          position="bottom-start"
-          offset={8}
-        >
-          <Switch
-            checked={live}
-            onChange={(e) => setLive(e.currentTarget.checked)}
-            label="Live"
-            size="sm"
-            color="green"
-            aria-label="Follow new events as they are indexed"
-          />
-        </Tooltip>
-      </div>
       <FilterBar
+        live={live}
+        onToggleLive={setLive}
         filters={filters}
         grouped={grouped}
         txnIds={props.txnIds}

@@ -188,6 +188,27 @@ describe('FilterBar', () => {
     expect(onToggleGrouped).not.toHaveBeenCalled()
   })
 
+  it('renders Live switch when onToggleLive is provided', () => {
+    const onToggleLive = vi.fn()
+    wrap(<FilterBar {...makeProps({ live: false, onToggleLive })} />)
+    const switchEl = screen.getByRole('switch', { name: /follow new events as they are indexed/i })
+    expect(switchEl).toBeTruthy()
+    expect((switchEl as HTMLInputElement).checked).toBe(false)
+  })
+
+  it('calls onToggleLive when Live switch is toggled', () => {
+    const onToggleLive = vi.fn()
+    wrap(<FilterBar {...makeProps({ live: false, onToggleLive })} />)
+    const switchEl = screen.getByRole('switch', { name: /follow new events as they are indexed/i })
+    fireEvent.click(switchEl)
+    expect(onToggleLive).toHaveBeenCalledWith(true)
+  })
+
+  it('does not render Live switch when onToggleLive is not provided', () => {
+    wrap(<FilterBar {...makeProps()} />)
+    expect(screen.queryByRole('switch', { name: /follow new events as they are indexed/i })).toBeNull()
+  })
+
   it('emptyFilters has expected shape', () => {
     expect(emptyFilters).toEqual({
       types: [],

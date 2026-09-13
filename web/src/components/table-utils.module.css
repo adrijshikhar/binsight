@@ -58,12 +58,6 @@
 
 /* ── EventsView layout primitives ────────────────────────────────────────── */
 
-:global(.events-toolbar) {
-  display: flex;
-  justify-content: flex-end;
-  padding: 4px 8px;
-}
-
 :global(.statusbar) {
   padding: 5px 16px;
   border-top: 1px solid var(--border);
