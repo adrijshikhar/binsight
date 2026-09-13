@@ -1,0 +1,113 @@
+---
+import { INSTALL_OPTIONS, SITE_CONFIG } from '../data/product';
+import CopyButton from './ui/CopyButton.astro';
+---
+
+<section id="install" class="py-20 md:py-28 px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-[#38bdf8] mb-3">Get Started</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+        Up and running in seconds.
+      </h3>
+      <p class="text-base text-[#8b949e]">
+        Binsight ships as a single static binary with zero external runtime dependencies.
+      </p>
+    </div>
+
+    <!-- Step 1: Install -->
+    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 shadow-xl mb-6">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#212c3d]">
+        <div class="flex items-center gap-2 text-sm font-bold text-[#f0f6fc]">
+          <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono">1</span>
+          <span>Install Binsight</span>
+        </div>
+        <!-- Tabs Header -->
+        <div class="flex items-center gap-1.5 p-1 bg-[#161f2c] rounded-lg border border-[#212c3d] text-xs font-mono">
+          {INSTALL_OPTIONS.map((opt, i) => (
+            <button
+              type="button"
+              class={`install-tab-btn px-2.5 py-1 rounded transition-colors ${i === 0 ? 'bg-[#212c3d] text-[#f0f6fc] font-semibold' : 'text-[#8b949e] hover:text-[#f0f6fc]'}`}
+              data-tab={opt.id}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Tab Panels -->
+      {INSTALL_OPTIONS.map((opt, i) => (
+        <div id={`tab-panel-${opt.id}`} class={`install-panel ${i === 0 ? '' : 'hidden'}`}>
+          <div class="text-xs text-[#8b949e] mb-3">{opt.description}</div>
+          <div class="flex items-center justify-between rounded-lg border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm">
+            <div class="flex items-center gap-2 overflow-x-auto text-left">
+              <span class="text-[#8b949e] select-none">$</span>
+              <span class="text-[#f0f6fc] select-all">{opt.command}</span>
+            </div>
+            <CopyButton text={opt.command} />
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Step 2: Run -->
+    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 shadow-xl">
+      <div class="flex items-center gap-2 text-sm font-bold text-[#f0f6fc] mb-4">
+        <span class="w-6 h-6 rounded-full bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-xs text-[#38bdf8] font-mono">2</span>
+        <span>Point it at your binlog directory</span>
+      </div>
+      <div class="flex items-center justify-between rounded-lg border border-[#2d3b4f] bg-[#0b0f14] p-3 font-mono text-sm mb-4">
+        <div class="flex items-center gap-2 overflow-x-auto text-left">
+          <span class="text-[#8b949e] select-none">$</span>
+          <span class="text-[#f0f6fc] select-all">{SITE_CONFIG.startCommand}</span>
+        </div>
+        <CopyButton text={SITE_CONFIG.startCommand} />
+      </div>
+
+      <div class="flex items-center justify-between px-4 py-3 rounded-lg bg-[#161f2c]/70 border border-[#212c3d] text-xs font-mono">
+        <span class="text-[#8b949e]">Console URL:</span>
+        <a
+          href={`http://localhost:${SITE_CONFIG.defaultPort}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-[#38bdf8] hover:underline font-bold"
+        >
+          http://localhost:{SITE_CONFIG.defaultPort} →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function setupInstallTabs() {
+    const tabs = document.querySelectorAll('.install-tab-btn');
+    const panels = document.querySelectorAll('.install-panel');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.getAttribute('data-tab');
+
+        tabs.forEach((t) => {
+          t.classList.remove('bg-[#212c3d]', 'text-[#f0f6fc]', 'font-semibold');
+          t.classList.add('text-[#8b949e]');
+        });
+        tab.classList.add('bg-[#212c3d]', 'text-[#f0f6fc]', 'font-semibold');
+        tab.classList.remove('text-[#8b949e]');
+
+        panels.forEach((panel) => {
+          if (panel.id === `tab-panel-${target}`) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+      });
+    });
+  }
+
+  setupInstallTabs();
+  document.addEventListener('astro:page-load', setupInstallTabs);
+</script>

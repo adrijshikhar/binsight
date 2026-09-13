@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="8" fill="#0b0f14"/>
+  <rect x="1" y="1" width="30" height="30" rx="7" stroke="#212c3d" stroke-width="2"/>
+  <!-- Stylized binlog byte stream / loupe icon -->
+  <path d="M7 11h18M7 16h12M7 21h15" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="21" cy="18" r="4.5" stroke="#58a6ff" stroke-width="2.2" fill="#11161d"/>
+  <path d="M24.5 21.5L28 25" stroke="#58a6ff" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

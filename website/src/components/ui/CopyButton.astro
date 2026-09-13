@@ -1,0 +1,60 @@
+---
+interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  class={`copy-btn px-2.5 py-1 text-xs rounded bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#8b949e] hover:text-[#f0f6fc] transition-colors flex items-center gap-1.5 select-none shrink-0 ${className}`}
+  data-copy-text={text}
+  aria-label="Copy code to clipboard"
+>
+  <svg class="copy-icon w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+  <svg class="check-icon w-3.5 h-3.5 fill-none stroke-current stroke-2 hidden text-[#3fb950]" viewBox="0 0 24 24">
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+  <span class="btn-label">Copy</span>
+</button>
+
+<script>
+  function setupCopyButtons() {
+    document.querySelectorAll('.copy-btn').forEach((btn) => {
+      if (btn.hasAttribute('data-initialized')) return;
+      btn.setAttribute('data-initialized', 'true');
+
+      btn.addEventListener('click', async () => {
+        const textToCopy = btn.getAttribute('data-copy-text') || '';
+        const label = btn.querySelector('.btn-label');
+        const copyIcon = btn.querySelector('.copy-icon');
+        const checkIcon = btn.querySelector('.check-icon');
+
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          if (label) label.textContent = 'Copied!';
+          if (copyIcon) copyIcon.classList.add('hidden');
+          if (checkIcon) checkIcon.classList.remove('hidden');
+          btn.classList.add('border-[#3fb950]', 'text-[#3fb950]');
+
+          setTimeout(() => {
+            if (label) label.textContent = 'Copy';
+            if (copyIcon) copyIcon.classList.remove('hidden');
+            if (checkIcon) checkIcon.classList.add('hidden');
+            btn.classList.remove('border-[#3fb950]', 'text-[#3fb950]');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy', err);
+        }
+      });
+    });
+  }
+
+  setupCopyButtons();
+  document.addEventListener('astro:page-load', setupCopyButtons);
+</script>

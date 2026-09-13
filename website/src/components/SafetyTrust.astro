@@ -1,0 +1,68 @@
+---
+---
+
+<section class="py-20 md:py-28 px-6 border-t border-[#212c3d]">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-[#3fb950] mb-3">Security & Privacy</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+        Your database stays your database.
+      </h3>
+      <p class="text-base sm:text-lg text-[#8b949e]">
+        Local by design. Read-only by default.
+      </p>
+    </div>
+
+    <!-- Trust Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between">
+        <div>
+          <div class="w-8 h-8 rounded bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#3fb950] mb-4 font-mono font-bold text-sm">
+            127
+          </div>
+          <h4 class="font-bold text-[#f0f6fc] mb-2">Loopback Bound</h4>
+          <p class="text-sm text-[#8b949e] leading-relaxed">
+            Binds strictly to <code class="text-[#38bdf8] font-mono text-xs">127.0.0.1</code> by default. Built-in network guard blocks external interface exposure unless explicitly requested.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between">
+        <div>
+          <div class="w-8 h-8 rounded bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] mb-4 font-mono font-bold text-sm">
+            RO
+          </div>
+          <h4 class="font-bold text-[#f0f6fc] mb-2">Strictly Read-Only</h4>
+          <p class="text-sm text-[#8b949e] leading-relaxed">
+            The parser only inspects offline files or connects via replication client privileges. It never executes write queries or modifies database state.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between">
+        <div>
+          <div class="w-8 h-8 rounded bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#58a6ff] mb-4 font-mono font-bold text-sm">
+            SQL
+          </div>
+          <h4 class="font-bold text-[#f0f6fc] mb-2">Zero CGO SQLite</h4>
+          <p class="text-sm text-[#8b949e] leading-relaxed">
+            Backed by a pure Go translation of SQLite (<code class="text-[#38bdf8] font-mono text-xs">modernc.org/sqlite</code>). All index metadata remains entirely in local storage.
+          </p>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between">
+        <div>
+          <div class="w-8 h-8 rounded bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#e3b341] mb-4 font-mono font-bold text-sm">
+            0%
+          </div>
+          <h4 class="font-bold text-[#f0f6fc] mb-2">Zero Cloud Telemetry</h4>
+          <p class="text-sm text-[#8b949e] leading-relaxed">
+            No cloud backend, no tracking scripts, no third-party APIs, and no account requirements. Your sensitive customer records never leave your host.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

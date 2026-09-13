@@ -1,0 +1,68 @@
+---
+import { FEATURES } from '../data/product';
+---
+
+<section id="features" class="py-20 md:py-28 px-6">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="text-xs font-mono uppercase tracking-widest text-[#38bdf8] mb-3">Capabilities</h2>
+      <h3 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+        Engineered for database forensics.
+      </h3>
+      <p class="text-base sm:text-lg text-[#8b949e]">
+        Binsight turns inscrutable binary logs into a clean, queryable operational timeline.
+      </p>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {FEATURES.map((feature, i) => (
+        <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 hover:border-[#38bdf8]/40 hover:bg-[#151d28] transition-all flex flex-col justify-between group">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] mb-5 group-hover:border-[#38bdf8] group-hover:scale-105 transition-all">
+              {feature.icon === 'stream' && (
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round"/>
+                </svg>
+              )}
+              {feature.icon === 'rows' && (
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              )}
+              {feature.icon === 'alert' && (
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2 text-[#e3b341]" viewBox="0 0 24 24">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              )}
+              {feature.icon === 'schema' && (
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              )}
+              {feature.icon === 'hex' && (
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
+                  <polyline points="4 7 4 4 20 4 20 7"/>
+                  <line x1="9" y1="20" x2="15" y2="20"/>
+                  <line x1="12" y1="4" x2="12" y2="20"/>
+                </svg>
+              )}
+              {feature.icon === 'tail' && (
+                <svg class="w-5 h-5 fill-none stroke-current stroke-2 text-[#3fb950]" viewBox="0 0 24 24">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              )}
+            </div>
+            <div class="text-xs font-mono text-[#38bdf8] mb-1">{feature.tagline}</div>
+            <h4 class="text-lg font-bold text-[#f0f6fc] mb-2">{feature.title}</h4>
+            <p class="text-sm text-[#8b949e] leading-relaxed">{feature.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

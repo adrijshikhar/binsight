@@ -1,0 +1,54 @@
+---
+import { SITE_CONFIG } from '../data/product';
+---
+
+<section class="py-20 px-6 border-t border-[#212c3d]">
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#8b949e] mb-6">
+      MIT Licensed · Free & Open Source
+    </div>
+
+    <h3 class="text-3xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+      Built in the open for the community.
+    </h3>
+
+    <p class="text-base text-[#8b949e] max-w-2xl mx-auto mb-8">
+      Binsight is 100% open source. Contributions, bug reports, feature requests, and sample binlog test cases are always welcome.
+    </p>
+
+    <div class="flex flex-wrap items-center justify-center gap-4 text-xs font-mono">
+      <a
+        href={SITE_CONFIG.repoUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-4 py-2 rounded-lg bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] transition-colors flex items-center gap-2"
+      >
+        <span>GitHub Repository</span>
+      </a>
+      <a
+        href={`${SITE_CONFIG.repoUrl}/releases`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-4 py-2 rounded-lg bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] transition-colors"
+      >
+        Releases
+      </a>
+      <a
+        href={`${SITE_CONFIG.repoUrl}/issues`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-4 py-2 rounded-lg bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] transition-colors"
+      >
+        Issue Tracker
+      </a>
+      <a
+        href={`${SITE_CONFIG.repoUrl}/blob/main/CONTRIBUTING.md`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="px-4 py-2 rounded-lg bg-[#161f2c] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] transition-colors"
+      >
+        Contributing Guide
+      </a>
+    </div>
+  </div>
+</section>

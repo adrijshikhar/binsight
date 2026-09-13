@@ -1,0 +1,126 @@
+---
+---
+
+<section class="py-20 md:py-28 px-6 border-t border-[#212c3d] bg-[#0b0f14]/50">
+  <div class="max-w-6xl mx-auto">
+    <!-- Section Header -->
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-[#f0f6fc] tracking-tight mb-4">
+        Stop reading binlogs like this.
+      </h2>
+      <p class="text-base sm:text-lg text-[#8b949e] leading-relaxed">
+        Paging through gigabytes of raw decoder text in a terminal during a 2 AM production incident is slow, error-prone, and painful.
+      </p>
+    </div>
+
+    <!-- Comparison Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      <!-- Old Way: Raw mysqlbinlog pager -->
+      <div class="flex flex-col rounded-xl border border-[#ef4444]/30 bg-[#10151d] overflow-hidden shadow-xl">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-[#161f2c] border-b border-[#212c3d] text-xs font-mono">
+          <div class="flex items-center gap-2 text-[#ef4444]">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444]"></span>
+            <span>terminal (mysqlbinlog | less)</span>
+          </div>
+          <span class="text-[#8b949e]">1.2 GB text stream</span>
+        </div>
+        <div class="p-4 font-mono text-xs text-[#8b949e] overflow-x-auto leading-relaxed flex-1 bg-[#0b0f14]/90">
+          <div class="text-[#c9d1d9] mb-2">$ mysqlbinlog --base64-output=DECODE-ROWS -v -v mysql-bin.000142 | less</div>
+          <div class="text-[#6e7681]"># at 4194304</div>
+          <div class="text-[#6e7681]">#260913 14:35:10 server id 1  end_log_pos 4194381 CRC32 0x9f1a2c3d  Table_map: `shop`.`orders` mapped to number 108</div>
+          <div class="text-[#6e7681]"># at 4194381</div>
+          <div class="text-[#6e7681]">#260913 14:35:10 server id 1  end_log_pos 4195120 CRC32 0x7c4e8b12  Update_rows: table id 108 flags: STMT_END_F</div>
+          <div class="text-[#e3b341]">### UPDATE `shop`.`orders`</div>
+          <div class="text-[#e3b341]">### WHERE</div>
+          <div class="text-[#8b949e]">###   @1=48382 /* INT(11) */</div>
+          <div class="text-[#8b949e]">###   @2='PENDING' /* VARCHAR(32) */</div>
+          <div class="text-[#8b949e]">###   @3=119.20 /* DECIMAL(10,2) */</div>
+          <div class="text-[#e3b341]">### SET</div>
+          <div class="text-[#8b949e]">###   @1=48382 /* INT(11) */</div>
+          <div class="text-[#3fb950]">###   @2='COMPLETED' /* VARCHAR(32) */</div>
+          <div class="text-[#8b949e]">###   @3=119.20 /* DECIMAL(10,2) */</div>
+          <div class="text-[#6e7681]"># at 4195120</div>
+          <div class="text-[#6e7681]">#260913 14:35:11 server id 1  end_log_pos 4195151 CRC32 0x11ab44ef  Xid = 918239</div>
+          <div class="text-[#6e7681] mt-3">(END) - press q to exit, / to search regex</div>
+        </div>
+        <div class="px-4 py-3 bg-[#161f2c]/50 border-t border-[#212c3d] text-xs text-[#8b949e] flex items-center justify-between">
+          <span class="text-[#ef4444]">✕ No transaction grouping</span>
+          <span class="text-[#ef4444]">✕ No diff visualization</span>
+          <span class="text-[#ef4444]">✕ Manual awk scripts</span>
+        </div>
+      </div>
+
+      <!-- New Way: Binsight Structured UI -->
+      <div class="flex flex-col rounded-xl border border-[#38bdf8]/40 bg-[#10151d] overflow-hidden shadow-2xl">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-[#161f2c] border-b border-[#212c3d] text-xs font-mono">
+          <div class="flex items-center gap-2 text-[#38bdf8]">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#38bdf8] animate-pulse"></span>
+            <span class="font-bold">binsight (visual console)</span>
+          </div>
+          <span class="text-[#3fb950] font-mono">0.02s SQLite query</span>
+        </div>
+        <div class="p-4 font-mono text-xs overflow-x-auto flex-1 bg-[#0b0f14]/90 flex flex-col justify-between">
+          <div class="space-y-2">
+            <!-- Filter summary -->
+            <div class="flex items-center justify-between pb-2 border-b border-[#212c3d] text-[11px] text-[#8b949e]">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#c9d1d9]">table: orders</span>
+                <span class="px-2 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#38bdf8]">grouped by txn</span>
+              </div>
+              <span>Showing txn 918239</span>
+            </div>
+
+            <!-- Txn Header -->
+            <div class="px-2.5 py-1 rounded bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-between text-[#38bdf8] font-bold">
+              <span>▾ txn 142 · 3 events · 1 row</span>
+              <span class="text-[#8b949e] font-normal font-mono text-[10px]">duration: 42ms</span>
+            </div>
+
+            <!-- Structured Event Rows -->
+            <div class="space-y-1 pl-3 border-l-2 border-[#2d3b4f]">
+              <div class="flex items-center justify-between py-1 px-2 rounded hover:bg-[#161f2c] transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#8b949e]">4194304</span>
+                  <span class="px-1.5 py-0.2 rounded bg-[#1f2937] text-[#9ca3af] text-[10px]">TABLE_MAP</span>
+                  <span class="text-[#c9d1d9]">shop.orders</span>
+                </div>
+                <span class="text-[#8b949e]">77 B</span>
+              </div>
+
+              <div class="flex items-center justify-between py-1 px-2 rounded bg-[#38bdf8]/10 border border-[#38bdf8]/30">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#8b949e]">4194381</span>
+                  <span class="px-1.5 py-0.2 rounded bg-[#0284c7] text-[#f0f6fc] text-[10px] font-bold">UPDATE_ROWS</span>
+                  <span class="text-[#c9d1d9]">status: PENDING → COMPLETED</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[#3fb950] font-bold">1 row</span>
+                  <span class="text-[#8b949e]">739 B</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between py-1 px-2 rounded hover:bg-[#161f2c] transition-colors">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#8b949e]">4195120</span>
+                  <span class="px-1.5 py-0.2 rounded bg-[#1f2937] text-[#9ca3af] text-[10px]">XID</span>
+                  <span class="text-[#c9d1d9]">COMMIT</span>
+                </div>
+                <span class="text-[#8b949e]">31 B</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-[#212c3d] flex items-center justify-between text-[11px] text-[#38bdf8]">
+            <span>Click any event to open row-image diff & hex inspector</span>
+            <span>Drawer →</span>
+          </div>
+        </div>
+        <div class="px-4 py-3 bg-[#161f2c]/50 border-t border-[#212c3d] text-xs text-[#8b949e] flex items-center justify-between">
+          <span class="text-[#3fb950]">✓ Visual transaction timeline</span>
+          <span class="text-[#3fb950]">✓ Instant before/after diffs</span>
+          <span class="text-[#3fb950]">✓ Anomaly detection</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

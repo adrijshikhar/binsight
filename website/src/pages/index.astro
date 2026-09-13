@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import Comparison from '../components/Comparison.astro';
+import FeatureGrid from '../components/FeatureGrid.astro';
+import DiffSpotlight from '../components/DiffSpotlight.astro';
+import SafetyTrust from '../components/SafetyTrust.astro';
+import Architecture from '../components/Architecture.astro';
+import CompatibilityMatrix from '../components/CompatibilityMatrix.astro';
+import InstallTabs from '../components/InstallTabs.astro';
+import OpenSource from '../components/OpenSource.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout>
+  <Navbar />
+  <main id="main-content">
+    <Hero />
+    <Comparison />
+    <FeatureGrid />
+    <DiffSpotlight />
+    <SafetyTrust />
+    <Architecture />
+    <CompatibilityMatrix />
+    <InstallTabs />
+    <OpenSource />
+    <FinalCTA />
+  </main>
+  <Footer />
+</BaseLayout>
