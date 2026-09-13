@@ -451,15 +451,15 @@ export default function EventsView(props: EventsViewProps) {
 
   const colgroup = (
     <colgroup>
-      <col style={{ width: 28 }} />
+      <col style={{ width: 26 }} />
+      <col style={{ width: 100 }} />
+      <col style={{ width: 140 }} />
       <col style={{ width: 120 }} />
-      <col style={{ width: 150 }} />
       <col style={{ width: 130 }} />
-      <col style={{ width: 160 }} />
       <col />
-      <col style={{ width: 70 }} />
-      <col style={{ width: 90 }} />
-      <col style={{ width: 120 }} />
+      <col style={{ width: 55 }} />
+      <col style={{ width: 75 }} />
+      <col style={{ width: 100 }} />
     </colgroup>
   )
 
@@ -513,7 +513,8 @@ export default function EventsView(props: EventsViewProps) {
               : 'Follow new events as they are indexed (Live mode is OFF)'
           }
           withArrow
-          position="left"
+          position="bottom-start"
+          offset={8}
         >
           <Switch
             checked={live}

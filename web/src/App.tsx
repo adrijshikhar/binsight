@@ -438,8 +438,14 @@ export default function App() {
               setFileId(id)
               setTab('overview')
             }}
-            onSettings={() => setTab('settings')}
-            onArchitecture={() => setTab('architecture')}
+            onSettings={() => {
+              setSelected(null)
+              setTab('settings')
+            }}
+            onArchitecture={() => {
+              setSelected(null)
+              setTab('architecture')
+            }}
             streamStatus={streamStatus ?? undefined}
           />
           {!sidebar.collapsed && (
@@ -686,7 +692,7 @@ export default function App() {
           </main>
         </AppShell.Main>
 
-        {selected && (
+        {selected && tab === 'events' && (
           <AppShell.Aside>
             <Drawer
               fileId={fileId}

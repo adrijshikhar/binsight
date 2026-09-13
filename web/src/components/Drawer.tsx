@@ -126,22 +126,25 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
 
       {/* Header */}
       <div className={styles.drawerHdr}>
-        <div className={styles.drawerHdrType}>
-          {event.type_name}
-          {wrapped && (
-            <span className={styles.wrapTag}>
-              <WrapArrow size={13} /> 4 GiB wrap
-            </span>
-          )}
-        </div>
-        <div className={styles.drawerHdrSub}>
-          pos {event.pos} &rarr; {event.end_pos} &middot; {[event.db_name, event.table_name].filter(Boolean).join('.')}{' '}
-          &middot; {fmtBytes(event.size)}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className={styles.drawerHdrType}>
+              {event.type_name}
+              {wrapped && (
+                <span className={styles.wrapTag}>
+                  <WrapArrow size={13} /> 4 GiB wrap
+                </span>
+              )}
+            </div>
+            <div className={styles.drawerHdrSub}>
+              pos {event.pos} &rarr; {event.end_pos} &middot; {[event.db_name, event.table_name].filter(Boolean).join('.')}{' '}
+              &middot; {fmtBytes(event.size)}
+            </div>
+          </div>
           <CloseButton
             aria-label="Close drawer"
             onClick={onClose}
             size="sm"
-            style={{ float: 'right', marginTop: -2 }}
           />
         </div>
       </div>

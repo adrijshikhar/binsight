@@ -35,6 +35,10 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
   }, [props.fileId, fetchKey])
 
   const totalBytes = tables.reduce((n, t) => n + t.bytes_total, 0) || 1
+  const totalRows = tables.reduce((n, t) => n + t.rows_total, 0)
+  const totalIns = tables.reduce((n, t) => n + t.inserts, 0)
+  const totalUpd = tables.reduce((n, t) => n + t.updates, 0)
+  const totalDel = tables.reduce((n, t) => n + t.deletes, 0)
 
   return (
     <Stack p="md" gap="md" style={{ height: '100%', overflowY: 'auto' }}>
@@ -61,7 +65,50 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
           </Stack>
         </Center>
       )}
-      <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
+      {tables.length > 0 && (
+        <Group
+          justify="space-between"
+          align="center"
+          pb="xs"
+          style={{ borderBottom: '1px solid var(--border)', flexShrink: 0 }}
+        >
+          <Group gap="md">
+            <Text size="xs" c="dimmed" ff="monospace" style={{ textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+              {tables.length} {tables.length === 1 ? 'Table' : 'Tables'} Indexed
+            </Text>
+            <Text size="xs" c="dimmed">
+              ·
+            </Text>
+            <Text size="xs" c="dimmed" ff="monospace">
+              {totalRows.toLocaleString()} mutations
+            </Text>
+            <Text size="xs" c="dimmed">
+              ·
+            </Text>
+            <Text size="xs" c="dimmed" ff="monospace">
+              {(totalBytes / 1024).toFixed(1)} KB payload
+            </Text>
+          </Group>
+          <Group gap="xs">
+            <Badge color="green" variant="light" size="sm" ff="monospace">
+              +{totalIns} ins
+            </Badge>
+            <Badge color="orange" variant="light" size="sm" ff="monospace">
+              ~{totalUpd} upd
+            </Badge>
+            <Badge color="red" variant="light" size="sm" ff="monospace">
+              -{totalDel} del
+            </Badge>
+          </Group>
+        </Group>
+      )}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+          gap: '12px',
+        }}
+      >
         {tables.map((t) => {
           let cols: string[] = []
           try {
@@ -73,8 +120,22 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
             <Paper
               key={t.id}
               withBorder
-              p="sm"
-              style={{ cursor: 'pointer' }}
+              p="md"
+              style={{
+                cursor: 'pointer',
+                background: 'var(--panel)',
+                borderColor: 'var(--border)',
+                borderRadius: '6px',
+                transition: 'border-color 150ms ease, box-shadow 150ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent)'
+                e.currentTarget.style.boxShadow = '0 0 0 1px var(--accentSoft)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
               {...clickable(() => props.onOpenTable(t.db_name, t.table_name))}
             >
               <Title order={4} ff="monospace" mb="xs" style={{ overflowWrap: 'anywhere' }}>
@@ -101,7 +162,7 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
             </Paper>
           )
         })}
-      </SimpleGrid>
+      </div>
     </Stack>
   )
 }

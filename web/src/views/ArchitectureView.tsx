@@ -221,11 +221,12 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
               block
               style={{
                 fontFamily: 'var(--mantine-font-family-monospace)',
-                fontSize: 'var(--mantine-font-size-sm)',
+                fontSize: '11px',
                 lineHeight: 1.55,
                 background: 'transparent',
                 color: 'var(--text)',
                 whiteSpace: 'pre',
+                overflowX: 'auto',
               }}
             >{`type Decoder interface {
     Name() string
@@ -238,11 +239,12 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
               block
               style={{
                 fontFamily: 'var(--mantine-font-family-monospace)',
-                fontSize: 'var(--mantine-font-size-sm)',
+                fontSize: '11px',
                 lineHeight: 1.55,
                 background: 'transparent',
                 color: 'var(--text)',
                 whiteSpace: 'pre',
+                overflowX: 'auto',
               }}
             >{`type Capabilities struct {
     FullScan     bool // eligible: indexer

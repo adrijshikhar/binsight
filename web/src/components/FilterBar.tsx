@@ -74,7 +74,7 @@ export default function FilterBar(props: FilterBarProps) {
 
   return (
     <Stack gap={0}>
-      <Group gap="xs" px="sm" py={6} align="flex-start" wrap="wrap" style={{ borderBottom: '1px solid var(--border)' }}>
+      <Group gap="xs" px="md" py={6} align="center" wrap="wrap" style={{ borderBottom: '1px solid var(--border)' }}>
         <MultiSelect
           aria-label="type"
           placeholder="type"

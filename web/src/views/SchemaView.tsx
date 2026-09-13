@@ -12,6 +12,21 @@ function ddlKind(sql: string): string | null {
   return DDL_PREFIXES.find((p) => u.startsWith(p)) ?? null
 }
 
+function ddlBadgeColor(kind: string | null): string {
+  switch (kind) {
+    case 'CREATE':
+      return 'teal'
+    case 'ALTER':
+      return 'accent'
+    case 'DROP':
+      return 'red'
+    case 'TRUNCATE':
+      return 'orange'
+    default:
+      return 'grape'
+  }
+}
+
 // Split a unix-seconds timestamp into [date, clock] so the time column can
 // render two clean lines (date over clock) instead of wrapping mid-token.
 function fmtTimeParts(ts: number): [string, string] {
@@ -24,6 +39,7 @@ function fmtTimeParts(ts: number): [string, string] {
 // COMPLETE decoded statement in its tooltip (lazily fetched via fileId+pos) since
 // the list only carries a truncated `summary` preview.
 function DdlRow({ fileId, e, onOpen }: { fileId: number; e: EventRow; onOpen: (pos: number) => void }) {
+  const kind = ddlKind(e.summary)
   return (
     <Table.Tr {...clickableRow(() => onOpen(e.pos))} style={{ cursor: 'pointer' }}>
       <Table.Td style={{ fontVariantNumeric: 'tabular-nums' }} ff="monospace">
@@ -43,8 +59,8 @@ function DdlRow({ fileId, e, onOpen }: { fileId: number; e: EventRow; onOpen: (p
         })()}
       </Table.Td>
       <Table.Td style={{ width: '1%', whiteSpace: 'nowrap' }}>
-        <Badge color="grape" variant="light" size="sm" ff="monospace" styles={{ label: { overflow: 'visible' } }}>
-          {ddlKind(e.summary)}
+        <Badge color={ddlBadgeColor(kind)} variant="light" size="sm" ff="monospace" styles={{ label: { overflow: 'visible' } }}>
+          {kind}
         </Badge>
       </Table.Td>
       <TruncCell label={e.summary} className="summary" fileId={fileId} pos={e.pos} mono />

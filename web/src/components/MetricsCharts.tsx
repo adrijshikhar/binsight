@@ -270,6 +270,12 @@ export default function MetricsCharts({ series, byType, onOpenType, loading, err
       <div className={styles.chartRow}>
         <Panel title="events over time" summary={`Event count across ${series.length} time buckets`}>
           <BarChart data={series} margin={{ top: 4, right: 8, bottom: 20, left: 0 }}>
+            <defs>
+              <linearGradient id="barCountGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.35} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID} />
             <XAxis dataKey="t" tickFormatter={fmtTime} minTickGap={32} {...AXIS}>
               <Label value="time" offset={-4} position="insideBottom" fontSize={9} fill={MUTED} />
@@ -278,12 +284,18 @@ export default function MetricsCharts({ series, byType, onOpenType, loading, err
               <Label value="events" angle={-90} position="insideLeft" offset={14} fontSize={9} fill={MUTED} />
             </YAxis>
             <Tooltip labelFormatter={(t) => fmtTime(Number(t))} {...TIP} />
-            <Bar dataKey="count" fill={c('accent')} radius={[2, 2, 0, 0]} />
+            <Bar dataKey="count" fill="url(#barCountGrad)" stroke="var(--accent)" strokeWidth={1} radius={[2, 2, 0, 0]} />
           </BarChart>
         </Panel>
 
         <Panel title="bytes/sec over time" summary="Byte throughput over time">
           <BarChart data={series} margin={{ top: 4, right: 8, bottom: 20, left: 0 }}>
+            <defs>
+              <linearGradient id="barBytesGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--grape)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="var(--grape)" stopOpacity={0.35} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID} />
             <XAxis dataKey="t" tickFormatter={fmtTime} minTickGap={32} {...AXIS}>
               <Label value="time" offset={-4} position="insideBottom" fontSize={9} fill={MUTED} />
@@ -296,12 +308,18 @@ export default function MetricsCharts({ series, byType, onOpenType, loading, err
               formatter={(v) => [fmtBytes(Number(v)), 'bytes']}
               {...TIP}
             />
-            <Bar dataKey="bytes" fill={CHART_VIOLET} radius={[2, 2, 0, 0]} />
+            <Bar dataKey="bytes" fill="url(#barBytesGrad)" stroke="var(--grape)" strokeWidth={1} radius={[2, 2, 0, 0]} />
           </BarChart>
         </Panel>
 
         <Panel title="bytes by type" summary="Total bytes per event type">
           <BarChart data={topTypes} layout="vertical" margin={{ top: 4, right: 12, bottom: 20, left: 4 }}>
+            <defs>
+              <linearGradient id="barTypeGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="var(--green)" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="var(--green)" stopOpacity={0.9} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={GRID} />
             <XAxis type="number" tickFormatter={(v) => fmtBytes(Number(v))} {...AXIS}>
               <Label value="bytes" offset={-4} position="insideBottom" fontSize={9} fill={MUTED} />
@@ -316,7 +334,9 @@ export default function MetricsCharts({ series, byType, onOpenType, loading, err
             <Tooltip formatter={(v) => [fmtBytes(Number(v)), 'bytes']} {...TIP} />
             <Bar
               dataKey="bytes"
-              fill={c('green')}
+              fill="url(#barTypeGrad)"
+              stroke="var(--green)"
+              strokeWidth={1}
               radius={[0, 2, 2, 0]}
               cursor="pointer"
               onClick={(_, index) => {

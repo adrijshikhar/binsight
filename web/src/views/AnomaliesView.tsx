@@ -126,11 +126,57 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
                   </Table.Td>
                   <Table.Td>
                     {a.txn_id ? (
-                      <Anchor size="sm" {...clickable(() => onOpenTxn(a.txn_id!))}>
+                      <Anchor
+                        size="xs"
+                        ff="monospace"
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 7px',
+                          borderRadius: 4,
+                          background: 'var(--panel2)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--accent)',
+                          textDecoration: 'none',
+                          fontWeight: 500,
+                          transition: 'border-color 150ms ease, background 150ms ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--accent)'
+                          e.currentTarget.style.background = 'var(--surface-active)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--border)'
+                          e.currentTarget.style.background = 'var(--panel2)'
+                        }}
+                        {...clickable(() => onOpenTxn(a.txn_id!))}
+                      >
                         txn #{a.txn_id}
                       </Anchor>
                     ) : a.event_pos ? (
-                      <Anchor size="sm" {...clickable(() => onOpenEvent(a.event_pos!))}>
+                      <Anchor
+                        size="xs"
+                        ff="monospace"
+                        style={{
+                          display: 'inline-block',
+                          padding: '2px 7px',
+                          borderRadius: 4,
+                          background: 'var(--panel2)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--accent)',
+                          textDecoration: 'none',
+                          fontWeight: 500,
+                          transition: 'border-color 150ms ease, background 150ms ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--accent)'
+                          e.currentTarget.style.background = 'var(--surface-active)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--border)'
+                          e.currentTarget.style.background = 'var(--panel2)'
+                        }}
+                        {...clickable(() => onOpenEvent(a.event_pos!))}
+                      >
                         @ {a.event_pos}
                       </Anchor>
                     ) : (

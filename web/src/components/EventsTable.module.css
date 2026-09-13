@@ -3,6 +3,26 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.tableWrap::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tableWrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tableWrap::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.tableWrap::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
 }
 
 /* .eventsTable — fixed-layout table inside the scroll container.
@@ -11,10 +31,9 @@
 .eventsTable {
   table-layout: fixed;
   width: 100%;
-  /* Fixed columns sum to 868px; reserve ~210px more so the flexible summary
-     column never collapses to zero when the drawer/window narrows — below this
-     the .tableWrap scrolls horizontally instead. */
-  min-width: 1080px;
+  /* Fixed columns sum to 746px; reserve ~154px more so the flexible summary
+     column stays readable when the drawer/window narrows. */
+  min-width: 900px;
 }
 
 /* Truncating td cells — className applied by caller (e.g. "tbl") */

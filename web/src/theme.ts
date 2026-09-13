@@ -109,10 +109,46 @@ export const theme = createTheme({
     MultiSelect: { defaultProps: { size: 'xs' } },
     Tooltip: {
       defaultProps: { multiline: true },
-      styles: { tooltip: { maxWidth: 'min(440px, 60vw)', whiteSpace: 'normal', wordBreak: 'break-word' } },
+      styles: {
+        tooltip: {
+          maxWidth: 'min(440px, 60vw)',
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          backgroundColor: 'var(--panel2)',
+          color: 'var(--text)',
+          border: '1px solid var(--border)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+          fontFamily: 'var(--mono)',
+          fontSize: '11px',
+          borderRadius: '4px',
+          padding: '4px 8px',
+        },
+        arrow: {
+          backgroundColor: 'var(--panel2)',
+          border: '1px solid var(--border)',
+        },
+      },
     },
     TooltipFloating: {
-      styles: { tooltip: { maxWidth: 'min(440px, 60vw)', whiteSpace: 'normal', wordBreak: 'break-word' } },
+      styles: {
+        tooltip: {
+          maxWidth: 'min(440px, 60vw)',
+          whiteSpace: 'normal',
+          wordBreak: 'break-word',
+          backgroundColor: 'var(--panel2)',
+          color: 'var(--text)',
+          border: '1px solid var(--border)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+          fontFamily: 'var(--mono)',
+          fontSize: '11px',
+          borderRadius: '4px',
+          padding: '4px 8px',
+        },
+        arrow: {
+          backgroundColor: 'var(--panel2)',
+          border: '1px solid var(--border)',
+        },
+      },
     },
   },
 })
