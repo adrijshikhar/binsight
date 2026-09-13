@@ -44,11 +44,10 @@ const isSm = size === 'sm';
 
   <span class="w-px h-3 bg-[#2d3b4f]"></span>
 
-  <!-- Forks -->
-  <span class="inline-flex items-center gap-1 text-[#8b949e] group-hover:text-[#c9d1d9] transition-colors">
-    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 16 16">
-      <path d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm0 2.122a2.25 2.25 0 1 0-1.5 0v.878A2.25 2.25 0 0 0 5.75 8.5h4.5A2.25 2.25 0 0 0 12.5 6.25v-.878a2.25 2.25 0 1 0-1.5 0v.878a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 5 6.25v-.878zM10.5 3.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0zM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zM3.5 8.25v2.25a2.25 2.25 0 1 0 1.5 0V8.25h-1.5z"/>
-    </svg>
-    <span class="gh-forks-count font-semibold">{SITE_CONFIG.forksCount ?? 1}</span>
+  <!-- Version Tag Pill -->
+  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-[#38bdf8]/10 text-[#38bdf8] border border-[#38bdf8]/20 group-hover:border-[#38bdf8]/40 transition-colors">
+    v{SITE_CONFIG.version}
   </span>
 </a>
+
+

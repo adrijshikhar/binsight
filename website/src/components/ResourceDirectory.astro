@@ -1,0 +1,109 @@
+---
+import { SITE_CONFIG } from '../data/product';
+
+const DIRECTORIES = [
+  {
+    title: 'Installation',
+    icon: 'terminal',
+    links: [
+      { label: 'Homebrew Cask', href: '#install', badge: 'macOS / Linux' },
+      { label: 'Docker Multi-Arch', href: '#install', badge: 'ghcr.io' },
+      { label: 'Binary Tarballs', href: 'https://github.com/adrijshikhar/binsight/releases', badge: 'x86 / arm64' },
+      { label: 'Go Install', href: '#install', badge: 'Go 1.24+' },
+    ],
+  },
+  {
+    title: 'Documentation',
+    icon: 'book',
+    links: [
+      { label: 'CLI Flag Reference', href: 'https://github.com/adrijshikhar/binsight#configuration' },
+      { label: 'Dual-Engine Specification', href: '#diff' },
+      { label: 'Event Type Support Matrix', href: '#matrix' },
+      { label: 'Remote Streaming Guide', href: 'https://github.com/adrijshikhar/binsight#remote-streaming-mode' },
+    ],
+  },
+  {
+    title: 'Deep Dives & Articles',
+    icon: 'article',
+    links: [
+      {
+        label: 'Building a Pure-Go Binlog Analyzer',
+        href: 'https://adrijshikhar.dev/blog/building-a-pure-go-binlog-analyzer',
+        badge: 'Technical',
+      },
+      {
+        label: 'MySQL Binlog 4GiB Position Wrap Bug',
+        href: 'https://adrijshikhar.dev/blog/mysql-binlog-4gib-position-wrap',
+        badge: 'Forensics',
+      },
+      {
+        label: 'Zero-CGo Decoders vs mysqlbinlog',
+        href: '#benchmarks',
+        badge: 'Benchmarks',
+      },
+    ],
+  },
+  {
+    title: 'Community & Source',
+    icon: 'github',
+    links: [
+      { label: 'GitHub Repository', href: SITE_CONFIG.repoUrl },
+      { label: 'GitHub Issues & Bug Reports', href: `${SITE_CONFIG.repoUrl}/issues` },
+      { label: 'Release Notes (v0.2.1)', href: `${SITE_CONFIG.repoUrl}/releases/tag/v0.2.1` },
+      { label: 'Contributing Guidelines', href: `${SITE_CONFIG.repoUrl}/blob/main/CONTRIBUTING.md` },
+    ],
+  },
+];
+---
+
+<section id="resources" class="relative py-24 md:py-32 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0b0f14]/80">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center max-w-2xl mx-auto mb-16 md:mb-20">
+      <h2 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
+        <span class="italic">Resources &</span>
+        <span class="font-sans font-bold text-[#38bdf8] px-1">Tooling.</span>
+      </h2>
+      <p class="text-base sm:text-lg text-[#8b949e] font-sans">
+        Everything you need to integrate, automate, and explore MySQL binary log forensics.
+      </p>
+    </div>
+
+    <!-- 4-Column Directory Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+      {DIRECTORIES.map((col) => (
+        <div class="resource-col rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between hover:border-[#38bdf8]/40 transition-colors">
+          <div>
+            <h3 class="text-base font-bold text-[#f0f6fc] mb-5 pb-3 border-b border-[#212c3d] flex items-center justify-between font-mono">
+              <span>{col.title}</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+            </h3>
+            <ul class="space-y-3 font-mono text-xs">
+              {col.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    target={link.href.startsWith('http') ? '_blank' : '_self'}
+                    rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    class="text-[#8b949e] hover:text-[#38bdf8] transition-colors flex items-center justify-between py-1 group/link"
+                  >
+                    <span class="truncate pr-2">{link.label}</span>
+                    {link.badge ? (
+                      <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#38bdf8] shrink-0">
+                        {link.badge}
+                      </span>
+                    ) : (
+                      <svg class="w-3.5 h-3.5 opacity-0 group-hover/link:opacity-100 transition-opacity text-[#38bdf8] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

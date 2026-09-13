@@ -57,7 +57,7 @@ const jsonLd = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:alt" content="Binsight — MySQL & MariaDB Binlog Analyzer" />
+    <meta property="og:image:alt" content="Binsight: MySQL & MariaDB Binlog Analyzer" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
@@ -65,7 +65,7 @@ const jsonLd = {
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={`${canonicalUrl}/og.png`} />
-    <meta property="twitter:image:alt" content="Binsight — MySQL & MariaDB Binlog Analyzer" />
+    <meta property="twitter:image:alt" content="Binsight: MySQL & MariaDB Binlog Analyzer" />
 
     <!-- Fonts: IBM Plex Serif for editorial devtool elegance + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -93,26 +93,9 @@ const jsonLd = {
     <!-- Subtle radial grid texture -->
     <div class="fixed inset-0 pointer-events-none bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-25 z-0"></div>
 
-    <!-- Outer Framing with Zed-style Guide Rails -->
-    <div class="relative z-10 flex min-h-screen w-full">
-      <!-- Left Blueprint Gutter Rail -->
-      <aside class="hidden sm:flex w-4 sm:w-6 md:w-8 lg:w-12 shrink-0 border-r border-[#222d3d]/50 bg-[#0b0f14]/60 flex-col items-center justify-between py-6 select-none pointer-events-none relative" aria-hidden="true">
-        <div class="ruler-pattern w-full flex-1 opacity-25"></div>
-        <div class="font-mono text-[9px] text-[#3a4d66] -rotate-90 tracking-widest my-10 uppercase whitespace-nowrap">BINSIGHT // 0x00</div>
-        <div class="ruler-pattern w-full flex-1 opacity-25"></div>
-      </aside>
-
-      <!-- Center Main Column -->
-      <div class="flex-1 min-w-0 flex flex-col">
-        <slot />
-      </div>
-
-      <!-- Right Blueprint Gutter Rail -->
-      <aside class="hidden sm:flex w-4 sm:w-6 md:w-8 lg:w-12 shrink-0 border-l border-[#222d3d]/50 bg-[#0b0f14]/60 flex-col items-center justify-between py-6 select-none pointer-events-none relative" aria-hidden="true">
-        <div class="ruler-pattern w-full flex-1 opacity-25"></div>
-        <div class="font-mono text-[9px] text-[#3a4d66] rotate-90 tracking-widest my-10 uppercase whitespace-nowrap">READ_ONLY // RAW</div>
-        <div class="ruler-pattern w-full flex-1 opacity-25"></div>
-      </aside>
+    <!-- Main App Container -->
+    <div class="relative z-10 flex flex-col flex-1 w-full min-h-screen">
+      <slot />
     </div>
 
     <!-- Live GitHub Metrics Sync (session-cached, zero layout shift) -->
@@ -143,16 +126,24 @@ const jsonLd = {
             })
             .catch(function () {});
 
-          function updateDOM(stars, forks) {
+          function updateDOM(stars) {
             document.querySelectorAll('.gh-stars-count').forEach(function (el) {
               el.textContent = String(stars);
-            });
-            document.querySelectorAll('.gh-forks-count').forEach(function (el) {
-              el.textContent = String(forks);
             });
           }
         } catch (e) {}
       })();
+    </script>
+
+    <!-- Anime.js Scroll & Stagger Animations -->
+    <script>
+      import { setupScrollAnimations } from '../scripts/animations';
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setupScrollAnimations());
+      } else {
+        setupScrollAnimations();
+      }
     </script>
   </body>
 </html>

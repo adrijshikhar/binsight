@@ -2,34 +2,28 @@
 // Benchmarks & Telemetry Comparison Section inspired by Zed.dev's performance charts
 ---
 
-<section id="benchmarks" class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0c1017]/40">
-  <div class="corner-diamond left-0 top-0"></div>
-  <div class="corner-diamond left-full top-0"></div>
-
+<section id="benchmarks" class="relative py-28 md:py-36 px-4 sm:px-6 border-t border-[#212c3d] bg-[#0c1017]/40">
   <div class="max-w-5xl mx-auto">
     <!-- Header -->
-    <div class="text-center mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
-        <span>BENCHMARKS // TELEMETRY</span>
-      </div>
+    <div data-anime="reveal" class="text-center mb-20">
       <h2 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Engineered for</span>
         <span class="font-sans font-bold text-[#38bdf8] px-1">speed</span>,
         <span class="italic">not bloat.</span>
       </h2>
-      <p class="text-base sm:text-lg text-[#8b949e] max-w-2xl mx-auto font-sans">
+      <p class="text-base sm:text-lg text-[#8b949e] max-w-2xl mx-auto font-sans leading-relaxed">
         Traditional binlog investigation relies on piping massive text output through pagers. Here is how Binsight stacks up against legacy pipelines and enterprise APM agents.
       </p>
     </div>
 
     <!-- Benchmark Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div data-anime="stagger" class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16">
       <!-- Card 1: Triage Latency -->
       <div class="p-6 rounded-xl border border-[#2d3b4f] bg-[#11161d] flex flex-col justify-between group hover:border-[#38bdf8]/50 transition-colors">
         <div>
           <div class="flex items-center justify-between text-xs font-mono text-[#8b949e] mb-4">
             <span>METRIC: 01</span>
-            <span class="text-[#38bdf8] font-semibold">98.9% faster</span>
+            <span class="text-[#38bdf8] font-semibold" data-counter-target="98.9" data-counter-suffix="% faster" data-counter-decimals="1">98.9% faster</span>
           </div>
           <h3 class="text-lg font-bold text-[#f0f6fc] mb-2 font-mono">2GB Binlog Triage</h3>
           <p class="text-xs text-[#8b949e] mb-6 leading-relaxed">
@@ -45,7 +39,7 @@
                 <span class="w-2 h-2 rounded-full bg-[#38bdf8]"></span>
                 <span>Binsight</span>
               </span>
-              <span class="text-[#38bdf8]">1.4s</span>
+              <span class="text-[#38bdf8]" data-counter-target="1.4" data-counter-suffix="s" data-counter-decimals="1">1.4s</span>
             </div>
             <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
               <div class="h-full bg-[#38bdf8] rounded-full" style="width: 4%;"></div>
@@ -74,7 +68,7 @@
         <div>
           <div class="flex items-center justify-between text-xs font-mono text-[#8b949e] mb-4">
             <span>METRIC: 02</span>
-            <span class="text-[#3fb950] font-semibold">24x lighter</span>
+            <span class="text-[#3fb950] font-semibold" data-counter-target="24" data-counter-suffix="x lighter">24x lighter</span>
           </div>
           <h3 class="text-lg font-bold text-[#f0f6fc] mb-2 font-mono">Memory Footprint</h3>
           <p class="text-xs text-[#8b949e] mb-6 leading-relaxed">
@@ -90,7 +84,7 @@
                 <span class="w-2 h-2 rounded-full bg-[#3fb950]"></span>
                 <span>Binsight (Go)</span>
               </span>
-              <span class="text-[#3fb950]">26 MB</span>
+              <span class="text-[#3fb950]" data-counter-target="26" data-counter-suffix=" MB">26 MB</span>
             </div>
             <div class="w-full h-2.5 rounded-full bg-[#161f2c] overflow-hidden">
               <div class="h-full bg-[#3fb950] rounded-full" style="width: 5%;"></div>

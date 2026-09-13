@@ -2,27 +2,21 @@
 import { COMPATIBILITY } from '../data/product';
 ---
 
-<section class="relative py-20 md:py-28 px-4 sm:px-6 border-t border-[#212c3d]">
-  <div class="corner-diamond left-0 top-0"></div>
-  <div class="corner-diamond left-full top-0"></div>
-
+<section id="matrix" class="relative py-28 md:py-36 px-4 sm:px-6 border-t border-[#212c3d]">
   <div class="max-w-5xl mx-auto">
     <!-- Header -->
-    <div class="text-center max-w-2xl mx-auto mb-16">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
-        <span>CI CONFORMANCE MATRIX</span>
-      </div>
+    <div data-anime="reveal" class="text-center max-w-2xl mx-auto mb-20">
       <h3 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Battle-tested</span>
         <span class="font-sans font-bold text-[#f0f6fc] px-1">conformance.</span>
       </h3>
-      <p class="text-base text-[#8b949e] font-sans">
+      <p class="text-base sm:text-lg text-[#8b949e] font-sans leading-relaxed">
         Binsight is continuously validated against authentic multi-version Docker fixture corpuses in CI.
       </p>
     </div>
 
     <!-- Matrix Table -->
-    <div class="rounded-xl border border-[#212c3d] bg-[#10151d] overflow-hidden shadow-xl">
+    <div data-anime="reveal" class="rounded-xl border border-[#212c3d] bg-[#10151d] overflow-hidden shadow-xl">
       <div class="divide-y divide-[#212c3d]">
         {COMPATIBILITY.map((item) => (
           <div class="p-5 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
