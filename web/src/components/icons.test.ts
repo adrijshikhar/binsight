@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { Close, Warning, kindBadgeStyle, kindBadgeClassName, kindColor } from './icons'
+import { Close, Warning, kindBadgeStyle, kindBadgeClassName, kindColor, kindToBadgeVariant } from './icons'
 
 describe('icons module', () => {
   it('exports semantic icons', () => {
@@ -39,4 +39,20 @@ describe('icons module', () => {
     expect(kindColor('TABLE_MAP')).toBe('teal')
     expect(kindColor('FORMAT_DESCRIPTION')).toBe('gray')
   })
+
+  it('kindToBadgeVariant maps semantic variants honoring green quarantine', () => {
+    expect(kindToBadgeVariant('WRITE_ROWS_V1')).toBe('insert')
+    expect(kindToBadgeVariant('WRITE_ROWS_V2')).toBe('insert')
+    expect(kindToBadgeVariant('UPDATE_ROWS_V1')).toBe('update')
+    expect(kindToBadgeVariant('DELETE_ROWS_V1')).toBe('delete')
+    expect(kindToBadgeVariant('QUERY')).toBe('query')
+    expect(kindToBadgeVariant('CREATE')).toBe('query')
+    expect(kindToBadgeVariant('ALTER')).toBe('query')
+    expect(kindToBadgeVariant('DROP')).toBe('delete')
+    expect(kindToBadgeVariant('TRUNCATE')).toBe('update')
+    expect(kindToBadgeVariant('TABLE_MAP')).toBe('outline')
+    expect(kindToBadgeVariant('XID')).toBe('outline')
+    expect(kindToBadgeVariant('UNKNOWN')).toBe('outline')
+  })
 })
+

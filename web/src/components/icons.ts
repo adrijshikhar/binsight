@@ -41,6 +41,19 @@ const KIND_CLASS: Record<string, string> = {
   default: styles.muted,
 }
 
+export type EventBadgeVariant = 'insert' | 'update' | 'delete' | 'query' | 'outline'
+
+/** Event-kind -> semantic Badge variant following strict green quarantine and data roles. */
+export function kindToBadgeVariant(typeName: string): EventBadgeVariant {
+  if (typeName.startsWith('WRITE_ROWS')) return 'insert'
+  if (typeName.startsWith('UPDATE_ROWS')) return 'update'
+  if (typeName.startsWith('DELETE_ROWS')) return 'delete'
+  if (typeName === 'QUERY' || typeName === 'CREATE' || typeName === 'ALTER') return 'query'
+  if (typeName === 'DROP') return 'delete'
+  if (typeName === 'TRUNCATE') return 'update'
+  return 'outline'
+}
+
 /** Event-kind -> theme color name. */
 export function kindColor(typeName: string): string {
   if (typeName.startsWith('WRITE_ROWS_')) return 'green'
@@ -51,6 +64,7 @@ export function kindColor(typeName: string): string {
   if (typeName === 'TABLE_MAP') return 'teal'
   return 'gray'
 }
+
 
 /** Returns the scoped CSS Module class name for a given event kind badge. */
 export function kindBadgeClassName(kind: string): string {
