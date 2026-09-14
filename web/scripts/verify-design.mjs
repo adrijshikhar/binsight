@@ -156,10 +156,10 @@ async function runVerification() {
     const segmented = await page.locator('[aria-label="View mode"]').first().boundingBox()
     if (!segmented) throw new Error('Segmented control not found')
     console.log(`Segmented control height: ${segmented.height}px`)
-    if (segmented.height < 28) {
-      throw new Error(`Expected >= 28px segmented control height, got ${segmented.height}px`)
+    if (segmented.height < 24) {
+      throw new Error(`Expected >= 24px segmented control height, got ${segmented.height}px`)
     }
-    console.log('PASS: Segmented control capsule height verified.')
+    console.log('PASS: Stock Coss segmented control height verified.')
 
     // Verify design foundation tokens
     const resolvedTokens = await page.evaluate(() => {

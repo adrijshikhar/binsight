@@ -201,7 +201,7 @@ describe('theme.css', () => {
     expect(controlsSpacing).toBe('0')
   })
 
-  it('verifies pills, shapes and navigation adhere to compact rounded rectangle specs', () => {
+  it('verifies pills, shapes and navigation adhere to stock Coss component specs', () => {
     // 1. FilterChip uses rounded-xs (4px)
     const filterChipPath = path.resolve(process.cwd(), 'src/components/ui/filter-chip.tsx')
     const filterChipCode = fs.readFileSync(filterChipPath, 'utf-8')
@@ -212,11 +212,10 @@ describe('theme.css', () => {
     const badgeCode = fs.readFileSync(badgePath, 'utf-8')
     expect(badgeCode).toContain('rounded-sm')
 
-    // 3. Card uses rounded-lg (12px)
+    // 3. Card uses stock Coss rounded-2xl
     const cardPath = path.resolve(process.cwd(), 'src/components/ui/card.tsx')
     const cardCode = fs.readFileSync(cardPath, 'utf-8')
-    expect(cardCode).toContain('rounded-lg')
-    expect(cardCode).not.toContain('rounded-2xl')
+    expect(cardCode).toContain('rounded-2xl')
 
     // 4. App tabs use underline navigation
     const appCssPath = path.resolve(process.cwd(), 'src/App.module.css')
@@ -224,27 +223,25 @@ describe('theme.css', () => {
     expect(appCss).toContain('border-bottom: 2px solid transparent')
     expect(appCss).toContain('border-bottom-color: var(--primary)')
 
-    // 5. Dialog uses rounded-lg (12px framed panel)
+    // 5. Dialog uses stock Coss rounded-2xl
     const dialogPath = path.resolve(process.cwd(), 'src/components/ui/dialog.tsx')
     const dialogCode = fs.readFileSync(dialogPath, 'utf-8')
-    expect(dialogCode).toContain('rounded-lg')
-    expect(dialogCode).not.toContain('rounded-2xl')
+    expect(dialogCode).toContain('rounded-2xl')
 
-    // 6. Segmented control uses rounded-full (capsule) with neutral track and 1px border
+    // 6. Segmented control uses stock Coss rounded-lg root track and rounded-md items
     const segmentedPath = path.resolve(process.cwd(), 'src/lib/segmented-control.ts')
     const segmentedCode = fs.readFileSync(segmentedPath, 'utf-8')
-    expect(segmentedCode).toContain('rounded-full')
-    expect(segmentedCode).toContain('border border-border')
-    expect(segmentedCode).toContain('min-h-7')
+    expect(segmentedCode).toContain('rounded-lg')
+    expect(segmentedCode).toContain('rounded-md')
 
-    // 7. Buttons and inputs use rounded-md (8px)
+    // 7. Buttons and inputs use stock Coss rounded-lg
     const buttonPath = path.resolve(process.cwd(), 'src/components/ui/button.tsx')
     const buttonCode = fs.readFileSync(buttonPath, 'utf-8')
-    expect(buttonCode).toContain('rounded-md')
+    expect(buttonCode).toContain('rounded-lg')
 
     const inputPath = path.resolve(process.cwd(), 'src/components/ui/input.tsx')
     const inputCode = fs.readFileSync(inputPath, 'utf-8')
-    expect(inputCode).toContain('rounded-md')
+    expect(inputCode).toContain('rounded-lg')
   })
 
   it('verifies elevation and interaction states (focus rings and reduced motion)', () => {
