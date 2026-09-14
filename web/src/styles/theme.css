@@ -1,6 +1,7 @@
 :root {
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
+  --font-heading: var(--font-sans);
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
@@ -15,6 +16,7 @@
 @theme inline {
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
   --radius-xs: var(--radius-xs);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -36,13 +38,22 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-solid-foreground: var(--destructive-solid-foreground);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-status-ready: var(--status-ready);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 }
 
 :root[data-theme="dark"],
-:root:not([data-theme])[data-mantine-color-scheme='dark'] {
+:root.dark {
   --background: #010102;
   --surface-1: #0f1011;
   --surface-2: #141516;
@@ -77,8 +88,16 @@
   --accent-foreground: var(--brand-foreground);
 
   --destructive: #be123c;
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: var(--data-delete);
+  --destructive-solid-foreground: #ffffff;
   --destructive-hover: #9f1239;
+
+  --info: var(--selection);
+  --info-foreground: var(--brand-foreground);
+  --warning: var(--data-update-bg);
+  --warning-foreground: var(--data-update);
+  --success: var(--surface-2);
+  --success-foreground: var(--foreground);
 
   --data-insert: #34d399;
   --data-insert-bg: rgba(52, 211, 153, 0.14);
@@ -142,7 +161,7 @@
 }
 
 :root[data-theme="light"],
-:root:not([data-theme])[data-mantine-color-scheme='light'] {
+:root:not(.dark) {
   --background: #ffffff;
   --surface-1: #f5f6f6;
   --surface-2: #f6f7f7;
@@ -177,8 +196,16 @@
   --accent-foreground: var(--brand-foreground);
 
   --destructive: #be123c;
-  --destructive-foreground: #ffffff;
+  --destructive-foreground: var(--data-delete);
+  --destructive-solid-foreground: #ffffff;
   --destructive-hover: #9f1239;
+
+  --info: var(--selection);
+  --info-foreground: var(--brand-foreground);
+  --warning: var(--data-update-bg);
+  --warning-foreground: var(--data-update);
+  --success: var(--surface-2);
+  --success-foreground: var(--foreground);
 
   --data-insert: #047857;
   --data-insert-bg: #ecfdf5;

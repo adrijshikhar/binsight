@@ -18,12 +18,10 @@ describe('theme.css', () => {
     root.walkRules((rule: Rule) => {
       const isDark =
         rule.selector.includes('data-theme="dark"') ||
-        rule.selector.includes("data-mantine-color-scheme='dark'") ||
-        rule.selector.includes('.dark')
+        rule.selector.includes(':root.dark')
       const isLight =
         rule.selector.includes('data-theme="light"') ||
-        rule.selector.includes("data-mantine-color-scheme='light'") ||
-        rule.selector.includes(':not(.dark)')
+        rule.selector.includes(':root:not(.dark)')
       const isRoot = rule.selector === ':root' || rule.selector === ':root, :host'
 
       rule.walkDecls((decl) => {
@@ -98,5 +96,36 @@ describe('theme.css', () => {
     expect(darkTokens['--border-strong']).toBe('#34343a')
     expect(lightTokens['--surface-4']).toBe('#f1f3f5')
     expect(lightTokens['--border-strong']).toBe('#ced4da')
+
+    // Task 20A: Coss color roles and destructive separation
+    expect(darkTokens['--destructive-foreground']).toBe('var(--data-delete)')
+    expect(lightTokens['--destructive-foreground']).toBe('var(--data-delete)')
+    expect(darkTokens['--destructive-solid-foreground']).toBe('#ffffff')
+    expect(lightTokens['--destructive-solid-foreground']).toBe('#ffffff')
+    expect(darkTokens['--destructive-hover']).toBe('#9f1239')
+    expect(lightTokens['--destructive-hover']).toBe('#9f1239')
+
+    expect(darkTokens['--info']).toBe('var(--selection)')
+    expect(darkTokens['--info-foreground']).toBe('var(--brand-foreground)')
+    expect(lightTokens['--info']).toBe('var(--selection)')
+    expect(lightTokens['--info-foreground']).toBe('var(--brand-foreground)')
+
+    expect(darkTokens['--warning']).toBe('var(--data-update-bg)')
+    expect(darkTokens['--warning-foreground']).toBe('var(--data-update)')
+    expect(lightTokens['--warning']).toBe('var(--data-update-bg)')
+    expect(lightTokens['--warning-foreground']).toBe('var(--data-update)')
+
+    // Success role must be NEUTRAL, strictly respecting green quarantine
+    expect(darkTokens['--success']).toBe('var(--surface-2)')
+    expect(darkTokens['--success-foreground']).toBe('var(--foreground)')
+    expect(lightTokens['--success']).toBe('var(--surface-2)')
+    expect(lightTokens['--success-foreground']).toBe('var(--foreground)')
+
+    // Ready dot exception
+    expect(darkTokens['--status-ready']).toBe('#34d399')
+    expect(lightTokens['--status-ready']).toBe('#059669')
+
+    // Font heading
+    expect(sharedTokens['--font-heading'] || darkTokens['--font-heading']).toBe('var(--font-sans)')
   })
 })
