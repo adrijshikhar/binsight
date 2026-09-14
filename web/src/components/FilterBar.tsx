@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import type React from 'react'
-import { Pill } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
 import KindBadge from './KindBadge'
 import FilterMultiSelect from './FilterMultiSelect'
-
+import { FilterChip } from '@/components/ui/filter-chip'
 import { Input } from '@/components/ui/input'
+
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
@@ -239,57 +239,79 @@ export default function FilterBar(props: FilterBarProps) {
 
 
         {/* Active filter pills */}
-        {(filters.types.length > 0 || filters.dbs.length > 0 || filters.tables.length > 0) && (
+        {(filters.types.length > 0 || filters.dbs.length > 0 || filters.tables.length > 0 || txnIds.length > 0) && (
           <span className="text-xs text-muted-foreground font-mono">
             active:
           </span>
         )}
         {filters.types.map((t) => (
-          <Pill
+          <FilterChip
             key={`type-${t}`}
-            withRemoveButton
-            onRemove={() => props.onChange({ ...filters, types: filters.types.filter((x) => x !== t) })}
-            removeButtonProps={{ 'aria-label': `Remove ${t} filter` }}
-            className={styles.kindPill}
+            removeLabel={`Remove ${t} filter`}
+            onRemove={() => {
+              props.onChange({ ...filters, types: filters.types.filter((x) => x !== t) })
+              setTimeout(() => {
+                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                if (next) next.focus()
+                else qRef.current?.focus()
+              }, 0)
+            }}
           >
             <KindBadge typeName={t} size="xs" />
-          </Pill>
+          </FilterChip>
         ))}
         {filters.dbs.map((db) => (
-          <Pill
+          <FilterChip
             key={`db-${db}`}
-            withRemoveButton
-            onRemove={() => props.onChange({ ...filters, dbs: filters.dbs.filter((x) => x !== db) })}
-            removeButtonProps={{ 'aria-label': `Remove database ${db} filter` }}
-            className={styles.summaryPill}
+            removeLabel={`Remove database ${db} filter`}
+            onRemove={() => {
+              props.onChange({ ...filters, dbs: filters.dbs.filter((x) => x !== db) })
+              setTimeout(() => {
+                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                if (next) next.focus()
+                else qRef.current?.focus()
+              }, 0)
+            }}
           >
             db: {db}
-          </Pill>
+          </FilterChip>
         ))}
         {filters.tables.map((tbl) => (
-          <Pill
+          <FilterChip
             key={`tbl-${tbl}`}
-            withRemoveButton
-            onRemove={() => props.onChange({ ...filters, tables: filters.tables.filter((x) => x !== tbl) })}
-            removeButtonProps={{ 'aria-label': `Remove table ${tbl} filter` }}
-            className={styles.summaryPill}
+            removeLabel={`Remove table ${tbl} filter`}
+            onRemove={() => {
+              props.onChange({ ...filters, tables: filters.tables.filter((x) => x !== tbl) })
+              setTimeout(() => {
+                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                if (next) next.focus()
+                else qRef.current?.focus()
+              }, 0)
+            }}
           >
             table: {tbl}
-          </Pill>
+          </FilterChip>
         ))}
 
         {/* Active transaction badges */}
         {txnIds.map((id) => (
-          <Pill
+          <FilterChip
             key={`tx-${id}`}
-            withRemoveButton
-            onRemove={() => props.onRemoveTxn(id)}
-            removeButtonProps={{ 'aria-label': `Remove txn ${id} filter` }}
-            className={styles.txnPill}
+            removeLabel={`Remove txn ${id} filter`}
+            tone="brand"
+            onRemove={() => {
+              props.onRemoveTxn(id)
+              setTimeout(() => {
+                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                if (next) next.focus()
+                else qRef.current?.focus()
+              }, 0)
+            }}
           >
             txn #{id}
-          </Pill>
+          </FilterChip>
         ))}
+
 
         {/* Clear all filters */}
         {hasActiveFilters && (
