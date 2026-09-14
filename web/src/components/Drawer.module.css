@@ -162,6 +162,12 @@
 .drawerTabsList {
   border-bottom: 1px solid var(--border, #30363d);
   flex-shrink: 0;
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 0;
+  background: transparent;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 /* tab body: scrollable, padded */

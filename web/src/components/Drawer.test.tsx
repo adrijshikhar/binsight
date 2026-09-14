@@ -7,7 +7,7 @@ import Drawer from './Drawer'
 import { api } from '../lib/api'
 import type { EventRow } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
+// jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -22,14 +22,14 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// jsdom doesn't implement ResizeObserver — Mantine's Tabs/FloatingIndicator needs it.
+// jsdom doesn't implement ResizeObserver - Mantine's Tabs/FloatingIndicator needs it.
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 }
 
-// Mock the api module — Drawer fetches detail/diff/hex but we don't test network here.
+// Mock the api module - Drawer fetches detail/diff/hex but we don't test network here.
 vi.mock('../lib/api', () => ({
   api: {
     detail: vi.fn().mockResolvedValue({
@@ -92,7 +92,7 @@ function makeProps(overrides: Partial<Parameters<typeof Drawer>[0]> = {}) {
   }
 }
 
-describe('Drawer tabs (Mantine Tabs)', () => {
+describe('Drawer (stock Coss UI)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -151,4 +151,148 @@ describe('Drawer tabs (Mantine Tabs)', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
     await waitFor(() => expect(vi.mocked(api.detail)).toHaveBeenCalled())
   })
+
+  it('renders only one active tabpanel at a time', async () => {
+    wrap(<Drawer {...makeProps()} />)
+    await waitFor(() => expect(vi.mocked(api.detail)).toHaveBeenCalled())
+    const panels = screen.getAllByRole('tabpanel')
+    expect(panels).toHaveLength(1)
+
+    // Switch to Raw JSON
+    fireEvent.click(screen.getByRole('tab', { name: /raw json/i }))
+    await waitFor(() => {
+      expect(screen.getAllByRole('tabpanel')).toHaveLength(1)
+    })
+  })
+
+  it('lazy-fetches diff only when Diff tab is activated', async () => {
+    wrap(<Drawer {...makeProps()} />)
+    await waitFor(() => expect(vi.mocked(api.detail)).toHaveBeenCalled())
+    expect(vi.mocked(api.diff)).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('tab', { name: /diff/i }))
+    await waitFor(() => {
+      expect(vi.mocked(api.diff)).toHaveBeenCalledWith(1, 100)
+    })
+  })
+
+  it('retains active tab when event prop changes', async () => {
+    const { rerender } = wrap(<Drawer {...makeProps()} />)
+    await waitFor(() => expect(vi.mocked(api.detail)).toHaveBeenCalled())
+
+    // Switch to Hex tab
+    fireEvent.click(screen.getByRole('tab', { name: /hex/i }))
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: /hex/i }).getAttribute('aria-selected')).toBe('true')
+    })
+
+    // Rerender with a new event
+    const newEvent: EventRow = { ...BASE_EVENT, pos: 300, end_pos: 400 }
+    rerender(
+      <MantineProvider theme={theme} defaultColorScheme="dark">
+        <Drawer {...makeProps({ event: newEvent })} />
+      </MantineProvider>,
+    )
+
+    // Tab should still be Hex
+    expect(screen.getByRole('tab', { name: /hex/i }).getAttribute('aria-selected')).toBe('true')
+    // And detail should be refetched for new event
+    await waitFor(() => {
+      expect(vi.mocked(api.detail)).toHaveBeenCalledWith(1, 300)
+    })
+  })
+
+  it('shows error banner and retries detail on details tab', async () => {
+    vi.mocked(api.detail).mockRejectedValueOnce(new Error('Failed to fetch detail'))
+    wrap(<Drawer {...makeProps()} />)
+
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('Failed to fetch detail')
+
+    // Click retry
+    const retryBtn = screen.getByRole('button', { name: /retry/i })
+    fireEvent.click(retryBtn)
+    await waitFor(() => {
+      expect(vi.mocked(api.detail)).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  it('shows error banner and retries diff on diff tab', async () => {
+    vi.mocked(api.diff).mockRejectedValueOnce(new Error('Diff network error'))
+    wrap(<Drawer {...makeProps()} />)
+    await waitFor(() => expect(vi.mocked(api.detail)).toHaveBeenCalled())
+
+    fireEvent.click(screen.getByRole('tab', { name: /diff/i }))
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('Diff network error')
+
+    // Click retry
+    const retryBtn = screen.getByRole('button', { name: /retry/i })
+    fireEvent.click(retryBtn)
+    await waitFor(() => {
+      expect(vi.mocked(api.diff)).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  it('adjusts width on ArrowLeft and ArrowRight keyboard events on resize handle with clamping', () => {
+    const onWidthChange = vi.fn()
+    wrap(<Drawer {...makeProps({ width: 520, onWidthChange })} />)
+
+    const handle = screen.getByRole('separator', { name: /resize details panel/i })
+
+    // ArrowLeft widens by 20
+    fireEvent.keyDown(handle, { key: 'ArrowLeft' })
+    expect(onWidthChange).toHaveBeenCalledWith(540)
+
+    // ArrowRight narrows by 20
+    fireEvent.keyDown(handle, { key: 'ArrowRight' })
+    expect(onWidthChange).toHaveBeenCalledWith(500)
+  })
+
+  it('clamps width to max (1000) on ArrowLeft and min (360) on ArrowRight', () => {
+    const onWidthChange = vi.fn()
+    const { rerender } = wrap(<Drawer {...makeProps({ width: 990, onWidthChange })} />)
+    const handle = screen.getByRole('separator', { name: /resize details panel/i })
+
+    fireEvent.keyDown(handle, { key: 'ArrowLeft' })
+    expect(onWidthChange).toHaveBeenCalledWith(1000)
+
+    rerender(
+      <MantineProvider theme={theme} defaultColorScheme="dark">
+        <Drawer {...makeProps({ width: 370, onWidthChange })} />
+      </MantineProvider>,
+    )
+    fireEvent.keyDown(handle, { key: 'ArrowRight' })
+    expect(onWidthChange).toHaveBeenCalledWith(360)
+  })
+
+  it('supports keyboard navigation between tabs using Arrow keys', async () => {
+    wrap(<Drawer {...makeProps()} />)
+    await waitFor(() => expect(vi.mocked(api.detail)).toHaveBeenCalled())
+
+    const detailsTab = screen.getByRole('tab', { name: /details/i })
+    detailsTab.focus()
+    fireEvent.keyDown(detailsTab, { key: 'ArrowRight' })
+
+    const diffTab = screen.getByRole('tab', { name: /diff/i })
+    await waitFor(() => {
+      expect(document.activeElement).toBe(diffTab)
+    })
+  })
+
+  it('does not trap focus away from desktop document', () => {
+    const { container } = wrap(
+      <div>
+        <button type="button" data-testid="external-btn">
+          External
+        </button>
+        <Drawer {...makeProps()} />
+      </div>,
+    )
+    const extBtn = screen.getByTestId('external-btn')
+    extBtn.focus()
+    expect(document.activeElement).toBe(extBtn)
+    expect(container.querySelector('[role="dialog"]')).toBeNull()
+  })
 })
+

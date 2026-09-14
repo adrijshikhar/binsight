@@ -1,10 +1,15 @@
 import { Fragment, useEffect, useState } from 'react'
 import type React from 'react'
-import { Alert, Button, CloseButton, Tabs, Tooltip } from '@mantine/core'
+import { IconX } from '@tabler/icons-react'
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTab, TabsPanel } from '@/components/ui/tabs'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { api } from '../lib/api'
 import { clampDrawerWidth, DRAWER_MIN_WIDTH, DRAWER_MAX_WIDTH } from '../lib/sidebarPrefs'
 import { fmtBytes } from '../lib/format'
 import { WrapArrow } from './icons'
+import KindBadge from './KindBadge'
 import type { DiffResult, EventDetail, EventRow } from '../lib/types'
 import HexView from './HexView'
 import DiffView, { BaGrid, BaWrap, KV, RowImages, RowLabel, RowNav } from './DiffView'
@@ -22,7 +27,7 @@ export interface DrawerProps {
 }
 
 /**
- * Drawer — aside pane with four tabs: Details / Diff / Hex / Raw JSON.
+ * Drawer - aside pane with four tabs: Details / Diff / Hex / Raw JSON.
  *
  * Prop interface is identical to the oracle Drawer so it can be dropped in
  * as a direct replacement. The resize handle, header, pos-wrap panel, and
@@ -98,38 +103,43 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
   const tabLabel = (t: Tab) => (t === 'details' ? 'Details' : t === 'diff' ? 'Diff' : t === 'hex' ? 'Hex' : 'Raw JSON')
 
   return (
-    <div className={styles.drawer} style={{ width }}>
-      {/* Resize handle — drag leftward to widen the panel */}
-      <Tooltip label="Drag or use Arrow keys to resize" openDelay={150} withinPortal>
-        <div
-          className={styles.drawerResize}
-          onPointerDown={onResizeStart}
-          onKeyDown={(e: React.KeyboardEvent) => {
-            const STEP = 20
-            if (e.key === 'ArrowLeft') {
-              e.preventDefault()
-              onWidthChange(clampDrawerWidth(width + STEP))
-            } else if (e.key === 'ArrowRight') {
-              e.preventDefault()
-              onWidthChange(clampDrawerWidth(width - STEP))
-            }
-          }}
-          role="separator"
-          aria-orientation="vertical"
-          aria-label="Resize details panel"
-          aria-valuenow={width}
-          aria-valuemin={DRAWER_MIN_WIDTH}
-          aria-valuemax={DRAWER_MAX_WIDTH}
-          tabIndex={0}
+    <aside className={styles.drawer} style={{ width }} aria-label="Event inspector">
+      {/* Resize handle - drag leftward to widen the panel */}
+      <Tooltip>
+        <TooltipTrigger
+          render={
+            <div
+              className={styles.drawerResize}
+              onPointerDown={onResizeStart}
+              onKeyDown={(e: React.KeyboardEvent) => {
+                const STEP = 20
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault()
+                  onWidthChange(clampDrawerWidth(width + STEP))
+                } else if (e.key === 'ArrowRight') {
+                  e.preventDefault()
+                  onWidthChange(clampDrawerWidth(width - STEP))
+                }
+              }}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize details panel"
+              aria-valuenow={width}
+              aria-valuemin={DRAWER_MIN_WIDTH}
+              aria-valuemax={DRAWER_MAX_WIDTH}
+              tabIndex={0}
+            />
+          }
         />
+        <TooltipPopup>Drag or use Arrow keys to resize</TooltipPopup>
       </Tooltip>
 
       {/* Header */}
       <div className={styles.drawerHdr}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-          <div style={{ minWidth: 0, flex: 1 }}>
+        <div className={styles.drawerHdrRow}>
+          <div className={styles.drawerHdrCol}>
             <div className={styles.drawerHdrType}>
-              {event.type_name}
+              <KindBadge typeName={event.type_name} size="sm" />
               {wrapped && (
                 <span className={styles.wrapTag}>
                   <WrapArrow size={13} /> 4 GiB wrap
@@ -141,11 +151,15 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
               &middot; {fmtBytes(event.size)}
             </div>
           </div>
-          <CloseButton
+          <Button
+            variant="ghost"
+            size="icon-xs"
             aria-label="Close drawer"
             onClick={onClose}
-            size="sm"
-          />
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <IconX className="size-4" />
+          </Button>
         </div>
       </div>
 
@@ -153,12 +167,12 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
       {wrapped && (
         <div className={styles.wrapPanel}>
           <div className={styles.wrapPanelTitle}>
-            <WrapArrow /> uint32 end_log_pos overflow — this event crosses 4 GiB
+            <WrapArrow /> uint32 end_log_pos overflow - this event crosses 4 GiB
           </div>
           <p>
             This event&apos;s byte range spans the {fmtBytes(boundary)} ({boundary.toLocaleString()}) mark. The binlog
             event header stores <code>end_log_pos</code> as a <strong>uint32</strong>, which wraps at 4 GiB, so on disk
-            the server records this event&apos;s end position as the small value below — not its real offset.
+            the server records this event&apos;s end position as the small value below - not its real offset.
           </p>
           <table className={styles.wrapKv}>
             <tbody>
@@ -187,9 +201,13 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
 
       {/* Per-tab error banner */}
       {err && (
-        <Alert color="red" role="alert" mb={0} radius={0}>
-          {err}
-          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
+        <Alert variant="error" className="rounded-none border-x-0 border-t-0 flex items-center justify-between py-2 px-4">
+          <span className="text-xs font-mono">{err}</span>
+          <Button
+            size="xs"
+            variant="outline"
+            onClick={tab === 'diff' ? fetchDiff : fetchDetail}
+          >
             retry
           </Button>
         </Alert>
@@ -198,43 +216,43 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
       {/* Tab strip + panels */}
       <Tabs
         value={tab}
-        onChange={(v) => v && setTab(v as Tab)}
-        keepMounted={false}
-        classNames={{
-          root: styles.drawerTabsRoot,
-          list: styles.drawerTabsList,
-          panel: styles.drawerBody,
-        }}
+        onValueChange={(v) => v && setTab(v as Tab)}
+        className={styles.drawerTabsRoot}
       >
-        <Tabs.List>
+        <TabsList
+          variant="underline"
+          size="sm"
+          className={styles.drawerTabsList}
+          aria-label="Event inspector"
+        >
           {tabs.map((t) => (
-            <Tabs.Tab key={t} value={t}>
+            <TabsTab key={t} value={t} className="font-mono text-xs">
               {tabLabel(t)}
-            </Tabs.Tab>
+            </TabsTab>
           ))}
-        </Tabs.List>
+        </TabsList>
 
-        <Tabs.Panel value="details">
+        <TabsPanel value="details" className={styles.drawerBody}>
           <DetailsTab detail={detail} />
-        </Tabs.Panel>
+        </TabsPanel>
 
-        <Tabs.Panel value="diff">
+        <TabsPanel value="diff" className={styles.drawerBody}>
           <DiffView diff={diff} />
-        </Tabs.Panel>
+        </TabsPanel>
 
-        <Tabs.Panel value="hex">
+        <TabsPanel value="hex" className={styles.drawerBody}>
           <HexView fileId={fileId} pos={event.pos} />
-        </Tabs.Panel>
+        </TabsPanel>
 
-        <Tabs.Panel value="json">
+        <TabsPanel value="json" className={styles.drawerBody}>
           {detail ? (
             <pre className={styles.jsonPane}>{JSON.stringify(detail, null, 2)}</pre>
           ) : (
             <div className={styles.muted}>loading…</div>
           )}
-        </Tabs.Panel>
+        </TabsPanel>
       </Tabs>
-    </div>
+    </aside>
   )
 }
 
@@ -246,7 +264,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
  * for transaction-control and DDL events.
  */
 function DetailsTab({ detail }: { detail: EventDetail | null }) {
-  if (!detail) return <div style={{ color: 'var(--muted)' }}>loading&hellip;</div>
+  if (!detail) return <div className="text-muted">loading&hellip;</div>
   const d = detail.decoded
   const type = detail.header.type_name
 
@@ -261,7 +279,7 @@ function DetailsTab({ detail }: { detail: EventDetail | null }) {
     case 'ANONYMOUS_GTID':
       return <KV pairs={[['GTID', d?.gtid ?? 'ANONYMOUS']]} note="transaction boundary marker" />
     case 'XID':
-      return <KV pairs={[['Xid', String(d?.xid ?? '')]]} note="commit marker — closes the transaction" />
+      return <KV pairs={[['Xid', String(d?.xid ?? '')]]} note="commit marker - closes the transaction" />
     case 'QUERY':
       return d?.sql ? (
         <>
@@ -269,7 +287,7 @@ function DetailsTab({ detail }: { detail: EventDetail | null }) {
           <pre className={styles.monoBlock}>{d.sql}</pre>
         </>
       ) : (
-        <div style={{ color: 'var(--muted)' }}>empty query event</div>
+        <div className="text-muted">empty query event</div>
       )
     case 'FORMAT_DESCRIPTION':
     case 'ROTATE':
@@ -279,10 +297,10 @@ function DetailsTab({ detail }: { detail: EventDetail | null }) {
       return d?.sql ? (
         <pre className={styles.monoBlock}>{d.sql}</pre>
       ) : (
-        <div style={{ color: 'var(--muted)' }}>no decoded payload — see Hex / Raw JSON</div>
+        <div className="text-muted">no decoded payload - see Hex / Raw JSON</div>
       )
     default:
-      return <div style={{ color: 'var(--muted)' }}>no decoded payload for {type} — see Hex / Raw JSON</div>
+      return <div className="text-muted">no decoded payload for {type} - see Hex / Raw JSON</div>
   }
 }
 
