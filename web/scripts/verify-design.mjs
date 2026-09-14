@@ -161,8 +161,99 @@ async function runVerification() {
       await page.screenshot({ path: path.join(OUT_DIR, '04-settings-dialog.png') })
       console.log('Captured 04-settings-dialog.png')
 
-      // Close dialog via Cancel button
-      const cancelBtn = page.locator('button:has-text("Cancel")').first()
+      // 6. Test Light Mode Theme Switch via Settings Display tab
+      const displayNavTab = page.locator('[role="dialog"] [role="tab"]:has-text("Display")').first()
+      if (await displayNavTab.count() > 0) {
+        console.log('Navigating to Display tab in Settings...')
+        await displayNavTab.click()
+        await page.waitForTimeout(300)
+
+        const lightTab = page.locator('[role="dialog"] [role="tab"]:has-text("Light")').first()
+        if (await lightTab.count() > 0) {
+          console.log('Switching to Light appearance in Settings...')
+          await lightTab.click()
+          await page.waitForTimeout(400)
+
+          const lightTokens = await page.evaluate(() => {
+            const rootStyle = window.getComputedStyle(document.documentElement)
+            return {
+              bg: rootStyle.getPropertyValue('--bg').trim(),
+              panel: rootStyle.getPropertyValue('--panel').trim(),
+              primary: rootStyle.getPropertyValue('--primary').trim(),
+            }
+          })
+          console.log('Computed light theme tokens:', lightTokens)
+          if (lightTokens.bg !== '#ffffff' && lightTokens.bg !== '#fff' && lightTokens.bg !== 'rgb(255, 255, 255)') {
+            throw new Error(`Expected #ffffff light mode bg, got ${lightTokens.bg}`)
+          }
+          if (lightTokens.primary !== '#0062bd') {
+            throw new Error(`Expected #0062bd light mode primary, got ${lightTokens.primary}`)
+          }
+          console.log('PASS: Light mode theme tokens validated.')
+          await page.screenshot({ path: path.join(OUT_DIR, '05-light-settings.png') })
+          console.log('Captured 05-light-settings.png')
+        }
+      }
+
+      // Close settings dialog
+      const cancelBtn = page.locator('[role="dialog"] button:has-text("Cancel")').first()
+      if (await cancelBtn.count() > 0) {
+        await cancelBtn.click()
+        await page.waitForTimeout(300)
+      }
+    }
+
+    // 7. Verify all main tabs in light mode
+    const eventsTab = page.locator('[role="tab"]:has-text("Events")').first()
+    if (await eventsTab.count() > 0) {
+      await eventsTab.click()
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: path.join(OUT_DIR, '06-light-events.png') })
+      console.log('Captured 06-light-events.png')
+    }
+
+    if (await overviewTab.count() > 0) {
+      await overviewTab.click()
+      await page.waitForSelector('#tabpanel-overview', { timeout: 5000 })
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: path.join(OUT_DIR, '07-light-overview.png') })
+      console.log('Captured 07-light-overview.png')
+    }
+
+    const tablesTab = page.locator('[role="tab"]:has-text("Tables")').first()
+    if (await tablesTab.count() > 0) {
+      await tablesTab.click()
+      await page.waitForSelector('#tabpanel-tables', { timeout: 5000 })
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: path.join(OUT_DIR, '08-light-tables.png') })
+      console.log('Captured 08-light-tables.png')
+    }
+
+    const schemaTab = page.locator('[role="tab"]:has-text("Schema")').first()
+    if (await schemaTab.count() > 0) {
+      await schemaTab.click()
+      await page.waitForSelector('#tabpanel-schema', { timeout: 5000 })
+      await page.waitForTimeout(300)
+      await page.screenshot({ path: path.join(OUT_DIR, '09-light-schema.png') })
+      console.log('Captured 09-light-schema.png')
+    }
+
+    // 8. Restore Dark mode via Settings Display tab
+    if (await settingsBtn.count() > 0) {
+      await settingsBtn.click()
+      await page.getByRole('dialog', { name: 'Settings' }).waitFor({ timeout: 5000 })
+      const displayNavTab = page.locator('[role="dialog"] [role="tab"]:has-text("Display")').first()
+      if (await displayNavTab.count() > 0) {
+        await displayNavTab.click()
+        await page.waitForTimeout(200)
+        const darkTab = page.locator('[role="dialog"] [role="tab"]:has-text("Dark")').first()
+        if (await darkTab.count() > 0) {
+          console.log('Restoring Dark appearance in Settings...')
+          await darkTab.click()
+          await page.waitForTimeout(300)
+        }
+      }
+      const cancelBtn = page.locator('[role="dialog"] button:has-text("Cancel")').first()
       if (await cancelBtn.count() > 0) {
         await cancelBtn.click()
         await page.waitForTimeout(300)
