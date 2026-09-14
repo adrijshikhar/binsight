@@ -4,7 +4,12 @@ import { fmtBytes } from '../lib/format'
 import { clickable, clickableRow } from '../lib/a11y'
 import MetricsCharts from '../components/MetricsCharts'
 import type { Anomaly, BinlogFile, FileMetrics, TypeCount } from '../lib/types'
-import { Alert, Badge, Button, Card, Center, Group, Paper, SimpleGrid, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Table } from '@/components/ui/table'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { IconArrowRight, IconCheck, IconRefresh } from '@tabler/icons-react'
 import KindBadge from '../components/KindBadge'
 import styles from './OverviewView.module.css'
@@ -18,7 +23,7 @@ const ROW_TYPES = new Set([
   'DELETE_ROWS_V1',
 ])
 
-// fmtDuration renders a second count compactly, e.g. 5 → "5s", 3700 → "1h 1m".
+// fmtDuration renders a second count compactly, e.g. 5 -> "5s", 3700 -> "1h 1m".
 function fmtDuration(sec: number): string {
   if (sec < 60) return `${sec}s`
   if (sec < 3600) return `${Math.floor(sec / 60)}m ${sec % 60}s`
@@ -112,137 +117,130 @@ export default function OverviewView({
   const mutationCounts = counts.filter((c) => ROW_TYPES.has(c.type_name) && c.count > 0)
 
   return (
-    <Stack p="md" gap="md" className={styles.container}>
-      <Group justify="space-between" align="flex-start" gap="sm">
-        <Title order={2} ff="monospace" c="var(--brand-foreground)" className={styles.title}>
+    <div className={`p-4 flex flex-col gap-4 ${styles.container}`}>
+      <div className="flex items-start justify-between gap-2">
+        <h2 className={`font-mono text-lg font-semibold text-brand-foreground ${styles.title}`}>
           {file.path.split('/').pop()}
-        </Title>
+        </h2>
         <Button
-          variant="default"
+          variant="outline"
           size="xs"
-          leftSection={<IconRefresh size={14} className={reindexing ? 'animate-spin' : undefined} />}
           onClick={doReindex}
-          loading={reindexing}
           disabled={reindexing}
           title="Re-decode and re-index this file (rebuilds the event index, parsed schema, and anomalies)"
         >
-          {reindexing ? 'Indexing…' : 'Re-index'}
+          <IconRefresh size={14} className={reindexing ? 'animate-spin mr-1.5' : 'mr-1.5'} />
+          {reindexing ? 'Indexing...' : 'Re-index'}
         </Button>
-      </Group>
+      </div>
 
       {reindexErr && (
-        <Alert color="red" role="alert">
+        <Alert variant="error" role="alert">
           {reindexErr}
         </Alert>
       )}
 
       {/* Balanced 2-column top grid: File Specifications + Health & Row Mutations */}
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Left column: File Specifications */}
-        <Paper withBorder p="sm" className={styles.metaPaper}>
-          <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader} mb="xs">
+        <div className={`rounded-xl border bg-card p-3 Paper ${styles.metaPaper}`}>
+          <div className={`text-xs text-muted-foreground uppercase ${styles.sectionHeader} mb-2`}>
             File Specifications
-          </Text>
-          <Table withRowBorders={false} className="table-fixed">
+          </div>
+          <Table layout="fixed" withRowBorders={false} className="table-fixed">
             <Table.Tbody>
               {meta.map(([k, v]) => (
                 <Table.Tr key={k}>
-                  <Table.Td w={110} c="dimmed" fz="xs">
+                  <Table.Td className="w-[110px] text-xs text-muted-foreground">
                     {k}
                   </Table.Td>
-                  <Table.Td ff="monospace" fz="xs" className="wrap-anywhere">
+                  <Table.Td className="font-mono text-xs break-all">
                     {v}
                   </Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>
           </Table>
-        </Paper>
+        </div>
 
         {/* Right column: Health & Row Mutations */}
-        <Paper withBorder p="sm" className={styles.healthPaper}>
-          <Group justify="space-between" align="center" mb="xs">
-            <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+        <div className={`rounded-xl border bg-card p-3 Paper ${styles.healthPaper}`}>
+          <div className="flex items-center justify-between mb-2">
+            <div className={`text-xs text-muted-foreground uppercase ${styles.sectionHeader}`}>
               Health & Data Mutations
-            </Text>
+            </div>
             {total > 0 && (
               <Button
-                variant="subtle"
-                size="compact-xs"
-                color="accent"
-                rightSection={<IconArrowRight size={12} />}
+                variant="ghost"
+                size="xs"
                 onClick={onShowAnomalies}
                 className={styles.viewAllBtn}
               >
                 View all
+                <IconArrowRight size={12} className="ml-1" />
               </Button>
             )}
-          </Group>
+          </div>
 
           {/* Anomaly summary badge strip */}
-          <Paper
-            withBorder
-            p="xs"
-            mb="xs"
-            className={total > 0 ? styles.anomalySummary : styles.anomalySummaryDisabled}
+          <div
+            className={`p-2.5 mb-2 rounded-lg border ${total > 0 ? styles.anomalySummary : styles.anomalySummaryDisabled}`}
             {...(total > 0 ? clickable(onShowAnomalies) : {})}
           >
             {total === 0 ? (
-              <Group gap={6} c="var(--emerald)">
+              <div className="flex items-center gap-1.5 text-emerald-500">
                 <IconCheck size={16} />
-                <Text fw={500} size="xs">
+                <span className="text-xs font-medium">
                   No anomalies detected in this binlog
-                </Text>
-              </Group>
+                </span>
+              </div>
             ) : (
-              <Group justify="space-between" align="center" wrap="wrap" gap="xs">
-                <Text size="xs" fw={600} c="var(--orange)">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-amber-500">
                   Anomalies: {total}
-                </Text>
-                <Group gap={6} wrap="wrap">
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
                   {byDetector.map(([det, n]) => (
                     <Badge
                       key={det}
-                      color="gray"
-                      variant="light"
-                      size="xs"
-                      ff="monospace"
-                      className="cursor-pointer"
+                      variant="secondary"
+                      size="sm"
+                      className="font-mono cursor-pointer"
                       onClick={onShowAnomalies}
                     >
-                      {det} <strong>{n}</strong>
+                      {det} <strong className="ml-1">{n}</strong>
                     </Badge>
                   ))}
-                </Group>
-              </Group>
+                </div>
+              </div>
             )}
-          </Paper>
+          </div>
 
           {/* Row mutations breakdown table (relocated from sidebar) */}
-          <Stack gap={4} style={{ flex: 1 }}>
-            <Group justify="space-between" align="center" mt={4}>
-              <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+          <div className="flex flex-col gap-1 flex-1">
+            <div className="flex items-center justify-between mt-1">
+              <span className={`text-xs text-muted-foreground uppercase ${styles.sectionHeader}`}>
                 Row Mutations
-              </Text>
-              <Text size="xs" c="dimmed">
+              </span>
+              <span className="text-xs text-muted-foreground">
                 {mutationCounts.length > 0
                   ? `${mutationCounts.reduce((n, c) => n + c.rows_total, 0).toLocaleString()} rows affected`
                   : '0 rows'}
-              </Text>
-            </Group>
+              </span>
+            </div>
 
             {mutationCounts.length === 0 ? (
-              <Text size="xs" c="dimmed" py="xs">
+              <p className="text-xs text-muted-foreground py-2">
                 No row mutation events (inserts/updates/deletes) found in this binlog.
-              </Text>
+              </p>
             ) : (
-              <Table verticalSpacing={4} fz="xs" withRowBorders={false}>
+              <Table withRowBorders={false} className="text-xs">
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Type</Table.Th>
-                    <Table.Th ta="right">Events</Table.Th>
-                    <Table.Th ta="right">Rows</Table.Th>
-                    <Table.Th ta="right">Bytes</Table.Th>
+                    <Table.Th className="text-right">Events</Table.Th>
+                    <Table.Th className="text-right">Rows</Table.Th>
+                    <Table.Th className="text-right">Bytes</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -257,13 +255,13 @@ export default function OverviewView({
                         <Table.Td>
                           <KindBadge typeName={c.type_name} size="xs" />
                         </Table.Td>
-                        <Table.Td ta="right" className="tabular-nums">
+                        <Table.Td className="text-right tabular-nums">
                           {c.count.toLocaleString()}
                         </Table.Td>
-                        <Table.Td ta="right" className="tabular-nums">
+                        <Table.Td className="text-right tabular-nums">
                           {c.rows_total > 0 ? c.rows_total.toLocaleString() : '-'}
                         </Table.Td>
-                        <Table.Td ta="right" className="tabular-nums">
+                        <Table.Td className="text-right tabular-nums">
                           {bytes ? fmtBytes(bytes) : '-'}
                         </Table.Td>
                       </Table.Tr>
@@ -274,103 +272,97 @@ export default function OverviewView({
             )}
 
             {decodeWarn && (
-              <Alert color="yellow" variant="light" p="xs" mt="xs">
+              <Alert variant="warning" className="p-2 mt-2">
                 Decoded stream contains partial frames or errors.
               </Alert>
             )}
-          </Stack>
-        </Paper>
-      </SimpleGrid>
+          </div>
+        </div>
+      </div>
 
       {err && (
-        <Alert color="red" role="alert">
-          {err}
-          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => setRetryKey((k) => k + 1)}>
+        <Alert variant="error" role="alert" className="flex items-center justify-between">
+          <span>{err}</span>
+          <Button size="xs" variant="outline" className="ml-2" onClick={() => setRetryKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
       )}
 
       {!loading && !err && metrics && metrics.events === 0 && counts.length === 0 && (
-        <Center py="xl">
-          <Stack align="center" gap="xs" role="status">
-            <Text c="dimmed">No events indexed for this file.</Text>
-            <Text c="dimmed" size="xs">
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-2" role="status">
+            <p className="text-muted-foreground">No events indexed for this file.</p>
+            <p className="text-muted-foreground text-xs">
               The file may still be indexing or contain no parseable events.
-            </Text>
-            <Button variant="default" size="xs" onClick={doReindex}>
+            </p>
+            <Button variant="outline" size="xs" onClick={doReindex}>
               re-index now
             </Button>
-          </Stack>
-        </Center>
+          </div>
+        </div>
       )}
 
       {metrics && (
         <>
-          <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+          <div className={`text-xs text-muted-foreground uppercase ${styles.sectionHeader}`}>
             Metrics
-          </Text>
-          <Group gap="sm" wrap="wrap">
-            <Card withBorder padding="sm" className={styles.metricCard}>
-              <Text size="xs" c="dimmed">
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Card className={`p-3 ${styles.metricCard}`}>
+              <div className="text-xs text-muted-foreground">
                 event size (avg)
-              </Text>
-              <Text size="lg" fw={600} ff="monospace" className={styles.metricValue}>
+              </div>
+              <div className={`text-lg font-semibold font-mono ${styles.metricValue}`}>
                 {fmtBytes(metrics.event_size.avg)}
-              </Text>
-              <Text size="xs" c="dimmed">
+              </div>
+              <div className="text-xs text-muted-foreground">
                 {fmtBytes(metrics.event_size.min)} min · {fmtBytes(metrics.event_size.max)} max ·{' '}
                 {fmtBytes(metrics.event_size.total)} total
-              </Text>
+              </div>
             </Card>
-            <Card withBorder padding="sm" className={styles.metricCard}>
-              <Text size="xs" c="dimmed">
+            <Card className={`p-3 ${styles.metricCard}`}>
+              <div className="text-xs text-muted-foreground">
                 events
-              </Text>
-              <Text size="lg" fw={600} ff="monospace" className={styles.metricValue}>
+              </div>
+              <div className={`text-lg font-semibold font-mono ${styles.metricValue}`}>
                 {metrics.events.toLocaleString()}
-              </Text>
-              <Text size="xs" c="dimmed">
+              </div>
+              <div className="text-xs text-muted-foreground">
                 {metrics.events_per_sec.toFixed(1)}/s · {fmtBytes(metrics.bytes_per_sec)}/s
-              </Text>
+              </div>
             </Card>
-            <Card withBorder padding="sm" className={styles.metricCard}>
-              <Text size="xs" c="dimmed">
+            <Card className={`p-3 ${styles.metricCard}`}>
+              <div className="text-xs text-muted-foreground">
                 time span
-              </Text>
-              <Text size="lg" fw={600} ff="monospace" className={styles.metricValue}>
+              </div>
+              <div className={`text-lg font-semibold font-mono ${styles.metricValue}`}>
                 {fmtDuration(metrics.span_sec)}
-              </Text>
-              <Text size="xs" c="dimmed">
+              </div>
+              <div className="text-xs text-muted-foreground">
                 {metrics.txns.count.toLocaleString()} txns
-              </Text>
+              </div>
             </Card>
             <Card
-              withBorder
-              padding="sm"
-              className={`${styles.metricCard} ${decodeWarn ? styles.metricCardWarn : ''}`}
+              className={`p-3 ${styles.metricCard} ${decodeWarn ? styles.metricCardWarn : ''}`}
             >
-              <Text size="xs" c="dimmed">
+              <div className="text-xs text-muted-foreground">
                 decode
-              </Text>
-              <Text
-                size="lg"
-                fw={600}
-                ff="monospace"
-                c={decodeWarn ? 'orange' : undefined}
-                className={styles.metricValue}
+              </div>
+              <div
+                className={`text-lg font-semibold font-mono ${decodeWarn ? 'text-amber-500' : ''} ${styles.metricValue}`}
               >
                 {metrics.decode.full.toLocaleString()} full
-              </Text>
-              <Text size="xs" c="dimmed">
+              </div>
+              <div className="text-xs text-muted-foreground">
                 {metrics.decode.partial} partial · {metrics.decode.none} none · {metrics.decode.errors} err
-              </Text>
+              </div>
             </Card>
-          </Group>
+          </div>
 
-          <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+          <div className={`text-xs text-muted-foreground uppercase ${styles.sectionHeader}`}>
             Event activity
-          </Text>
+          </div>
           <MetricsCharts
             series={metrics.series}
             byType={metrics.by_type}
@@ -382,31 +374,30 @@ export default function OverviewView({
         </>
       )}
 
-      <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+      <div className={`text-xs text-muted-foreground uppercase ${styles.sectionHeader}`}>
         Breakdown
-      </Text>
-      <Group gap="md" align="stretch" wrap="wrap">
+      </div>
+      <div className="flex flex-wrap items-stretch gap-4">
         {metrics && metrics.largest_events.length > 0 && (
-          <Paper
-            withBorder
-            p="xs"
-            className={styles.breakdownCol}
+          <div
+            className={`rounded-xl border bg-card p-3 Paper ${styles.breakdownCol}`}
+            data-slot="breakdown-panel"
           >
-            <Text size="xs" c="dimmed" mb="xs">
+            <div className="text-xs text-muted-foreground mb-2">
               Largest events by size
-            </Text>
+            </div>
             <div className={styles.tableScroll}>
-              <Table fz="xs" className={styles.tableFixed}>
+              <Table className={`text-xs ${styles.tableFixed}`}>
                 <Table.Thead className={styles.stickyHeader}>
                   <Table.Tr>
                     <Table.Th>type</Table.Th>
-                    <Table.Th w="3.5rem" ta="right">
+                    <Table.Th className="w-14 text-right">
                       txn
                     </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
+                    <Table.Th className="w-20 text-right">
                       size
                     </Table.Th>
-                    <Table.Th w="5.5rem" ta="right" title="byte offset of the event in the binlog file">
+                    <Table.Th className="w-20 text-right" title="byte offset of the event in the binlog file">
                       offset
                     </Table.Th>
                   </Table.Tr>
@@ -421,13 +412,13 @@ export default function OverviewView({
                       <Table.Td>
                         <KindBadge typeName={e.type_name} size="xs" />
                       </Table.Td>
-                      <Table.Td ta="right" className="tabular-nums">
+                      <Table.Td className="text-right tabular-nums">
                         {e.txn_id ? `#${e.txn_id}` : '-'}
                       </Table.Td>
-                      <Table.Td ta="right" className="tabular-nums">
+                      <Table.Td className="text-right tabular-nums">
                         {fmtBytes(e.size)}
                       </Table.Td>
-                      <Table.Td ta="right" className="tabular-nums">
+                      <Table.Td className="text-right tabular-nums">
                         {e.pos.toLocaleString()}
                       </Table.Td>
                     </Table.Tr>
@@ -435,27 +426,26 @@ export default function OverviewView({
                 </Table.Tbody>
               </Table>
             </div>
-          </Paper>
+          </div>
         )}
 
         {metrics && metrics.largest_txns.length > 0 && (
-          <Paper
-            withBorder
-            p="xs"
-            className={styles.breakdownCol}
+          <div
+            className={`rounded-xl border bg-card p-3 Paper ${styles.breakdownCol}`}
+            data-slot="breakdown-panel"
           >
-            <Text size="xs" c="dimmed" mb="xs">
+            <div className="text-xs text-muted-foreground mb-2">
               Largest transactions by event count
-            </Text>
+            </div>
             <div className={styles.tableScroll}>
-              <Table fz="xs" className={styles.tableFixed}>
+              <Table className={`text-xs ${styles.tableFixed}`}>
                 <Table.Thead className={styles.stickyHeader}>
                   <Table.Tr>
                     <Table.Th>txn</Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
+                    <Table.Th className="w-20 text-right">
                       events
                     </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
+                    <Table.Th className="w-20 text-right">
                       rows
                     </Table.Th>
                   </Table.Tr>
@@ -467,19 +457,22 @@ export default function OverviewView({
                       {...clickableRow(() => onOpenTxn(t.id))}
                       className="cursor-pointer"
                     >
-                      <Table.Td className="wrap-anywhere">
+                      <Table.Td className="break-all">
                         {t.gtid && t.gtid !== 'ANONYMOUS' ? (
-                          <Tooltip label={t.gtid} openDelay={200} withinPortal>
-                            <span>{t.gtid}</span>
+                          <Tooltip>
+                            <TooltipTrigger render={<span>{t.gtid}</span>} />
+                            <TooltipPopup side="top" align="center">
+                              {t.gtid}
+                            </TooltipPopup>
                           </Tooltip>
                         ) : (
                           `#${t.id}`
                         )}
                       </Table.Td>
-                      <Table.Td ta="right" className="tabular-nums">
+                      <Table.Td className="text-right tabular-nums">
                         {t.events.toLocaleString()}
                       </Table.Td>
-                      <Table.Td ta="right" className="tabular-nums">
+                      <Table.Td className="text-right tabular-nums">
                         {t.rows.toLocaleString()}
                       </Table.Td>
                     </Table.Tr>
@@ -487,30 +480,30 @@ export default function OverviewView({
                 </Table.Tbody>
               </Table>
             </div>
-          </Paper>
+          </div>
         )}
 
-        <Paper withBorder p="xs" className={styles.breakdownCol}>
-          <Text size="xs" c="dimmed" mb="xs">
+        <div className={`rounded-xl border bg-card p-3 Paper ${styles.breakdownCol}`} data-slot="breakdown-panel">
+          <div className="text-xs text-muted-foreground mb-2">
             Event types
-          </Text>
+          </div>
           {loading && counts.length === 0 ? (
-            <Text size="xs" c="dimmed" p="xs">
-              loading…
-            </Text>
+            <div className="text-xs text-muted-foreground p-2">
+              loading...
+            </div>
           ) : (
             <div className={styles.tableScroll}>
-              <Table fz="xs" className={styles.tableFixed}>
+              <Table className={`text-xs ${styles.tableFixed}`}>
                 <Table.Thead className={styles.stickyHeader}>
                   <Table.Tr>
                     <Table.Th>type</Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
+                    <Table.Th className="w-20 text-right">
                       events
                     </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
+                    <Table.Th className="w-20 text-right">
                       rows
                     </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
+                    <Table.Th className="w-20 text-right">
                       bytes
                     </Table.Th>
                   </Table.Tr>
@@ -528,29 +521,29 @@ export default function OverviewView({
                         <Table.Td>
                           <KindBadge typeName={c.type_name} size="xs" />
                         </Table.Td>
-                        <Table.Td ta="right" className="tabular-nums">
+                        <Table.Td className="text-right tabular-nums">
                           {c.count.toLocaleString()}
                         </Table.Td>
-                        <Table.Td ta="right" className="tabular-nums">
+                        <Table.Td className="text-right tabular-nums">
                           {isRow && c.rows_total > 0 ? c.rows_total.toLocaleString() : ''}
                         </Table.Td>
-                        <Table.Td ta="right" className="tabular-nums">
+                        <Table.Td className="text-right tabular-nums">
                           {bytes ? fmtBytes(bytes) : ''}
                         </Table.Td>
                       </Table.Tr>
                     )
                   })}
                   <Table.Tr className={styles.totalRow}>
-                    <Table.Td c="dimmed" fw={600}>
+                    <Table.Td className="text-muted-foreground font-semibold">
                       total
                     </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} className="tabular-nums">
+                    <Table.Td className="text-right text-muted-foreground font-semibold tabular-nums">
                       {totalEvents.toLocaleString()}
                     </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} className="tabular-nums">
+                    <Table.Td className="text-right text-muted-foreground font-semibold tabular-nums">
                       {totalRows.toLocaleString()}
                     </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} className="tabular-nums">
+                    <Table.Td className="text-right text-muted-foreground font-semibold tabular-nums">
                       {fmtBytes(metrics?.event_size.total ?? 0)}
                     </Table.Td>
                   </Table.Tr>
@@ -558,8 +551,8 @@ export default function OverviewView({
               </Table>
             </div>
           )}
-        </Paper>
-      </Group>
-    </Stack>
+        </div>
+      </div>
+    </div>
   )
 }
