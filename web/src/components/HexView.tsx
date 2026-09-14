@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Alert, Tooltip } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { api } from '../lib/api'
 import { Check, Cross } from './icons'
 import type { HexResult } from '../lib/types'
@@ -24,7 +26,7 @@ interface Props {
 }
 
 /**
- * HexView — paged hex dump for a single binlog event.
+ * HexView - paged hex dump for a single binlog event.
  *
  * Loads bytes in 4 KiB windows (server-side HexResult) and renders them as
  * offset + 16 × hex + ascii rows. Field annotations are shown as colored
@@ -39,6 +41,15 @@ export default function HexView({ fileId, pos }: Props) {
   useEffect(() => {
     setWinStart(0)
   }, [fileId, pos])
+
+  const fetchHex = () => {
+    setHex(null)
+    setErr('')
+    api
+      .hex(fileId, pos, winStart, HEX_WINDOW)
+      .then((h) => setHex(h))
+      .catch((e: unknown) => setErr(e instanceof Error ? e.message : String(e)))
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -59,8 +70,11 @@ export default function HexView({ fileId, pos }: Props) {
 
   if (err)
     return (
-      <Alert color="red" role="alert">
-        {err}
+      <Alert variant="error" role="alert" className="flex items-center justify-between">
+        <span>{err}</span>
+        <Button size="xs" variant="outline" onClick={fetchHex}>
+          retry
+        </Button>
       </Alert>
     )
   if (!hex) return <div className={styles.rowNav}>loading&hellip;</div>
@@ -77,11 +91,21 @@ export default function HexView({ fileId, pos }: Props) {
         {slice.map((i) => {
           const a = annFor(base + i)
           const cls = a ? (ANN_CLASS[a.field] ?? '') : ''
+          const byteStr = bytes.charCodeAt(i).toString(16).padStart(2, '0') + ' '
           return (
-            <Tooltip key={i} label={a ? `${a.field}: ${a.value}` : ''} openDelay={150} withinPortal disabled={!a}>
-              <span className={cls} aria-label={a ? `${a.field}: ${a.value}` : undefined}>
-                {bytes.charCodeAt(i).toString(16).padStart(2, '0')}{' '}
-              </span>
+            <Tooltip key={i} disabled={!a}>
+              <TooltipTrigger
+                render={
+                  <span className={cls} aria-label={a ? `${a.field}: ${a.value}` : undefined}>
+                    {byteStr}
+                  </span>
+                }
+              />
+              {a && (
+                <TooltipPopup side="top" align="center">
+                  {`${a.field}: ${a.value}`}
+                </TooltipPopup>
+              )}
             </Tooltip>
           )
         })}
@@ -106,23 +130,32 @@ export default function HexView({ fileId, pos }: Props) {
       <div className={styles.rowNav}>
         {hex.crc_checked && (
           <span
-            className={hex.crc_valid ? styles.ok : styles.warn}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+            className={`${hex.crc_valid ? styles.ok : styles.warn} ${styles.crcStatus}`}
           >
             CRC32
             {hex.crc_valid ? <Check size={14} /> : <Cross size={14} />}
             {hex.crc_valid ? 'valid' : 'MISMATCH'}
           </span>
         )}
-        {' · '}bytes {base.toLocaleString()}–{winEnd.toLocaleString()} of {hex.total.toLocaleString()}
+        {' · '}bytes {base.toLocaleString()}-{winEnd.toLocaleString()} of {hex.total.toLocaleString()}
         {(hasPrev || hasMore) && (
           <span className={styles.hexPager}>
-            <button disabled={!hasPrev} onClick={() => setWinStart(Math.max(0, base - HEX_WINDOW))}>
+            <Button
+              variant="ghost"
+              size="xs"
+              disabled={!hasPrev}
+              onClick={() => setWinStart(Math.max(0, base - HEX_WINDOW))}
+            >
               ‹ prev
-            </button>
-            <button disabled={!hasMore} onClick={() => setWinStart(base + HEX_WINDOW)}>
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
+              disabled={!hasMore}
+              onClick={() => setWinStart(base + HEX_WINDOW)}
+            >
               next ›
-            </button>
+            </Button>
           </span>
         )}
       </div>

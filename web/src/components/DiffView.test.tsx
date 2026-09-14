@@ -3,10 +3,10 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import { MantineProvider } from '@mantine/core'
 import { theme } from '../theme'
-import DiffView from './DiffView'
+import DiffView, { RowImages } from './DiffView'
 import type { DiffResult } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
+// jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: (query: string) => ({
@@ -42,9 +42,12 @@ function makeDiff(overrides: Partial<DiffResult> = {}): DiffResult {
 }
 
 describe('DiffView', () => {
-  it('renders "all adapters agree" when no disagreements', () => {
+  it('renders "✓ all adapters agree" when no disagreements', () => {
     wrap(<DiffView diff={makeDiff()} />)
-    expect(screen.getByText(/all adapters agree/i)).toBeTruthy()
+    const el = screen.getByText(/all adapters agree/i)
+    expect(el).toBeTruthy()
+    expect(el.textContent).toContain('✓ all adapters agree')
+    expect(el.className).toMatch(/agreeText/)
   })
 
   it('shows disagreement count when disagreements exist', () => {
@@ -123,4 +126,46 @@ describe('DiffView', () => {
     const changedCells = container.querySelectorAll('[class*="diffValChanged"]')
     expect(changedCells.length).toBe(0)
   })
+
+  it('does NOT render "all adapters agree" when adapter errors exist', () => {
+    const diff = makeDiff({
+      disagreement_count: 0,
+      errors: { mysqlbinlog: 'mysqlbinlog exited: exit status 1' },
+    })
+    wrap(<DiffView diff={diff} />)
+    expect(screen.queryByText(/all adapters agree/i)).toBeNull()
+    expect(screen.getByText(/1 adapter error/i)).toBeTruthy()
+    expect(screen.getByText(/mysqlbinlog: mysqlbinlog exited: exit status 1/i)).toBeTruthy()
+  })
+
+  it('marks agreement with data-status="agreement" and row additions with data-change="added"', () => {
+    const diff = makeDiff({
+      disagreement_count: 0,
+      fields: [
+        {
+          name: 'decoded.table',
+          agree: true,
+          partial: false,
+          severity: 'decoded',
+          values: { gomysql: 'users', mysqlbinlog: 'users' },
+        },
+      ],
+    })
+    const { container: diffContainer } = wrap(<DiffView diff={diff} />)
+    const agreement = diffContainer.querySelector('[data-status="agreement"]')
+    expect(agreement).toBeTruthy()
+    expect(agreement?.getAttribute('data-status')).toBe('agreement')
+
+    // Test RowImages addition
+    const { container: rowContainer } = render(
+      <RowImages
+        rows={[{ before: undefined, after: ['new_row_val'] }]}
+        colTypes={['VARCHAR']}
+      />,
+    )
+    const addition = rowContainer.querySelector('[data-change="added"]')
+    expect(addition).toBeTruthy()
+    expect(addition?.getAttribute('data-change')).toBe('added')
+  })
 })
+

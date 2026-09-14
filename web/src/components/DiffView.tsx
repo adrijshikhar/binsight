@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react'
 import type React from 'react'
-import { Alert, Tooltip } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import type { DiffResult, RowImage } from '../lib/types'
 import styles from './DiffView.module.css'
 
@@ -83,7 +84,11 @@ function RowGrid({ row, colTypes, index }: { row: RowImage; colTypes: string[]; 
         <span>{colTypes[i] ?? ''}</span>
       </div>,
       <div key={`b${i}`}>{row.before ? fmtVal(b) : '-'}</div>,
-      <div key={`a${i}`} className={changed ? styles.changed : ''}>
+      <div
+        key={`a${i}`}
+        className={changed ? styles.changed : ''}
+        data-change={!row.before && row.after ? 'added' : changed ? 'modified' : undefined}
+      >
         {row.after ? fmtVal(a) : '-'}
       </div>,
     )
@@ -109,7 +114,7 @@ function fmtVal(v: unknown): string {
 
 // ── KV ───────────────────────────────────────────────────────────────────
 
-/** Key/value table — structural events (GTID, XID, TABLE_MAP…). */
+/** Key/value table - structural events (GTID, XID, TABLE_MAP…). */
 export function KV({ pairs, note }: { pairs: [string, string][]; note?: string }) {
   return (
     <>
@@ -135,42 +140,49 @@ interface DiffViewProps {
 }
 
 /**
- * DiffView — multi-adapter comparison pane.
+ * DiffView - multi-adapter comparison pane.
  *
  * Shows a diff grid with per-field agree/disagree/partial/disagree-hard
  * styling, plus per-adapter error banners and timing info in the nav bar.
  * Mirrors the oracle Drawer's DiffTab exactly.
  */
 export default function DiffView({ diff }: DiffViewProps) {
-  if (!diff) return <div style={{ color: 'var(--muted)' }}>running diff adapters&hellip;</div>
+  if (!diff) return <div className="text-muted">running diff adapters&hellip;</div>
 
-  // Nil Go slices/maps marshal to JSON null — default before use.
+  // Nil Go slices/maps marshal to JSON null - default before use.
   const adapters = diff.adapters ?? []
   const fields = diff.fields ?? []
   const errors = diff.errors ?? {}
   const timing = diff.timing_ms ?? {}
+  const errCount = Object.keys(errors).length
 
   return (
     <>
       <RowNav>
-        {(diff.disagreement_count ?? 0) > 0 ? (
+        {errCount > 0 ? (
+          <b className={styles.error}>
+            {errCount} adapter error{errCount > 1 ? 's' : ''}
+          </b>
+        ) : (diff.disagreement_count ?? 0) > 0 ? (
           <b className={styles.warn}>{diff.disagreement_count} disagreement(s)</b>
         ) : (
-          <span>all adapters agree</span>
+          <span className={styles.agreeText} data-status="agreement">
+            ✓ all adapters agree
+          </span>
         )}
         {' · '}
         {adapters.map((a) => `${a}: ${timing[a] ?? '?'}ms`).join(' · ')}
       </RowNav>
       {Object.entries(errors).map(([a, e]) => (
-        <Alert key={a} color="red" role="alert" mb="xs">
+        <Alert key={a} variant="error" role="alert" className="mb-2">
           {a}: {e}
         </Alert>
       ))}
       {fields.length === 0 ? (
-        <div style={{ color: 'var(--muted)' }}>no comparable fields for this event type</div>
+        <div className="text-muted">no comparable fields for this event type</div>
       ) : (
         <div className={styles.diffGrid} style={{ gridTemplateColumns: `20px 120px repeat(${adapters.length}, 1fr)` }}>
-          {/* marker header — blank spacer above marker column */}
+          {/* marker header - blank spacer above marker column */}
           <div className={styles.h} aria-hidden="true" />
           <div className={`${styles.h} ${styles.diffHead}`}>field</div>
           {adapters.map((a) => (
@@ -211,13 +223,21 @@ function DiffRow({ field, adapters }: { field: DiffResult['fields'][0]; adapters
 
   return (
     <>
-      {/* marker cell — row-state class for color, no field-name emphasis */}
-      <div className={`${cls} ${styles.mk}`} aria-hidden="true">
+      {/* marker cell - row-state class for color, no field-name emphasis */}
+      <div
+        className={`${cls} ${styles.mk}`}
+        aria-hidden="true"
+        data-status={field.agree ? 'agreement' : field.partial ? 'partial' : 'disagreement'}
+      >
         {marker}
       </div>
-      <Tooltip label="only some adapters decoded this field" openDelay={150} withinPortal disabled={!field.partial}>
-        {/* field label is ALWAYS neutral — not tinted by agree/disagree state */}
-        <div className={styles.diffField}>{field.name}</div>
+      <Tooltip disabled={!field.partial}>
+        <TooltipTrigger
+          render={<div className={styles.diffField}>{field.name}</div>}
+        />
+        <TooltipPopup side="top" align="center">
+          only some adapters decoded this field
+        </TooltipPopup>
       </Tooltip>
       {adapters.map((a) => {
         const raw = field.values[a] ?? '-'
@@ -225,10 +245,17 @@ function DiffRow({ field, adapters }: { field: DiffResult['fields'][0]; adapters
         // If there is no oracle value (or the adapter IS the oracle), no emphasis.
         const isChanged = !isAgree && oracleVal !== undefined && a !== ORACLE && raw !== oracleVal
         return (
-          <Tooltip key={a} label={raw} openDelay={150} withinPortal>
-            <div className={`${cls} ${styles.diffVal}${isChanged ? ' ' + styles.diffValChanged : ''}`}>
-              {isSQL ? beautifySQL(raw) : raw}
-            </div>
+          <Tooltip key={a}>
+            <TooltipTrigger
+              render={
+                <div className={`${cls} ${styles.diffVal}${isChanged ? ' ' + styles.diffValChanged : ''}`}>
+                  {isSQL ? beautifySQL(raw) : raw}
+                </div>
+              }
+            />
+            <TooltipPopup side="top" align="center">
+              {raw}
+            </TooltipPopup>
           </Tooltip>
         )
       })}
