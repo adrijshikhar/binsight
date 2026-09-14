@@ -98,6 +98,35 @@ async function runVerification() {
       }
     }
 
+    // Measure Badge border radius
+    const badgeRadius = await page.evaluate(() => {
+      const b = document.querySelector('[data-slot="badge"]')
+      return b ? window.getComputedStyle(b).borderRadius : null
+    })
+    if (badgeRadius) {
+      console.log(`Badge border radius: ${badgeRadius}`)
+      if (badgeRadius !== '6px') {
+        throw new Error(`Expected 6px badge border radius, got ${badgeRadius}`)
+      }
+    }
+
+    // Verify active tab underline navigation
+    const activeTabBorder = await page.evaluate(() => {
+      const activeTab = document.querySelector('[role="tab"][aria-selected="true"]')
+      if (!activeTab) return null
+      const style = window.getComputedStyle(activeTab)
+      return {
+        bottomWidth: style.borderBottomWidth,
+        bottomStyle: style.borderBottomStyle,
+      }
+    })
+    if (activeTabBorder) {
+      console.log(`Active tab border: ${activeTabBorder.bottomWidth} ${activeTabBorder.bottomStyle}`)
+      if (activeTabBorder.bottomWidth !== '2px' || activeTabBorder.bottomStyle !== 'solid') {
+        throw new Error(`Expected 2px solid active tab underline, got ${JSON.stringify(activeTabBorder)}`)
+      }
+    }
+
     await page.screenshot({ path: path.join(OUT_DIR, '01-events-table.png') })
     console.log('Captured 01-events-table.png')
 

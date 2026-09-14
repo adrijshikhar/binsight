@@ -190,4 +190,28 @@ describe('theme.css', () => {
     expect(headingSpacing).toBe('0')
     expect(controlsSpacing).toBe('0')
   })
+
+  it('verifies pills, shapes and navigation adhere to compact rounded rectangle specs', () => {
+    // 1. FilterChip uses rounded-xs (4px)
+    const filterChipPath = path.resolve(process.cwd(), 'src/components/ui/filter-chip.tsx')
+    const filterChipCode = fs.readFileSync(filterChipPath, 'utf-8')
+    expect(filterChipCode).toContain('rounded-xs')
+
+    // 2. Badge uses rounded-sm (6px)
+    const badgePath = path.resolve(process.cwd(), 'src/components/ui/badge.tsx')
+    const badgeCode = fs.readFileSync(badgePath, 'utf-8')
+    expect(badgeCode).toContain('rounded-sm')
+
+    // 3. Card uses rounded-lg (12px)
+    const cardPath = path.resolve(process.cwd(), 'src/components/ui/card.tsx')
+    const cardCode = fs.readFileSync(cardPath, 'utf-8')
+    expect(cardCode).toContain('rounded-lg')
+    expect(cardCode).not.toContain('rounded-2xl')
+
+    // 4. App tabs use underline navigation
+    const appCssPath = path.resolve(process.cwd(), 'src/App.module.css')
+    const appCss = fs.readFileSync(appCssPath, 'utf-8')
+    expect(appCss).toContain('border-bottom: 2px solid transparent')
+    expect(appCss).toContain('border-bottom-color: var(--primary)')
+  })
 })

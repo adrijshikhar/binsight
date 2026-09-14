@@ -20,7 +20,7 @@ export function FilterChip({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 rounded border text-xs font-mono h-5 px-1.5 shrink-0 transition-colors',
+        'inline-flex items-center gap-1 rounded-xs border text-xs font-mono h-5 px-1.5 shrink-0 transition-colors',
         tone === 'brand'
           ? 'bg-[var(--selection)] text-[var(--brand-foreground)] border-[var(--border)]'
           : 'bg-[var(--surface-2)] text-[var(--foreground-secondary)] border-[var(--border)]',
