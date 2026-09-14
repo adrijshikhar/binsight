@@ -1,12 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { useState, useEffect } from 'react'
-import { MantineProvider, Switch } from '@mantine/core'
 import EventsView from './EventsView'
 import { SSEContext, type IndexEvent } from '../lib/sse'
 import type { EventRow, Severity } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
+// jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -21,7 +20,7 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// jsdom doesn't implement ResizeObserver — Mantine's SegmentedControl/FloatingIndicator needs it.
+// jsdom doesn't implement ResizeObserver - Mantine's SegmentedControl/FloatingIndicator needs it.
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -81,21 +80,15 @@ function EventsViewHarness({ ev, fileId = ACTIVE_FILE }: { ev: IndexEvent | null
   }, [fileId, currentFileId])
 
   return (
-    <MantineProvider defaultColorScheme="dark">
+    <div data-theme="dark">
       <SSEContext.Provider value={ev}>
-        <Switch
-          checked={live}
-          onChange={(e) => setLive(e.currentTarget.checked)}
-          label="Live"
-          aria-label="Follow new events as they are indexed"
-        />
         <EventsView
           {...baseProps(fileId)}
           live={live}
           onToggleLive={setLive}
         />
       </SSEContext.Provider>
-    </MantineProvider>
+    </div>
   )
 }
 

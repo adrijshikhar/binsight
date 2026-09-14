@@ -17,7 +17,7 @@ body {
 }
 
 /* Linear negative letter-spacing on display headlines */
-h1, h2, h3, h4, h5, h6, .mantine-Title-root {
+h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
   font-weight: 600;
 }
@@ -51,74 +51,6 @@ h1, h2, h3, h4, h5, h6, .mantine-Title-root {
   }
 }
 
-/* Linear card and panel styling from designer template */
-.mantine-Paper-root[data-with-border],
-.mantine-Card-root[data-with-border] {
-  background-color: var(--panel) !important;
-  border-color: var(--border) !important;
-}
-
-[data-mantine-color-scheme='dark'] .mantine-Paper-root[data-with-border],
-[data-mantine-color-scheme='dark'] .mantine-Card-root[data-with-border] {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.mantine-Paper-root[role='button'],
-.mantine-Card-root[role='button'] {
-  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.mantine-Paper-root[role='button']:hover,
-.mantine-Card-root[role='button']:hover {
-  background-color: var(--panel2) !important;
-  border-color: var(--border-strong) !important;
-}
-
-/* High-contrast Alert and Badge styling across schemes */
-.mantine-Alert-root {
-  border-width: 1px !important;
-  border-style: solid !important;
-}
-
-[data-mantine-color-scheme='dark'] .mantine-Alert-message {
-  color: var(--text) !important;
-}
-
-[data-mantine-color-scheme='light'] .mantine-Alert-message {
-  color: var(--text) !important;
-}
-
-.mantine-Badge-root[data-variant='light'] {
-  border-width: 1px !important;
-  border-style: solid !important;
-}
-
-/* Fix Mantine 9 Switch thumb: eliminate unwanted donut hole indicator */
-.mantine-Switch-thumb::before {
-  display: none !important;
-}
-.mantine-Switch-thumb {
-  background-color: #ffffff !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
-}
-
-/* Curved rectangular pill design across all badges and pills (replaces oval/stadium 9999px) */
-.mantine-Pill-root {
-  border-radius: 6px !important;
-}
-.mantine-Badge-root {
-  border-radius: 6px !important;
-}
-
-/* SegmentedControl styling matching Linear tab pill */
-.mantine-SegmentedControl-root {
-  background-color: var(--panel) !important;
-  border: 1px solid var(--border);
-}
-[data-mantine-color-scheme='dark'] .mantine-SegmentedControl-indicator {
-  background-color: var(--panel2) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
 
 /* Layout & Typography Utility Classes (replaces inline style attributes) */
 .cursor-pointer {
@@ -240,16 +172,6 @@ summary,
 .cursor-pointer,
 .cursor-pointer *,
 tr[tabindex="0"],
-tr[tabindex="0"] *,
-.mantine-UnstyledButton-root,
-.mantine-UnstyledButton-root *,
-.mantine-Button-root,
-.mantine-Button-root *,
-.mantine-ActionIcon-root,
-.mantine-ActionIcon-root *,
-.mantine-Paper-root[role="button"],
-.mantine-Paper-root[role="button"] *,
-.mantine-Card-root[role="button"],
-.mantine-Card-root[role="button"] * {
+tr[tabindex="0"] * {
   cursor: pointer !important;
 }

@@ -22,10 +22,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
-    "@mantine/core": "^9.6.1",
-    "@mantine/form": "^9.6.1",
-    "@mantine/hooks": "^9.6.1",
-    "@mantine/notifications": "^9.6.1",
     "@tabler/icons-react": "^3.46.0",
     "@tanstack/react-virtual": "^3.14.12",
     "agentation": "^3.0.2",

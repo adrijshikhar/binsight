@@ -16,8 +16,14 @@ describe('theme.css', () => {
     const sharedTokens: Record<string, string> = {}
 
     root.walkRules((rule: Rule) => {
-      const isDark = rule.selector.includes('data-theme="dark"') || rule.selector.includes("data-mantine-color-scheme='dark'")
-      const isLight = rule.selector.includes('data-theme="light"') || rule.selector.includes("data-mantine-color-scheme='light'")
+      const isDark =
+        rule.selector.includes('data-theme="dark"') ||
+        rule.selector.includes("data-mantine-color-scheme='dark'") ||
+        rule.selector.includes('.dark')
+      const isLight =
+        rule.selector.includes('data-theme="light"') ||
+        rule.selector.includes("data-mantine-color-scheme='light'") ||
+        rule.selector.includes(':not(.dark)')
       const isRoot = rule.selector === ':root' || rule.selector === ':root, :host'
 
       rule.walkDecls((decl) => {
@@ -54,5 +60,43 @@ describe('theme.css', () => {
     expect(darkTokens['--brand']).toBe('var(--primary)')
     expect(darkTokens['--muted-foreground']).toBe('#8a8f98')
     expect(lightTokens['--muted-foreground']).toBe('#62666d')
+
+    // Preserved behavioral variables from former theme.test.ts
+    const requiredVars = [
+      '--brand',
+      '--muted-foreground',
+      '--green',
+      '--red',
+      '--orange',
+      '--bg',
+      '--panel',
+      '--text',
+      '--text2',
+      '--accent-soft',
+      '--grape',
+      '--teal',
+      '--indigo',
+      '--diff-dis-bar',
+    ]
+    for (const v of requiredVars) {
+      expect(darkTokens[v], `dark missing ${v}`).toBeTruthy()
+      expect(lightTokens[v], `light missing ${v}`).toBeTruthy()
+    }
+
+    // Specific dark scheme values
+    expect(darkTokens['--bg']).toBe('var(--background)')
+    expect(darkTokens['--panel']).toBe('var(--surface-1)')
+    expect(darkTokens['--green']).toBe('var(--data-insert)')
+    expect(darkTokens['--red']).toBe('var(--data-delete)')
+    expect(darkTokens['--orange']).toBe('var(--data-update)')
+    expect(darkTokens['--warn']).toBe('var(--data-update)')
+
+    // Surface ladder
+    expect(darkTokens['--panel2']).toBe('var(--surface-2)')
+    expect(darkTokens['--elev']).toBe('var(--surface-3)')
+    expect(darkTokens['--surface-4']).toBe('#191a1b')
+    expect(darkTokens['--border-strong']).toBe('#34343a')
+    expect(lightTokens['--surface-4']).toBe('#f1f3f5')
+    expect(lightTokens['--border-strong']).toBe('#ced4da')
   })
 })

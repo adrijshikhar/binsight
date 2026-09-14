@@ -1,7 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
 import EventsTable from './EventsTable'
 
 // jsdom doesn't implement matchMedia

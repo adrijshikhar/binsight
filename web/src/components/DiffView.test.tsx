@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
-import { theme } from '../theme'
 import DiffView, { RowImages } from './DiffView'
 import type { DiffResult } from '../lib/types'
 
@@ -23,9 +21,9 @@ Object.defineProperty(window, 'matchMedia', {
 
 function wrap(ui: React.ReactElement) {
   return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
+    <div data-theme="dark">
       {ui}
-    </MantineProvider>,
+    </div>,
   )
 }
 

@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
-import { theme } from '../theme'
 import Drawer from './Drawer'
 import { api } from '../lib/api'
 import type { EventRow } from '../lib/types'
@@ -74,9 +72,9 @@ const BASE_EVENT: EventRow = {
 
 function wrap(ui: React.ReactElement) {
   return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
+    <div data-theme="dark">
       {ui}
-    </MantineProvider>,
+    </div>,
   )
 }
 
@@ -189,9 +187,9 @@ describe('Drawer (stock Coss UI)', () => {
     // Rerender with a new event
     const newEvent: EventRow = { ...BASE_EVENT, pos: 300, end_pos: 400 }
     rerender(
-      <MantineProvider theme={theme} defaultColorScheme="dark">
+      <div data-theme="dark">
         <Drawer {...makeProps({ event: newEvent })} />
-      </MantineProvider>,
+      </div>,
     )
 
     // Tab should still be Hex
@@ -258,9 +256,9 @@ describe('Drawer (stock Coss UI)', () => {
     expect(onWidthChange).toHaveBeenCalledWith(1000)
 
     rerender(
-      <MantineProvider theme={theme} defaultColorScheme="dark">
+      <div data-theme="dark">
         <Drawer {...makeProps({ width: 370, onWidthChange })} />
-      </MantineProvider>,
+      </div>,
     )
     fireEvent.keyDown(handle, { key: 'ArrowRight' })
     expect(onWidthChange).toHaveBeenCalledWith(360)

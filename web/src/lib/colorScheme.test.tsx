@@ -48,7 +48,6 @@ describe('colorScheme', () => {
     })
 
     document.documentElement.removeAttribute('data-theme')
-    document.documentElement.removeAttribute('data-mantine-color-scheme')
     document.documentElement.classList.remove('dark')
   })
 
@@ -62,7 +61,6 @@ describe('colorScheme', () => {
     expect(screen.getByTestId('preference').textContent).toBe('dark')
     expect(screen.getByTestId('resolved').textContent).toBe('dark')
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
-    expect(document.documentElement.getAttribute('data-mantine-color-scheme')).toBe('dark')
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 
@@ -78,7 +76,6 @@ describe('colorScheme', () => {
     expect(screen.getByTestId('preference').textContent).toBe('light')
     expect(screen.getByTestId('resolved').textContent).toBe('light')
     expect(document.documentElement.getAttribute('data-theme')).toBe('light')
-    expect(document.documentElement.getAttribute('data-mantine-color-scheme')).toBe('light')
     expect(document.documentElement.classList.contains('dark')).toBe(false)
   })
 
@@ -95,7 +92,6 @@ describe('colorScheme', () => {
     expect(screen.getByTestId('resolved').textContent).toBe('light')
     expect(localStorage.getItem(STORAGE_KEY)).toBe('light')
     expect(document.documentElement.getAttribute('data-theme')).toBe('light')
-    expect(document.documentElement.getAttribute('data-mantine-color-scheme')).toBe('light')
     expect(document.documentElement.classList.contains('dark')).toBe(false)
 
     await userEvent.click(screen.getByText('Set Dark'))
@@ -104,7 +100,6 @@ describe('colorScheme', () => {
     expect(screen.getByTestId('resolved').textContent).toBe('dark')
     expect(localStorage.getItem(STORAGE_KEY)).toBe('dark')
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
-    expect(document.documentElement.getAttribute('data-mantine-color-scheme')).toBe('dark')
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 

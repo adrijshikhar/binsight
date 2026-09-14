@@ -50,7 +50,7 @@
 
 .jumpErr {
   font-size: var(--fs-sm);
-  color: var(--mantine-color-red-6);
+  color: var(--destructive);
   align-self: center;
 }
 
@@ -62,25 +62,6 @@
   align-items: center;
   padding-left: 6px;
   padding-right: 28px;
-}
-
-.multiInput :global(.mantine-MultiSelect-pillsList) {
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  max-height: 24px;
-  gap: 4px;
-  scrollbar-width: none;
-}
-
-.multiInput :global(.mantine-MultiSelect-pillsList)::-webkit-scrollbar {
-  display: none;
-}
-
-.multiInput :global(.mantine-MultiSelect-inputField) {
-  height: 22px;
-  line-height: 22px;
-  font-size: 11px;
 }
 
 .activeFilters {

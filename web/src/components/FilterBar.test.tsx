@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MantineProvider } from '@mantine/core'
 import React from 'react'
 import FilterBar, { emptyFilters, type Filters } from './FilterBar'
 
@@ -29,7 +28,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 
 function wrap(ui: React.ReactNode) {
-  return render(<MantineProvider>{ui}</MantineProvider>)
+  return render(<div data-theme="dark">{ui}</div>)
 }
 
 function makeProps(overrides: Partial<Parameters<typeof FilterBar>[0]> = {}) {

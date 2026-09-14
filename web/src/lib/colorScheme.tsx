@@ -8,7 +8,8 @@ export interface ColorSchemeContextValue {
   setPreference: (val: ThemePreference) => void
 }
 
-const STORAGE_KEY = 'mantine-color-scheme-value'
+const STORAGE_KEY = 'binsight-theme'
+const LEGACY_STORAGE_KEY = 'mantine-color-scheme-value'
 
 export function getSystemScheme(): 'dark' | 'light' {
   if (typeof window === 'undefined' || !window.matchMedia) return 'dark'
@@ -17,7 +18,7 @@ export function getSystemScheme(): 'dark' | 'light' {
 
 export function getStoredPreference(): ThemePreference {
   try {
-    const val = localStorage.getItem(STORAGE_KEY)
+    const val = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY)
     if (val === 'dark' || val === 'light' || val === 'auto') return val
   } catch {
     // blocked or unavailable storage
@@ -34,7 +35,6 @@ export function applySchemeToDOM(resolved: 'dark' | 'light') {
   if (typeof document === 'undefined') return
   const root = document.documentElement
   root.setAttribute('data-theme', resolved)
-  root.setAttribute('data-mantine-color-scheme', resolved)
   if (resolved === 'dark') {
     root.classList.add('dark')
   } else {
@@ -66,6 +66,7 @@ export function ColorSchemeProvider({ children }: { children: React.ReactNode })
     setPrefState(newPref)
     try {
       localStorage.setItem(STORAGE_KEY, newPref)
+      localStorage.setItem(LEGACY_STORAGE_KEY, newPref)
     } catch {
       // ignore
     }
