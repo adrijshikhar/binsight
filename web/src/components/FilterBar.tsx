@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type React from 'react'
-import { MultiSelect, Pill } from '@mantine/core'
+import { Pill } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
 import KindBadge from './KindBadge'
+import FilterMultiSelect from './FilterMultiSelect'
+
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -210,101 +212,31 @@ export default function FilterBar(props: FilterBarProps) {
 
       {/* Tier 2: Filters row with Type, Database, Table multi-selects and active filter chips */}
       <div className={`flex items-center gap-2 px-4 py-1.5 flex-wrap ${styles.filterRow}`}>
-        <MultiSelect
-          aria-label="Type"
-          placeholder={filters.types.length === 0 ? 'Type' : undefined}
-          data={EVENT_TYPES}
+        <FilterMultiSelect
+          label="Type"
+          summaryNoun="types"
+          options={EVENT_TYPES}
           value={filters.types}
           onChange={(types) => props.onChange({ ...filters, types })}
-          clearable
-          searchable
-          w={{ base: 140, sm: 180 }}
-          size="xs"
-          classNames={{ input: styles.multiInput }}
-          renderOption={(item) => (
-            <KindBadge typeName={String(item.option.value)} size="xs" />
-          )}
-          renderPill={({ option }) => {
-            if (filters.types.length > 1) {
-              const isFirst = filters.types[0] === String(option.value)
-              if (isFirst) {
-                return (
-                  <Pill key="_count" className={styles.summaryPill}>
-                    {filters.types.length} types
-                  </Pill>
-                )
-              }
-              return null
-            }
-            return (
-              <Pill key={String(option.value)} className={styles.kindPill}>
-                <KindBadge typeName={String(option.value)} size="xs" />
-              </Pill>
-            )
-          }}
+          renderOption={(item) => <KindBadge typeName={item} size="xs" />}
         />
 
-        <MultiSelect
-          aria-label="Database"
-          placeholder={filters.dbs.length === 0 ? 'Database' : undefined}
-          data={props.dbOptions}
+        <FilterMultiSelect
+          label="Database"
+          summaryNoun="dbs"
+          options={props.dbOptions}
           value={filters.dbs}
           onChange={(dbs) => props.onChange({ ...filters, dbs })}
-          clearable
-          searchable
-          w={{ base: 130, sm: 160 }}
-          size="xs"
-          classNames={{ input: styles.multiInput }}
-          renderPill={({ option }) => {
-            if (filters.dbs.length > 1) {
-              const isFirst = filters.dbs[0] === String(option.value)
-              if (isFirst) {
-                return (
-                  <Pill key="_db_count" className={styles.summaryPill}>
-                    {filters.dbs.length} dbs
-                  </Pill>
-                )
-              }
-              return null
-            }
-            return (
-              <Pill key={String(option.value)} className={styles.summaryPill}>
-                {String(option.value)}
-              </Pill>
-            )
-          }}
         />
 
-        <MultiSelect
-          aria-label="Table"
-          placeholder={filters.tables.length === 0 ? 'Table' : undefined}
-          data={props.tableOptions}
+        <FilterMultiSelect
+          label="Table"
+          summaryNoun="tables"
+          options={props.tableOptions}
           value={filters.tables}
           onChange={(tables) => props.onChange({ ...filters, tables })}
-          clearable
-          searchable
-          w={{ base: 130, sm: 160 }}
-          size="xs"
-          classNames={{ input: styles.multiInput }}
-          renderPill={({ option }) => {
-            if (filters.tables.length > 1) {
-              const isFirst = filters.tables[0] === String(option.value)
-              if (isFirst) {
-                return (
-                  <Pill key="_tbl_count" className={styles.summaryPill}>
-                    {filters.tables.length} tables
-                  </Pill>
-                )
-              }
-              return null
-            }
-            return (
-              <Pill key={String(option.value)} className={styles.summaryPill}>
-                {String(option.value)}
-              </Pill>
-            )
-          }}
         />
+
 
         {/* Active filter pills */}
         {(filters.types.length > 0 || filters.dbs.length > 0 || filters.tables.length > 0) && (

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MantineProvider } from '@mantine/core'
 import React from 'react'
 import FilterBar, { emptyFilters, type Filters } from './FilterBar'
@@ -84,20 +85,20 @@ describe('FilterBar', () => {
   })
 
   it('onChange called when db MultiSelect option is selected', async () => {
+    const user = userEvent.setup()
     const onChange = vi.fn()
     wrap(<FilterBar {...makeProps({ onChange })} />)
     const dbInput = screen.getByRole('combobox', { name: /database|db/i })
-    fireEvent.click(dbInput)
-    await waitFor(() => {
-      expect(screen.getByText('mydb')).toBeTruthy()
-    })
-    fireEvent.click(screen.getByText('mydb'))
+    await user.click(dbInput)
+    const opt = await screen.findByRole('option', { name: /mydb/i })
+    await user.click(opt)
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled()
       const callArg: Filters = onChange.mock.calls[onChange.mock.calls.length - 1][0]
       expect(callArg.dbs).toContain('mydb')
     })
   })
+
 
   it('jump input: invalid input shows error message', () => {
     wrap(<FilterBar {...makeProps()} />)
