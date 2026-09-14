@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
 import { AppShell, Button, Group, Text, Alert, Box, Switch, Tooltip } from '@mantine/core'
-import { IconAlertTriangle } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconSettings } from '@tabler/icons-react'
 import { api } from './lib/api'
 import type { Anomaly, BinlogFile, EventRow, Severity, StreamStatus } from './lib/types'
-import ThemeToggle from './components/ThemeToggle'
 import Sidebar from './components/Sidebar'
 import { readUrlState, writeUrlState, pushUrlState } from './lib/url'
 import { SSEContext, type IndexEvent } from './lib/sse'
@@ -25,10 +24,20 @@ import SchemaView from './views/SchemaView'
 import SettingsView from './views/SettingsView'
 import ArchitectureView from './views/ArchitectureView'
 import Drawer from './components/Drawer'
+import { animateViewTransition } from './lib/motion'
 import { Agentation } from 'agentation'
 import styles from './App.module.css'
 
-export type MainTab = 'overview' | 'events' | 'txns' | 'tables' | 'anomalies' | 'schema' | 'settings' | 'architecture'
+export type MainTab =
+  | 'overview'
+  | 'events'
+  | 'txns'
+  | 'tables'
+  | 'anomalies'
+  | 'schema'
+  | 'settings'
+  | 'architecture'
+  | 'how-it-works'
 
 const VALID_TABS = new Set<MainTab>([
   'overview',
@@ -39,13 +48,19 @@ const VALID_TABS = new Set<MainTab>([
   'schema',
   'settings',
   'architecture',
+  'how-it-works',
 ])
 
 // tab strip (file views) vs full-page views shown without the strip
-const FULL_PAGE_TABS = new Set<MainTab>(['settings', 'architecture'])
+const FULL_PAGE_TABS = new Set<MainTab>()
 
 function isValidTab(s: string | undefined): s is MainTab {
   return VALID_TABS.has(s as MainTab)
+}
+
+function normalizeTab(s: string | undefined): MainTab {
+  if (isValidTab(s) && s !== 'settings' && s !== 'architecture' && s !== 'how-it-works') return s
+  return 'overview'
 }
 
 export default function App() {
@@ -53,7 +68,36 @@ export default function App() {
   const initialUrl = readUrlState()
   const [files, setFiles] = useState<BinlogFile[]>([])
   const [fileId, setFileId] = useState<number>(initialUrl.file ?? 0)
-  const [tab, setTab] = useState<MainTab>(isValidTab(initialUrl.tab) ? initialUrl.tab : 'overview')
+  const [tab, setTab] = useState<MainTab>(normalizeTab(initialUrl.tab))
+  const [settingsOpen, setSettingsOpen] = useState(
+    initialUrl.tab === 'settings' || initialUrl.tab === 'architecture' || initialUrl.tab === 'how-it-works',
+  )
+  const [settingsSection, setSettingsSection] = useState<
+    'decoding' | 'how-it-works' | 'display' | 'anomalies' | 'streaming' | 'watch'
+  >(() => {
+    return initialUrl.tab === 'how-it-works' || initialUrl.tab === 'architecture'
+      ? 'how-it-works'
+      : 'decoding'
+  })
+  const [lastInspectorTab, setLastInspectorTab] = useState<MainTab>(() => {
+    const t = normalizeTab(initialUrl.tab)
+    return t
+  })
+
+  // Remember the last active inspector tab so closing Settings/Architecture returns to it
+  useEffect(() => {
+    setLastInspectorTab(tab)
+  }, [tab])
+
+  const activePanelRef = useRef<HTMLDivElement | null>(null)
+
+  // Animate tab transitions with snappy anime.js motion
+  useEffect(() => {
+    if (activePanelRef.current) {
+      animateViewTransition(activePanelRef.current)
+    }
+  }, [tab])
+
   const [selected, setSelected] = useState<EventRow | null>(null)
   const [txnIds, setTxnIds] = useState<number[]>(() => {
     const t = readUrlState().txn
@@ -106,7 +150,7 @@ export default function App() {
     window.addEventListener('pointerup', onUp)
   }
 
-  // Drawer (right panel) width: drag its LEFT edge — moving left widens it.
+  // Drawer (right panel) width: drag its LEFT edge - moving left widens it.
   const [drawerWidth, setDrawerWidth] = useState(loadDrawerWidth)
   useEffect(() => {
     saveDrawerWidth(drawerWidth)
@@ -136,7 +180,7 @@ export default function App() {
       .catch(() => setAnomalies([]))
   }, [fileId])
 
-  // Ref to the current fileId so refreshFiles stays referentially stable — the
+  // Ref to the current fileId so refreshFiles stays referentially stable - the
   // SSE connection + poll interval are then set up once, not torn down and
   // recreated on every file switch.
   const fileIdRef = useRef(fileId)
@@ -219,24 +263,36 @@ export default function App() {
         if (page.events[0]) setSelected(page.events[0])
       })
       .catch(() => {
-        /* deep-linked event not found — ignore */
+        /* deep-linked event not found - ignore */
       })
   }, [fileId, initialUrl.event])
 
   // Sync file / tab / selected event to URL. The first sync (mount) and any
-  // sync triggered by a Back/Forward (popstate) only REPLACE — they must not
+  // sync triggered by a Back/Forward (popstate) only REPLACE - they must not
   // add history. Every other navigation PUSHES a history entry so the browser
   // Back button returns to the previous in-app view instead of leaving the site.
   const firstSync = useRef(true)
   const fromPop = useRef(false)
   const [navKey, setNavKey] = useState(0)
   useEffect(() => {
-    const s = {
-      file: fileId || undefined,
-      tab: tab !== 'overview' ? tab : undefined,
-      event: selected?.pos || undefined,
-      txn: txnIds.length ? txnIds.join(',') : undefined,
-    }
+    const isGlobal = FULL_PAGE_TABS.has(tab)
+    const s = isGlobal
+      ? {
+          tab,
+          file: undefined,
+          event: undefined,
+          txn: undefined,
+          type: undefined,
+          db: undefined,
+          table: undefined,
+          q: undefined,
+        }
+      : {
+          file: fileId || undefined,
+          tab: tab !== 'overview' ? tab : undefined,
+          event: selected?.pos || undefined,
+          txn: txnIds.length ? txnIds.join(',') : undefined,
+        }
     if (firstSync.current) {
       firstSync.current = false
       writeUrlState(s)
@@ -256,7 +312,7 @@ export default function App() {
       const u = readUrlState()
       fromPop.current = true
       setFileId(u.file ?? 0)
-      setTab(isValidTab(u.tab) ? u.tab : 'overview')
+      setTab(normalizeTab(u.tab))
       setDbFilter('')
       setTableFilter('')
       setTypeFilter('')
@@ -303,7 +359,7 @@ export default function App() {
         if (page.events[0]) setSelected(page.events[0])
       })
       .catch(() => {
-        /* event not found — ignore */
+        /* event not found - ignore */
       })
   }
 
@@ -336,11 +392,18 @@ export default function App() {
         navbar={{
           width: sidebar.collapsed ? 48 : sidebar.width,
           breakpoint: 'sm',
+          collapsed: {
+            desktop: FULL_PAGE_TABS.has(tab),
+            mobile: FULL_PAGE_TABS.has(tab),
+          },
         }}
         aside={{
           width: drawerWidth,
           breakpoint: 'sm',
-          collapsed: { desktop: !selected, mobile: !selected },
+          collapsed: {
+            desktop: !selected || tab !== 'events',
+            mobile: !selected || tab !== 'events',
+          },
         }}
         padding={0}
         styles={{
@@ -361,7 +424,7 @@ export default function App() {
             display: 'flex',
             flexDirection: 'column',
             // Bound Main to the viewport (Mantine defaults to min-height:100dvh,
-            // which grows with content and — under body{overflow:hidden} — clips
+            // which grows with content and - under body{overflow:hidden} - clips
             // instead of letting the inner panes scroll). Fixed height + overflow
             // hidden makes .content's flex:1 children the actual scroll regions.
             height: '100dvh',
@@ -372,27 +435,45 @@ export default function App() {
       >
         <AppShell.Header>
           <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-            <Group gap="md" wrap="nowrap" style={{ minWidth: 0 }}>
-              <Text fw={700} c="var(--accent)" ff="monospace" size="sm" style={{ letterSpacing: '0.5px', flexShrink: 0 }}>
+            {/* Left side: Brand + Active File breadcrumb */}
+            <Group gap="md" wrap="nowrap" className="min-w-0" align="center">
+              <Text fw={700} c="var(--primary)" ff="monospace" size="sm" className="flex-shrink-0 tracking-wider">
                 binsight
               </Text>
 
               {file && (
-                <Text
-                  size="xs"
-                  c="dimmed"
-                  ff="monospace"
-                  style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                >
-                  {file.path.split('/').slice(0, -1).join('/') || '/'}
-                  <span style={{ margin: '0 5px', opacity: 0.6 }}>/</span>
-                  <span style={{ color: 'var(--text)', fontWeight: 600 }}>{file.path.split('/').pop()}</span>
-                </Text>
+                <Group gap={4} wrap="nowrap" className="min-w-0">
+                  <span className={styles.headerDivider} />
+                  <Text
+                    size="xs"
+                    c="dimmed"
+                    ff="monospace"
+                    className="truncate"
+                  >
+                    {file.path.split('/').slice(0, -1).join('/') || '/'}
+                    <span className={styles.slash}>/</span>
+                    <span className={styles.fileName}>{file.path.split('/').pop()}</span>
+                  </Text>
+                </Group>
               )}
             </Group>
 
-            <Group gap="xs" wrap="nowrap" style={{ flexShrink: 0 }}>
-              <ThemeToggle />
+            {/* Right side: Settings button */}
+            <Group gap="xs" wrap="nowrap" align="center">
+              <Button
+                variant="subtle"
+                color="gray"
+                size="xs"
+                leftSection={<IconSettings size={14} />}
+                onClick={() => {
+                  setSettingsSection('decoding')
+                  setSettingsOpen(true)
+                }}
+                aria-label="Settings"
+                className={styles.settingsHeaderBtn}
+              >
+                Settings
+              </Button>
             </Group>
           </Group>
         </AppShell.Header>
@@ -408,12 +489,12 @@ export default function App() {
               setTab('overview')
             }}
             onSettings={() => {
-              setSelected(null)
-              setTab('settings')
+              setSettingsSection('decoding')
+              setSettingsOpen(true)
             }}
             onArchitecture={() => {
-              setSelected(null)
-              setTab('architecture')
+              setSettingsSection('how-it-works')
+              setSettingsOpen(true)
             }}
             streamStatus={streamStatus ?? undefined}
           />
@@ -438,20 +519,13 @@ export default function App() {
               aria-valuemax={480}
               tabIndex={0}
               title="Drag or use Arrow keys to resize"
-              style={{
-                position: 'absolute',
-                right: 0,
-                top: 0,
-                bottom: 0,
-                width: 4,
-                cursor: 'col-resize',
-              }}
+              className={styles.resizer}
             />
           )}
         </AppShell.Navbar>
 
         <AppShell.Main>
-          {filesErr && (
+          {filesErr && !FULL_PAGE_TABS.has(tab) && (
             <Alert
               icon={<IconAlertTriangle size={16} />}
               color="red"
@@ -477,10 +551,14 @@ export default function App() {
                     tabIndex={tab === t ? 0 : -1}
                     aria-selected={tab === t}
                     aria-controls={`tabpanel-${t}`}
-                    onClick={() => setTab(t)}
+                    onClick={() => {
+                      if (t !== 'events') setSelected(null)
+                      setTab(t)
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
+                        if (t !== 'events') setSelected(null)
                         setTab(t)
                       } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
                         e.preventDefault()
@@ -511,189 +589,135 @@ export default function App() {
                     {tabLabel(t)}
                   </div>
                 ))}
-                {tab === 'events' && (
-                  <div className={styles.tabLiveControl}>
-                    <Tooltip
-                      label={
-                        live
-                          ? 'Stop following new events (Live mode is ON)'
-                          : 'Follow new events as they are indexed (Live mode is OFF)'
-                      }
-                      withArrow
-                      position="bottom-end"
-                      offset={8}
-                    >
-                      <Switch
-                        checked={live}
-                        onChange={(e) => setLive(e.currentTarget.checked)}
-                        label="Live"
-                        size="xs"
-                        color="green"
-                        aria-label="Follow new events as they are indexed"
-                        styles={{
-                          root: { display: 'flex', alignItems: 'center' },
-                          label: {
-                            fontSize: '11px',
-                            fontWeight: 600,
-                            letterSpacing: '0.04em',
-                            cursor: 'pointer',
-                            userSelect: 'none',
-                            color: live ? 'var(--text)' : 'var(--muted)',
-                          },
-                        }}
-                      />
-                    </Tooltip>
-                  </div>
-                )}
               </div>
             )}
             {files.length === 0 && !filesErr && !FULL_PAGE_TABS.has(tab) && (
-              <div role="status" style={{ marginTop: 48, padding: '0 24px', color: 'var(--muted)', fontSize: 13 }}>
+              <div role="status" className={styles.emptyStatus}>
                 No binlog files found.
               </div>
             )}
 
-            {/* Tab content stubs — replaced by real views in later tasks */}
-            {tab === 'overview' && (
-              <div
-                id="tabpanel-overview"
-                role="tabpanel"
-                aria-labelledby="tab-overview"
-                tabIndex={0}
-                style={{ height: '100%', overflow: 'auto' }}
-              >
-                {file ? (
-                  <OverviewView
-                    file={file}
-                    onOpenType={(type) => {
-                      setTypeFilter(type)
-                      setTab('events')
-                    }}
-                    onOpenEvent={(pos) => {
-                      setTab('events')
-                      api
-                        .events({ file: fileId, from_pos: pos, to_pos: pos, limit: 1 })
-                        .then((page) => {
-                          if (page.events[0]) setSelected(page.events[0])
-                        })
-                        .catch(() => {})
-                    }}
-                    onOpenTxn={(id) => {
-                      setTxnIds([id])
-                      setTab('events')
-                    }}
-                    anomalies={anomalies}
-                    onShowAnomalies={() => setTab('anomalies')}
-                  />
-                ) : (
-                  <div style={{ padding: 24, color: 'var(--muted)' }}>no file selected</div>
-                )}
-              </div>
-            )}
-            {tab === 'events' && (
-              <div
-                id="tabpanel-events"
-                role="tabpanel"
-                aria-labelledby="tab-events"
-                tabIndex={0}
-                className={styles.tabpanelFill}
-              >
-                <EventsView
-                  key={navKey}
-                  fileId={fileId}
-                  txnIds={txnIds}
-                  dbFilter={dbFilter}
-                  tableFilter={tableFilter}
-                  typeFilter={typeFilter}
-                  selectedPos={selected?.pos ?? -1}
-                  onSelect={(e) => setSelected(e)}
-                  posSeverity={posSeverity}
-                  onConsumeFilters={() => {
-                    setDbFilter('')
-                    setTableFilter('')
-                    setTypeFilter('')
-                  }}
-                  onRemoveTxn={(id) => setTxnIds((ids) => ids.filter((i) => i !== id))}
-                  live={live}
-                  onToggleLive={setLive}
-                />
-              </div>
-            )}
-            {tab === 'txns' && (
-              <div
-                id="tabpanel-txns"
-                role="tabpanel"
-                aria-labelledby="tab-txns"
-                tabIndex={0}
-                className={styles.tabpanelFill}
-              >
-                {fileId > 0 && <TxnsView fileId={fileId} onOpenTxn={openTxn} txnSeverity={txnSeverity} />}
-              </div>
-            )}
-            {tab === 'tables' && (
-              <div
-                id="tabpanel-tables"
-                role="tabpanel"
-                aria-labelledby="tab-tables"
-                tabIndex={0}
-                className={styles.tabpanelFill}
-              >
-                {fileId > 0 && (
-                  <TablesView
+            {/* Tab content - animated on tab switch */}
+            <div ref={activePanelRef} className={styles.tabpanelFill}>
+              {tab === 'overview' && (
+                <div
+                  id="tabpanel-overview"
+                  role="tabpanel"
+                  aria-labelledby="tab-overview"
+                  tabIndex={0}
+                  className={styles.tabpanelFill}
+                >
+                  {file ? (
+                    <OverviewView
+                      file={file}
+                      onOpenType={(type) => {
+                        setTypeFilter(type)
+                        setTab('events')
+                      }}
+                      onOpenEvent={(pos) => {
+                        setTab('events')
+                        api
+                          .events({ file: fileId, from_pos: pos, to_pos: pos, limit: 1 })
+                          .then((page) => {
+                            if (page.events[0]) setSelected(page.events[0])
+                          })
+                          .catch(() => {})
+                      }}
+                      onOpenTxn={(id) => {
+                        setTxnIds([id])
+                        setTab('events')
+                      }}
+                      anomalies={anomalies}
+                      onShowAnomalies={() => setTab('anomalies')}
+                    />
+                  ) : (
+                    <div className={styles.noFile}>no file selected</div>
+                  )}
+                </div>
+              )}
+              {tab === 'events' && (
+                <div
+                  id="tabpanel-events"
+                  role="tabpanel"
+                  aria-labelledby="tab-events"
+                  tabIndex={0}
+                  className={styles.tabpanelFill}
+                >
+                  <EventsView
+                    key={navKey}
                     fileId={fileId}
-                    onOpenTable={(db, table) => {
-                      setDbFilter(db)
-                      setTableFilter(table)
-                      setTab('events')
+                    txnIds={txnIds}
+                    dbFilter={dbFilter}
+                    tableFilter={tableFilter}
+                    typeFilter={typeFilter}
+                    selectedPos={selected?.pos ?? -1}
+                    onSelect={(e) => setSelected(e)}
+                    posSeverity={posSeverity}
+                    onConsumeFilters={() => {
+                      setDbFilter('')
+                      setTableFilter('')
+                      setTypeFilter('')
                     }}
+                    onRemoveTxn={(id) => setTxnIds((ids) => ids.filter((i) => i !== id))}
+                    live={live}
+                    onToggleLive={setLive}
                   />
-                )}
-              </div>
-            )}
-            {tab === 'anomalies' && (
-              <div
-                id="tabpanel-anomalies"
-                role="tabpanel"
-                aria-labelledby="tab-anomalies"
-                tabIndex={0}
-                className={styles.tabpanelFill}
-              >
-                {fileId > 0 && <AnomaliesView fileId={fileId} onOpenTxn={openTxn} onOpenEvent={openEvent} />}
-              </div>
-            )}
-            {tab === 'schema' && (
-              <div
-                id="tabpanel-schema"
-                role="tabpanel"
-                aria-labelledby="tab-schema"
-                tabIndex={0}
-                className={styles.tabpanelFill}
-              >
-                {fileId > 0 && <SchemaView fileId={fileId} onOpenEvent={openEvent} />}
-              </div>
-            )}
-            {tab === 'settings' && (
-              <div
-                id="tabpanel-settings"
-                role="tabpanel"
-                aria-labelledby="tab-settings"
-                tabIndex={0}
-                style={{ height: '100%', overflow: 'auto' }}
-              >
-                <SettingsView onClose={() => setTab('events')} onOpenArchitecture={() => setTab('architecture')} />
-              </div>
-            )}
-            {tab === 'architecture' && (
-              <div
-                id="tabpanel-architecture"
-                role="tabpanel"
-                aria-labelledby="tab-architecture"
-                tabIndex={0}
-                style={{ height: '100%', overflow: 'auto' }}
-              >
-                <ArchitectureView onClose={() => setTab('events')} />
-              </div>
-            )}
+                </div>
+              )}
+              {tab === 'txns' && (
+                <div
+                  id="tabpanel-txns"
+                  role="tabpanel"
+                  aria-labelledby="tab-txns"
+                  tabIndex={0}
+                  className={styles.tabpanelFill}
+                >
+                  {fileId > 0 && <TxnsView fileId={fileId} onOpenTxn={openTxn} txnSeverity={txnSeverity} />}
+                </div>
+              )}
+              {tab === 'tables' && (
+                <div
+                  id="tabpanel-tables"
+                  role="tabpanel"
+                  aria-labelledby="tab-tables"
+                  tabIndex={0}
+                  className={styles.tabpanelFill}
+                >
+                  {fileId > 0 && (
+                    <TablesView
+                      fileId={fileId}
+                      onOpenTable={(db, table) => {
+                        setDbFilter(db)
+                        setTableFilter(table)
+                        setTab('events')
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+              {tab === 'anomalies' && (
+                <div
+                  id="tabpanel-anomalies"
+                  role="tabpanel"
+                  aria-labelledby="tab-anomalies"
+                  tabIndex={0}
+                  className={styles.tabpanelFill}
+                >
+                  {fileId > 0 && <AnomaliesView fileId={fileId} onOpenTxn={openTxn} onOpenEvent={openEvent} />}
+                </div>
+              )}
+              {tab === 'schema' && (
+                <div
+                  id="tabpanel-schema"
+                  role="tabpanel"
+                  aria-labelledby="tab-schema"
+                  tabIndex={0}
+                  className={styles.tabpanelFill}
+                >
+                  {fileId > 0 && <SchemaView fileId={fileId} onOpenEvent={openEvent} />}
+                </div>
+              )}
+            </div>
           </main>
         </AppShell.Main>
 
@@ -710,6 +734,11 @@ export default function App() {
           </AppShell.Aside>
         )}
       </AppShell>
+      <SettingsView
+        opened={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        initialSection={settingsSection}
+      />
       {showAgentation && <Agentation endpoint="http://localhost:4747" />}
     </SSEContext.Provider>
   )

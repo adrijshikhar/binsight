@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { ActionIcon, Badge, Card, Code, ColorSwatch, Group, Paper, Stack, Text, Title } from '@mantine/core'
 import { Close } from '../components/icons'
 import { IconChevronDown } from '@tabler/icons-react'
+import styles from './ArchitectureView.module.css'
 
 // In-app rendering of the pluggable-decoder architecture diagram, so anyone
 // opening the tool can understand how it fits together. Mirrors
@@ -16,35 +17,25 @@ interface LayerProps {
 function Layer({ label, children, variant }: LayerProps) {
   const isIface = variant === 'iface'
   return (
-    <Paper
+    <Card
       withBorder
-      p="md"
-      radius="md"
-      style={{
-        borderColor: isIface ? 'var(--mantine-color-accent-6)' : undefined,
-        borderWidth: isIface ? 2 : 1,
-        background: isIface ? 'var(--panel)' : 'var(--bg)',
-      }}
+      p="xs"
+      radius="sm"
+      className={isIface ? styles.layerPaperIface : styles.layerPaper}
     >
-      <Text size="xs" tt="uppercase" fw={600} lts={1.5} mb="xs" c={isIface ? 'accent' : 'dimmed'}>
+      <Text size="xs" tt="uppercase" fw={600} lts={1} mb={6} c={isIface ? 'accent' : 'dimmed'}>
         {label}
       </Text>
       {children}
-    </Paper>
+    </Card>
   )
 }
 
 function Arrow({ note }: { note: string }) {
   return (
-    <Group justify="center" gap="xs" py={2} c="dimmed">
-      <IconChevronDown size={18} aria-hidden="true" />
-      <Code
-        style={{
-          fontFamily: 'var(--mantine-font-family-monospace)',
-          color: 'var(--mantine-color-accent-6)',
-          background: 'var(--bg)',
-        }}
-      >
+    <Group justify="center" gap={6} py={1} c="dimmed">
+      <IconChevronDown size={14} aria-hidden="true" />
+      <Code className={styles.arrowCode}>
         {note}
       </Code>
     </Group>
@@ -59,19 +50,21 @@ interface BoxProps {
 }
 
 function Box({ children, borderColor, dashed, dimmed }: BoxProps) {
+  const boxCls = [
+    styles.cardBox,
+    dashed && styles.cardBoxDashed,
+    dimmed && styles.cardBoxDimmed,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
     <Card
       withBorder
       radius="sm"
-      p="sm"
-      style={{
-        flex: 1,
-        minWidth: 150,
-        background: 'var(--panel)',
-        borderColor: borderColor ?? undefined,
-        borderStyle: dashed ? 'dashed' : 'solid',
-        opacity: dimmed ? 0.75 : undefined,
-      }}
+      p="xs"
+      className={boxCls}
+      style={borderColor ? { borderColor } : undefined}
     >
       {children}
     </Card>
@@ -84,17 +77,17 @@ const CAP_GLOSSARY: { cap: string; what: string; unlocks: string }[] = [
   {
     cap: 'FullScan',
     what: 'Decode an entire binlog file start-to-finish in one pass.',
-    unlocks: 'indexer role — building the SQLite index',
+    unlocks: 'indexer role - building the SQLite index',
   },
   {
     cap: 'SeekDecode',
     what: 'Decode a single event at a given byte offset, without reading the whole file first.',
-    unlocks: 'detail role — the drawer & jump-to-position',
+    unlocks: 'detail role - the drawer & jump-to-position',
   },
   {
     cap: 'ResumeDecode',
     what: 'Resume decoding from the last committed offset via a true seek, instead of re-parsing the prefix.',
-    unlocks: 'incremental append-index — the live tail',
+    unlocks: 'incremental append-index - the live tail',
   },
   {
     cap: 'RemoteStream',
@@ -120,7 +113,7 @@ function CapGlossary() {
             color="accent"
             size="sm"
             variant="light"
-            style={{ fontFamily: 'var(--mantine-font-family-monospace)', flexShrink: 0, minWidth: 120 }}
+            className={styles.capBadge}
           >
             {cap}
           </Badge>
@@ -145,7 +138,7 @@ function CapBadges({ caps }: { caps: string[] }) {
           color="accent"
           size="xs"
           variant="light"
-          style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}
+          className="font-mono"
         >
           {cap}
         </Badge>
@@ -154,39 +147,34 @@ function CapBadges({ caps }: { caps: string[] }) {
   )
 }
 
-export default function ArchitectureView({ onClose }: { onClose: () => void }) {
+export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) {
   return (
-    <Stack p="md" maw={1100} gap="xs">
+    <Stack p={0} maw={1100} gap="xs" mx="auto">
       {/* Header */}
-      <Group justify="space-between" align="flex-start" mb={4}>
-        <Stack gap={4}>
-          <Title order={2} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
-            <Code
-              style={{
-                fontSize: 16,
-                padding: '2px 8px',
-                borderRadius: 4,
-                border: '1px solid var(--border)',
-                background: 'var(--panel2)',
-                color: 'var(--accent)',
-              }}
-            >
+      <Group justify="space-between" align="flex-start" mb={2}>
+        <Stack gap={2}>
+          <Group gap="xs" align="center">
+            <Code className={styles.brandCode}>
               binsight
-            </Code>{' '}
-            - Pluggable Decoder Architecture
-          </Title>
-          <Text size="sm" c="dimmed">
+            </Code>
+            <Title order={3} className={styles.brandTitle}>
+              - Pluggable Decoder Architecture
+            </Title>
+          </Group>
+          <Text size="xs" c="dimmed">
             Go core · no privileged library · adapters behind one interface · roles assigned by config
           </Text>
         </Stack>
-        <ActionIcon variant="subtle" color="gray" onClick={onClose} aria-label="Close architecture view">
-          <Close aria-hidden="true" />
-        </ActionIcon>
+        {onClose && (
+          <ActionIcon variant="subtle" color="gray" onClick={onClose} aria-label="Close architecture view">
+            <Close aria-hidden="true" />
+          </ActionIcon>
+        )}
       </Group>
 
       {/* Event Sources */}
       <Layer label="Event Sources">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <Group gap="sm" align="stretch" className="flex-wrap">
           <Box>
             <Text size="sm" fw={600} ff="monospace" mb={4}>
               Directory watch
@@ -200,13 +188,13 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
               <Text size="sm" fw={600} ff="monospace">
                 Remote stream
               </Text>
-              <Badge size="xs" color="green" variant="light">
+              <Badge size="xs" color="accent" variant="light">
                 shipped
               </Badge>
             </Group>
             <Text size="sm" c="dimmed" lh={1.5}>
-              Connects as a replica (go-mysql <Code>BinlogSyncer</Code>) → spools raw events into a{' '}
-              <strong>byte-identical local mirror</strong> under <Code>DATA_DIR/spool/</Code> → re-enters the pipeline
+              Direct TCP connection to source MySQL/MariaDB server using replication protocol (live mode B). Spools to
+              temp binlog file, indexer processes identical code path. Exposes local port, browser interacts with stream
               as a normal file. GTID-set resume (else file+pos), always txn-boundary aligned; cap + prune retention.
             </Text>
           </Box>
@@ -217,19 +205,11 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
 
       {/* Interface */}
       <Layer label="The Only Contract Core Knows" variant="iface">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <Group gap="sm" align="stretch" className="flex-wrap">
           <Box>
             <Code
               block
-              style={{
-                fontFamily: 'var(--mantine-font-family-monospace)',
-                fontSize: '11px',
-                lineHeight: 1.55,
-                background: 'transparent',
-                color: 'var(--text)',
-                whiteSpace: 'pre',
-                overflowX: 'auto',
-              }}
+              className={styles.codeBlock}
             >{`type Decoder interface {
     Name() string
     Capabilities() Capabilities
@@ -239,15 +219,7 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
           <Box>
             <Code
               block
-              style={{
-                fontFamily: 'var(--mantine-font-family-monospace)',
-                fontSize: '11px',
-                lineHeight: 1.55,
-                background: 'transparent',
-                color: 'var(--text)',
-                whiteSpace: 'pre',
-                overflowX: 'auto',
-              }}
+              className={styles.codeBlock}
             >{`type Capabilities struct {
     FullScan     bool // eligible: indexer
     SeekDecode   bool // eligible: detail view
@@ -257,7 +229,7 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
 }`}</Code>
           </Box>
         </Group>
-        <Paper withBorder p="sm" radius="sm" mt="sm" style={{ background: 'var(--bg)' }}>
+        <Paper withBorder p="sm" radius="sm" mt="sm" className={styles.capGlossaryPaper}>
           <CapGlossary />
         </Paper>
       </Layer>
@@ -267,8 +239,8 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
       {/* Adapters */}
       <Layer label="Adapters (2 shipped · 1 planned)">
         <Stack gap="sm">
-          <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
-            <Box borderColor="var(--mantine-color-green-6)">
+          <Group gap="sm" align="stretch" className="flex-wrap">
+            <Box borderColor="var(--mantine-color-accent-6)">
               <Group gap={6} mb={4}>
                 <Text size="sm" fw={600} ff="monospace">
                   go-mysql
@@ -278,7 +250,7 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
                 </Badge>
               </Group>
               <Text size="sm" c="dimmed" lh={1.5}>
-                Default indexer + detail + stream. Compiled in, but holds no special status — just adapter #1.
+                Default indexer + detail + stream. Compiled in, but holds no special status - just adapter #1.
               </Text>
               <CapBadges caps={['FullScan', 'SeekDecode', 'ResumeDecode', 'RemoteStream', 'RowImages']} />
             </Box>
@@ -317,31 +289,20 @@ export default function ArchitectureView({ onClose }: { onClose: () => void }) {
             </Box>
           </Group>
 
-          <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+          <Group gap="sm" align="stretch" className="flex-wrap">
             {/* roles */}
             <Card
               withBorder
               radius="sm"
               p="sm"
-              style={{
-                flex: 1,
-                background: 'var(--panel)',
-                borderColor: 'var(--mantine-color-grape-6)',
-              }}
+              className={styles.rolesCard}
             >
               <Text size="sm" fw={600} ff="monospace" c="grape" mb={6}>
                 roles, not hardcode (configured in Settings)
               </Text>
               <Code
                 block
-                style={{
-                  fontFamily: 'var(--mantine-font-family-monospace)',
-                  fontSize: 'var(--mantine-font-size-sm)',
-                  lineHeight: 1.55,
-                  background: 'transparent',
-                  color: 'var(--text)',
-                  whiteSpace: 'pre',
-                }}
+                className={styles.codeBlockSm}
               >{`adapters:
   go-mysql:       { type: builtin }
   mysqlbinlog:    { type: exec }
@@ -359,22 +320,18 @@ roles:
               withBorder
               radius="sm"
               p="sm"
-              style={{
-                flex: 1,
-                background: 'var(--panel)',
-                borderColor: 'var(--mantine-color-accent-6)',
-              }}
+              className={styles.schemaCard}
             >
               <Text size="sm" fw={600} ff="monospace" c="accent" mb={6}>
-                normalized event schema v1 — the real coupling point
+                normalized event schema v1 - the real coupling point
               </Text>
-              <Group gap="xs" align="stretch" style={{ flexWrap: 'wrap', marginTop: 4 }}>
-                <Box borderColor="var(--mantine-color-green-6)">
+              <Group gap="xs" align="stretch" className={`flex-wrap ${styles.schemaGroup}`}>
+                <Box borderColor="var(--mantine-color-accent-6)">
                   <Text size="sm" fw={600} ff="monospace" mb={4}>
                     header
                   </Text>
                   <Text size="sm" c="dimmed" lh={1.5}>
-                    19-byte common header. Mandatory. Byte-identical across correct adapters — disagreement = broken
+                    19-byte common header. Mandatory. Byte-identical across correct adapters - disagreement = broken
                     adapter.
                   </Text>
                 </Box>
@@ -391,7 +348,7 @@ roles:
                     native
                   </Text>
                   <Text size="sm" c="dimmed" lh={1.5}>
-                    Adapter-specific rendering, opaque. Preserved verbatim — this is what the diff view compares.
+                    Adapter-specific rendering, opaque. Preserved verbatim - this is what the diff view compares.
                   </Text>
                 </Box>
               </Group>
@@ -400,17 +357,17 @@ roles:
         </Stack>
       </Layer>
 
-      <Arrow note="JSON-lines (exec) / structs (builtin) — same schema" />
+      <Arrow note="JSON-lines (exec) / structs (builtin) - same schema" />
 
       {/* Core */}
       <Layer label="Core (Go binary)">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <Group gap="sm" align="stretch" className="flex-wrap">
           <Box>
             <Text size="sm" fw={600} ff="monospace" mb={4}>
               Indexer
             </Text>
             <Text size="sm" c="dimmed" lh={1.5}>
-              Streams events from the <Code>indexer</Code>-role adapter. Metadata only — no row values. On growth it{' '}
+              Streams events from the <Code>indexer</Code>-role adapter. Metadata only - no row values. On growth it{' '}
               <strong>true-seeks from the committed boundary</strong> (<Code>last_indexed_offset</Code>) and appends
               only the new tail. Positions come from a running byte accumulator, so &gt; 4 GiB files (uint32{' '}
               <Code>end_log_pos</Code> wrap) index correctly.
@@ -452,7 +409,7 @@ roles:
 
       {/* Web UI */}
       <Layer label="Web UI (React + TS · go:embed · localhost)">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <Group gap="sm" align="stretch" className="flex-wrap">
           <Box>
             <Text size="sm" fw={600} ff="monospace" mb={4}>
               Event list
@@ -489,32 +446,38 @@ roles:
       </Layer>
 
       {/* Legend */}
-      <Group gap="xl" mt="md" pb="md" style={{ flexWrap: 'wrap' }}>
-        <Group gap="xs">
-          <ColorSwatch color="var(--green)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            builtin adapter (in-process)
-          </Text>
+      <Card withBorder p="xs" radius="sm" className={styles.legendCard}>
+        <Group gap="md" wrap="wrap" align="center">
+          <Group gap={6} align="center">
+            <ColorSwatch color="var(--brand)" size={8} radius={2} />
+            <Text size="xs" c="dimmed">
+              builtin adapter (in-process)
+            </Text>
+          </Group>
+          <Group gap={6} align="center">
+            <ColorSwatch color="var(--orange)" size={8} radius={2} />
+            <Text size="xs" c="dimmed">
+              exec adapter (subprocess, JSON-lines)
+            </Text>
+          </Group>
+          <Group gap={6} align="center">
+            <ColorSwatch color="var(--grape)" size={8} radius={2} />
+            <Text size="xs" c="dimmed">
+              planned
+            </Text>
+          </Group>
+          <Group gap={6} align="center">
+            <ColorSwatch color="var(--brand)" size={8} radius={2} />
+            <Text size="xs" c="dimmed">
+              interface / schema contract
+            </Text>
+          </Group>
         </Group>
-        <Group gap="xs">
-          <ColorSwatch color="var(--orange)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            exec adapter (subprocess, JSON-lines)
-          </Text>
-        </Group>
-        <Group gap="xs">
-          <ColorSwatch color="var(--grape)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            planned
-          </Text>
-        </Group>
-        <Group gap="xs">
-          <ColorSwatch color="var(--accent)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            interface / schema contract
-          </Text>
-        </Group>
-      </Group>
+      </Card>
     </Stack>
   )
+}
+
+export default function ArchitectureView({ onClose }: { onClose: () => void }) {
+  return <ArchitectureContent onClose={onClose} />
 }

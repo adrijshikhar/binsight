@@ -1,0 +1,242 @@
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  --fs-sm: 11px;
+  --fs-base: 13px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root[data-theme="dark"],
+:root:not([data-theme])[data-mantine-color-scheme='dark'] {
+  --background: #010102;
+  --surface-1: #0f1011;
+  --surface-2: #141516;
+  --surface-3: #18191a;
+  --surface-4: #191a1b;
+
+  --border: #23252a;
+  --border-strong: #34343a;
+  --input: #777c85;
+
+  --foreground: #f7f8f8;
+  --foreground-secondary: #d0d6e0;
+  --muted-foreground: #8a8f98;
+
+  --primary: #0075de;
+  --primary-hover: #2c6bb3;
+  --primary-foreground: #ffffff;
+  --brand-foreground: #7eb8ff;
+  --ring: #7eb8ff;
+  --selection: #0b2543;
+  --row-selected: rgba(0, 117, 222, 0.10);
+
+  --brand: var(--primary);
+  --card: var(--surface-1);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-3);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface-2);
+  --accent: var(--selection);
+  --accent-foreground: var(--brand-foreground);
+
+  --destructive: #be123c;
+  --destructive-foreground: #ffffff;
+  --destructive-hover: #9f1239;
+
+  --data-insert: #34d399;
+  --data-insert-bg: rgba(52, 211, 153, 0.14);
+  --data-update: #fbbf24;
+  --data-update-bg: rgba(251, 191, 36, 0.14);
+  --data-delete: #fb7185;
+  --data-delete-bg: rgba(251, 113, 133, 0.14);
+  --data-query: #c4b5fd;
+  --data-query-bg: rgba(196, 181, 253, 0.14);
+  --status-ready: #34d399;
+
+  /* Legacy layout and semantic aliases */
+  --bg: var(--background);
+  --panel: var(--surface-1);
+  --panel2: var(--surface-2);
+  --elev: var(--surface-3);
+  --text: var(--foreground);
+  --text2: var(--foreground-secondary);
+  --mono: var(--font-mono);
+  --accent-hi: var(--primary-hover);
+  --accent-focus: var(--ring);
+  --accent-soft: var(--selection);
+  --surface-active: var(--row-selected);
+  --green: var(--data-insert);
+  --orange: var(--data-update);
+  --red: var(--data-delete);
+  --grape: var(--data-query);
+  --teal: var(--data-query);
+  --indigo: var(--data-query);
+  --warn: var(--data-update);
+  --warn-bg: var(--data-update-bg);
+  --warn-border: var(--data-update);
+  --sev-critical-text: var(--data-delete);
+  --sev-high-text: var(--data-delete);
+  --sev-medium-text: var(--data-update);
+  --sev-low-text: var(--muted-foreground);
+  --diff-dis-bar: var(--data-delete);
+  --diff-dis-bg: var(--data-delete-bg);
+
+  --badge-green-bg: var(--data-insert-bg);
+  --badge-green-text: var(--data-insert);
+  --badge-green-border: var(--border);
+  --badge-orange-bg: var(--data-update-bg);
+  --badge-orange-text: var(--data-update);
+  --badge-orange-border: var(--border);
+  --badge-red-bg: var(--data-delete-bg);
+  --badge-red-text: var(--data-delete);
+  --badge-red-border: var(--border);
+  --badge-grape-bg: var(--data-query-bg);
+  --badge-grape-text: var(--data-query);
+  --badge-grape-border: var(--border);
+  --badge-teal-bg: var(--data-query-bg);
+  --badge-teal-text: var(--data-query);
+  --badge-teal-border: var(--border);
+  --badge-accent-bg: var(--selection);
+  --badge-accent-text: var(--brand-foreground);
+  --badge-accent-border: var(--border);
+  --badge-gray-bg: var(--surface-2);
+  --badge-gray-text: var(--foreground-secondary);
+  --badge-gray-border: var(--border);
+}
+
+:root[data-theme="light"],
+:root:not([data-theme])[data-mantine-color-scheme='light'] {
+  --background: #ffffff;
+  --surface-1: #f5f6f6;
+  --surface-2: #f6f7f7;
+  --surface-3: #ffffff;
+  --surface-4: #f1f3f5;
+
+  --border: #e1e4ea;
+  --border-strong: #ced4da;
+  --input: #7e838c;
+
+  --foreground: #000000;
+  --foreground-secondary: #2c313a;
+  --muted-foreground: #62666d;
+
+  --primary: #0062bd;
+  --primary-hover: #0053ad;
+  --primary-foreground: #ffffff;
+  --brand-foreground: #0a67c2;
+  --ring: #0a67c2;
+  --selection: #ebf3fd;
+  --row-selected: rgba(0, 98, 189, 0.08);
+
+  --brand: var(--primary);
+  --card: var(--surface-1);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-3);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--surface-2);
+  --accent: var(--selection);
+  --accent-foreground: var(--brand-foreground);
+
+  --destructive: #be123c;
+  --destructive-foreground: #ffffff;
+  --destructive-hover: #9f1239;
+
+  --data-insert: #047857;
+  --data-insert-bg: #ecfdf5;
+  --data-update: #b45309;
+  --data-update-bg: #fffbeb;
+  --data-delete: #be123c;
+  --data-delete-bg: #fff1f2;
+  --data-query: #6d28d9;
+  --data-query-bg: #f5f3ff;
+  --status-ready: #059669;
+
+  /* Legacy layout and semantic aliases */
+  --bg: var(--background);
+  --panel: var(--surface-1);
+  --panel2: var(--surface-2);
+  --elev: var(--surface-3);
+  --text: var(--foreground);
+  --text2: var(--foreground-secondary);
+  --mono: var(--font-mono);
+  --accent-hi: var(--primary-hover);
+  --accent-focus: var(--ring);
+  --accent-soft: var(--selection);
+  --surface-active: var(--row-selected);
+  --green: var(--data-insert);
+  --orange: var(--data-update);
+  --red: var(--data-delete);
+  --grape: var(--data-query);
+  --teal: var(--data-query);
+  --indigo: var(--data-query);
+  --warn: var(--data-update);
+  --warn-bg: var(--data-update-bg);
+  --warn-border: var(--data-update);
+  --sev-critical-text: var(--data-delete);
+  --sev-high-text: var(--data-delete);
+  --sev-medium-text: var(--data-update);
+  --sev-low-text: var(--muted-foreground);
+  --diff-dis-bar: var(--data-delete);
+  --diff-dis-bg: var(--data-delete-bg);
+
+  --badge-green-bg: var(--data-insert-bg);
+  --badge-green-text: var(--data-insert);
+  --badge-green-border: var(--border);
+  --badge-orange-bg: var(--data-update-bg);
+  --badge-orange-text: var(--data-update);
+  --badge-orange-border: var(--border);
+  --badge-red-bg: var(--data-delete-bg);
+  --badge-red-text: var(--data-delete);
+  --badge-red-border: var(--border);
+  --badge-grape-bg: var(--data-query-bg);
+  --badge-grape-text: var(--data-query);
+  --badge-grape-border: var(--border);
+  --badge-teal-bg: var(--data-query-bg);
+  --badge-teal-text: var(--data-query);
+  --badge-teal-border: var(--border);
+  --badge-accent-bg: var(--selection);
+  --badge-accent-text: var(--brand-foreground);
+  --badge-accent-border: var(--border);
+  --badge-gray-bg: var(--surface-2);
+  --badge-gray-text: var(--foreground-secondary);
+  --badge-gray-border: var(--border);
+}

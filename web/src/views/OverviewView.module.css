@@ -1,0 +1,114 @@
+.container {
+  width: 100%;
+  overflow-y: auto;
+}
+
+.title {
+  overflow-wrap: anywhere;
+}
+
+.metaPaper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.healthPaper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.anomalySummary {
+  background-color: var(--panel2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.anomalySummary:hover {
+  background-color: var(--elev) !important;
+  border-color: var(--border-strong) !important;
+}
+
+.anomalySummaryDisabled {
+  background-color: var(--panel2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+}
+
+.viewAllBtn {
+  background: transparent !important;
+  color: var(--brand-foreground) !important;
+  padding: 0 4px !important;
+  height: 22px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: color 150ms ease;
+}
+
+.viewAllBtn:hover {
+  background: transparent !important;
+  color: var(--primary-hover) !important;
+  text-decoration: underline;
+}
+
+.sectionHeader {
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.metricCard {
+  min-width: 160px;
+  flex: 1 1 160px;
+}
+
+.metricValue {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricCardWarn {
+  border-color: var(--orange);
+}
+
+.breakdownCol {
+  flex: 1 1 280px;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableScroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.tableFixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.stickyHeader {
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  z-index: 1;
+}
+
+.totalRow {
+  border-top: 1px solid var(--border);
+}
+
+.tableScroll tr.cursor-pointer {
+  cursor: pointer !important;
+  transition: background-color 120ms ease;
+}
+
+.tableScroll tr.cursor-pointer:hover {
+  background-color: var(--panel2) !important;
+}

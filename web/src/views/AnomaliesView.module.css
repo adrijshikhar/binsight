@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.filterBar {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tableWrap {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.criticalRow {
+  border-left: 2px solid var(--red);
+}
+
+.messageCell {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jumpLink {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: var(--radius-xs, 4px);
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: var(--brand-foreground);
+  text-decoration: none;
+  font-weight: 500;
+  font-family: var(--mono);
+  font-size: var(--fs-sm, 11px);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.jumpLink:hover {
+  border-color: var(--primary);
+  background: var(--surface-active);
+}
+
+.jumpLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

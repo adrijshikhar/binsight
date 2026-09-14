@@ -1,4 +1,4 @@
-/* content area inside AppShell.Main — fills the main slot and stacks tabs + panels */
+/* content area inside AppShell.Main - fills the main slot and stacks tabs + panels */
 .content {
   flex: 1;
   display: flex;
@@ -7,42 +7,45 @@
   overflow: hidden;
 }
 
-/* Underline tabs — matches the Drawer's Mantine Tabs (one tab style app-wide). */
+/* Underline tabs - clean Linear-style indicator without rounded box clash */
 .tabs {
   display: flex;
-  gap: 2px;
+  gap: 8px;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
   background: var(--panel);
+  height: 38px;
+  align-items: flex-end;
 }
 
 .tab {
-  padding: 10px 16px;
+  padding: 8px 12px;
   cursor: pointer;
-  color: var(--muted);
-  font-size: var(--fs-base);
+  color: var(--muted-foreground);
+  font-size: 13px;
   font-weight: 500;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  border-radius: 4px 4px 0 0;
+  border-radius: 0;
+  background: transparent;
   transition:
-    color 150ms ease,
-    background-color 150ms ease,
-    border-color 150ms ease;
+    color 120ms ease,
+    border-color 120ms ease;
 }
 
 .tab:hover:not(.active) {
   color: var(--text2);
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
 }
 
 .tab.active {
   color: var(--text);
-  border-bottom-color: var(--accent);
-  background: var(--surface-active);
+  font-weight: 600;
+  border-bottom-color: var(--primary);
+  background: transparent;
 }
 
-/* tabpanel wrapper — fills the remaining flex space so inner table-wrap
+/* tabpanel wrapper - fills the remaining flex space so inner table-wrap
    and events-toolbar keep their full-height scrolling behaviour */
 .tabpanelFill {
   flex: 1;
@@ -52,11 +55,11 @@
 }
 
 /* Scroll by DEFAULT: every direct child of .content is a vertical scroll region
-   that fills the remaining flex height — overview/anomalies/schema/tables panels,
+   that fills the remaining flex height - overview/anomalies/schema/tables panels,
    the architecture + settings pages, the empty state, everything. The only
    opt-outs are the fixed tab nav (.tabs) and .tabpanelFill views, which bound
    their OWN inner scroll (sticky table headers, the virtualized events table).
-   This makes a forgotten scroll region impossible — new views just scroll. */
+   This makes a forgotten scroll region impossible - new views just scroll. */
 .content > *:not(.tabs):not(.tabpanelFill) {
   flex: 1;
   min-height: 0;
@@ -81,4 +84,105 @@
   bottom: 14px !important;
   right: 18px !important;
   z-index: 1000 !important;
+}
+
+.slash {
+  margin: 0 5px;
+  opacity: 0.6;
+}
+
+.fileName {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Top navigation in header: Inspector | Architecture | Settings */
+.topNav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--panel2);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+.topNavItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 120ms ease;
+  line-height: 1.2;
+}
+
+.topNavItem:hover:not(.topNavItemActive) {
+  color: var(--text2);
+  background: var(--surface-4);
+}
+
+.topNavItemActive {
+  color: var(--text);
+  background: var(--surface-active);
+  font-weight: 600;
+}
+
+.topNavIcon {
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.headerDivider {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background: var(--border-subtle);
+  margin: 0 4px;
+  opacity: 0.8;
+}
+
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+}
+
+.emptyStatus {
+  margin-top: 48px;
+  padding: 0 24px;
+  color: var(--muted-foreground);
+  font-size: 13px;
+}
+
+.noFile {
+  padding: 24px;
+  color: var(--muted-foreground);
+}
+
+.settingsHeaderBtn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 6px;
+  transition: all 120ms ease;
+  height: 28px;
+  padding: 0 10px;
+}
+
+.settingsHeaderBtn:hover {
+  color: var(--text);
+  background: var(--panel2);
+  border-color: var(--border-strong);
 }

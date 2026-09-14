@@ -1,4 +1,4 @@
-/* HexView — hex dump pane styles, scoped to v2 CSS Modules.
+/* HexView - hex dump pane styles, scoped to v2 CSS Modules.
    Ported from the global .hex*, .hl-*, .hex-pager rules in styles.css.
    Light-scheme overrides use :global([data-mantine-color-scheme='light'])
    because CSS Modules can't scope attribute selectors on <html>. */
@@ -17,16 +17,16 @@
 }
 
 .off {
-  color: var(--muted);
+  color: var(--muted-foreground);
   margin-right: 12px;
 }
 
 .ascii {
-  color: var(--muted);
+  color: var(--muted-foreground);
   margin-left: 12px;
 }
 
-/* field-highlight chips — 7 semantic colours for the 7 binlog header fields */
+/* field-highlight chips - 7 semantic colours for the 7 binlog header fields */
 .hlTs {
   background: #12331c;
 }
@@ -49,7 +49,7 @@
   background: var(--surface-active, #11243d);
 }
 
-/* Light-scheme tints — the dark tints above are unreadable on white surfaces */
+/* Light-scheme tints - the dark tints above are unreadable on white surfaces */
 :global([data-mantine-color-scheme='light']) .hlTs {
   background: #dafbe1;
 }
@@ -91,7 +91,7 @@
 /* row-nav: small info bar above hex dump */
 .rowNav {
   font-size: var(--fs-sm);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   margin-bottom: 10px;
   display: flex;
   gap: 8px;
@@ -99,9 +99,15 @@
 }
 
 .ok {
-  color: var(--green, #3fb950);
+  color: var(--muted-foreground);
 }
 
 .warn {
   color: var(--orange, #d29922);
+}
+
+.crcStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }

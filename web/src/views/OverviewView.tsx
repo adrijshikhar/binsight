@@ -4,7 +4,10 @@ import { fmtBytes } from '../lib/format'
 import { clickable, clickableRow } from '../lib/a11y'
 import MetricsCharts from '../components/MetricsCharts'
 import type { Anomaly, BinlogFile, FileMetrics, TypeCount } from '../lib/types'
-import { Alert, Badge, Button, Card, Center, Group, Paper, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
+import { Alert, Badge, Button, Card, Center, Group, Paper, SimpleGrid, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
+import { IconArrowRight, IconCheck, IconRefresh } from '@tabler/icons-react'
+import KindBadge from '../components/KindBadge'
+import styles from './OverviewView.module.css'
 
 const ROW_TYPES = new Set([
   'WRITE_ROWS_V2',
@@ -91,10 +94,10 @@ export default function OverviewView({
   const meta: [string, string][] = [
     ['Path', file.path],
     ['Size', fmtBytes(file.size)],
-    ['Server version', file.server_version || '—'],
-    ['Format', file.format_version ? `v${file.format_version}` : '—'],
+    ['Server version', file.server_version || '-'],
+    ['Format', file.format_version ? `v${file.format_version}` : '-'],
     ['Checksum', file.checksum_algo || 'none'],
-    ['Indexed by', file.indexed_by_adapter || '—'],
+    ['Indexed by', file.indexed_by_adapter || '-'],
     ['State', file.state],
   ]
 
@@ -106,21 +109,24 @@ export default function OverviewView({
     }, {}),
   ).sort((a, b) => b[1] - a[1])
 
+  const mutationCounts = counts.filter((c) => ROW_TYPES.has(c.type_name) && c.count > 0)
+
   return (
-    <Stack p="md" gap="md" style={{ width: '100%', overflowY: 'auto' }}>
+    <Stack p="md" gap="md" className={styles.container}>
       <Group justify="space-between" align="flex-start" gap="sm">
-        <Title order={2} ff="monospace" c="var(--accent)" style={{ overflowWrap: 'anywhere' }}>
+        <Title order={2} ff="monospace" c="var(--brand-foreground)" className={styles.title}>
           {file.path.split('/').pop()}
         </Title>
         <Button
           variant="default"
           size="xs"
-          ff="monospace"
+          leftSection={<IconRefresh size={14} className={reindexing ? 'animate-spin' : undefined} />}
           onClick={doReindex}
+          loading={reindexing}
           disabled={reindexing}
           title="Re-decode and re-index this file (rebuilds the event index, parsed schema, and anomalies)"
         >
-          {reindexing ? 'indexing…' : '↻ re-index'}
+          {reindexing ? 'Indexing…' : 'Re-index'}
         </Button>
       </Group>
 
@@ -130,45 +136,151 @@ export default function OverviewView({
         </Alert>
       )}
 
-      {/* File metadata grid */}
-      <Paper withBorder p="sm" style={{ maxWidth: 720 }}>
-        <Table withRowBorders={false} style={{ tableLayout: 'fixed' }}>
-          <Table.Tbody>
-            {meta.map(([k, v]) => (
-              <Table.Tr key={k}>
-                <Table.Td w={140} c="dimmed">
-                  {k}
-                </Table.Td>
-                <Table.Td ff="monospace" style={{ overflowWrap: 'anywhere' }}>
-                  {v}
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Paper>
-
-      {/* Anomaly summary strip */}
-      <Tooltip label="view anomalies" openDelay={150} withinPortal disabled={total === 0}>
-        <Paper
-          withBorder
-          p="xs"
-          style={{
-            borderLeft: total > 0 ? '3px solid var(--red)' : undefined,
-            cursor: total > 0 ? 'pointer' : undefined,
-          }}
-          {...(total > 0 ? clickable(onShowAnomalies) : {})}
-        >
-          <Group gap="xs" wrap="wrap" align="center">
-            <Text size="sm">Anomalies: {total}</Text>
-            {byDetector.map(([det, n]) => (
-              <Badge key={det} color="gray" variant="light" size="sm" ff="monospace">
-                {det} <strong>{n}</strong>
-              </Badge>
-            ))}
-          </Group>
+      {/* Balanced 2-column top grid: File Specifications + Health & Row Mutations */}
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+        {/* Left column: File Specifications */}
+        <Paper withBorder p="sm" className={styles.metaPaper}>
+          <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader} mb="xs">
+            File Specifications
+          </Text>
+          <Table withRowBorders={false} className="table-fixed">
+            <Table.Tbody>
+              {meta.map(([k, v]) => (
+                <Table.Tr key={k}>
+                  <Table.Td w={110} c="dimmed" fz="xs">
+                    {k}
+                  </Table.Td>
+                  <Table.Td ff="monospace" fz="xs" className="wrap-anywhere">
+                    {v}
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
         </Paper>
-      </Tooltip>
+
+        {/* Right column: Health & Row Mutations */}
+        <Paper withBorder p="sm" className={styles.healthPaper}>
+          <Group justify="space-between" align="center" mb="xs">
+            <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+              Health & Data Mutations
+            </Text>
+            {total > 0 && (
+              <Button
+                variant="subtle"
+                size="compact-xs"
+                color="accent"
+                rightSection={<IconArrowRight size={12} />}
+                onClick={onShowAnomalies}
+                className={styles.viewAllBtn}
+              >
+                View all
+              </Button>
+            )}
+          </Group>
+
+          {/* Anomaly summary badge strip */}
+          <Paper
+            withBorder
+            p="xs"
+            mb="xs"
+            className={total > 0 ? styles.anomalySummary : styles.anomalySummaryDisabled}
+            {...(total > 0 ? clickable(onShowAnomalies) : {})}
+          >
+            {total === 0 ? (
+              <Group gap={6} c="var(--emerald)">
+                <IconCheck size={16} />
+                <Text fw={500} size="xs">
+                  No anomalies detected in this binlog
+                </Text>
+              </Group>
+            ) : (
+              <Group justify="space-between" align="center" wrap="wrap" gap="xs">
+                <Text size="xs" fw={600} c="var(--orange)">
+                  Anomalies: {total}
+                </Text>
+                <Group gap={6} wrap="wrap">
+                  {byDetector.map(([det, n]) => (
+                    <Badge
+                      key={det}
+                      color="gray"
+                      variant="light"
+                      size="xs"
+                      ff="monospace"
+                      className="cursor-pointer"
+                      onClick={onShowAnomalies}
+                    >
+                      {det} <strong>{n}</strong>
+                    </Badge>
+                  ))}
+                </Group>
+              </Group>
+            )}
+          </Paper>
+
+          {/* Row mutations breakdown table (relocated from sidebar) */}
+          <Stack gap={4} style={{ flex: 1 }}>
+            <Group justify="space-between" align="center" mt={4}>
+              <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
+                Row Mutations
+              </Text>
+              <Text size="xs" c="dimmed">
+                {mutationCounts.length > 0
+                  ? `${mutationCounts.reduce((n, c) => n + c.rows_total, 0).toLocaleString()} rows affected`
+                  : '0 rows'}
+              </Text>
+            </Group>
+
+            {mutationCounts.length === 0 ? (
+              <Text size="xs" c="dimmed" py="xs">
+                No row mutation events (inserts/updates/deletes) found in this binlog.
+              </Text>
+            ) : (
+              <Table verticalSpacing={4} fz="xs" withRowBorders={false}>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Type</Table.Th>
+                    <Table.Th ta="right">Events</Table.Th>
+                    <Table.Th ta="right">Rows</Table.Th>
+                    <Table.Th ta="right">Bytes</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {mutationCounts.map((c) => {
+                    const bytes = bytesByType.get(c.type_name)
+                    return (
+                      <Table.Tr
+                        key={c.type_name}
+                        {...clickableRow(() => onOpenType(c.type_name))}
+                        className="cursor-pointer"
+                      >
+                        <Table.Td>
+                          <KindBadge typeName={c.type_name} size="xs" />
+                        </Table.Td>
+                        <Table.Td ta="right" className="tabular-nums">
+                          {c.count.toLocaleString()}
+                        </Table.Td>
+                        <Table.Td ta="right" className="tabular-nums">
+                          {c.rows_total > 0 ? c.rows_total.toLocaleString() : '-'}
+                        </Table.Td>
+                        <Table.Td ta="right" className="tabular-nums">
+                          {bytes ? fmtBytes(bytes) : '-'}
+                        </Table.Td>
+                      </Table.Tr>
+                    )
+                  })}
+                </Table.Tbody>
+              </Table>
+            )}
+
+            {decodeWarn && (
+              <Alert color="yellow" variant="light" p="xs" mt="xs">
+                Decoded stream contains partial frames or errors.
+              </Alert>
+            )}
+          </Stack>
+        </Paper>
+      </SimpleGrid>
 
       {err && (
         <Alert color="red" role="alert">
@@ -195,15 +307,15 @@ export default function OverviewView({
 
       {metrics && (
         <>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 1 }}>
+          <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
             Metrics
           </Text>
           <Group gap="sm" wrap="wrap">
-            <Card withBorder padding="sm" style={{ minWidth: 160 }}>
+            <Card withBorder padding="sm" className={styles.metricCard}>
               <Text size="xs" c="dimmed">
                 event size (avg)
               </Text>
-              <Text size="lg" fw={600} ff="monospace">
+              <Text size="lg" fw={600} ff="monospace" className={styles.metricValue}>
                 {fmtBytes(metrics.event_size.avg)}
               </Text>
               <Text size="xs" c="dimmed">
@@ -211,22 +323,22 @@ export default function OverviewView({
                 {fmtBytes(metrics.event_size.total)} total
               </Text>
             </Card>
-            <Card withBorder padding="sm" style={{ minWidth: 160 }}>
+            <Card withBorder padding="sm" className={styles.metricCard}>
               <Text size="xs" c="dimmed">
                 events
               </Text>
-              <Text size="lg" fw={600} ff="monospace">
+              <Text size="lg" fw={600} ff="monospace" className={styles.metricValue}>
                 {metrics.events.toLocaleString()}
               </Text>
               <Text size="xs" c="dimmed">
                 {metrics.events_per_sec.toFixed(1)}/s · {fmtBytes(metrics.bytes_per_sec)}/s
               </Text>
             </Card>
-            <Card withBorder padding="sm" style={{ minWidth: 160 }}>
+            <Card withBorder padding="sm" className={styles.metricCard}>
               <Text size="xs" c="dimmed">
                 time span
               </Text>
-              <Text size="lg" fw={600} ff="monospace">
+              <Text size="lg" fw={600} ff="monospace" className={styles.metricValue}>
                 {fmtDuration(metrics.span_sec)}
               </Text>
               <Text size="xs" c="dimmed">
@@ -236,12 +348,18 @@ export default function OverviewView({
             <Card
               withBorder
               padding="sm"
-              style={{ minWidth: 160, borderColor: decodeWarn ? 'var(--orange)' : undefined }}
+              className={`${styles.metricCard} ${decodeWarn ? styles.metricCardWarn : ''}`}
             >
               <Text size="xs" c="dimmed">
                 decode
               </Text>
-              <Text size="lg" fw={600} ff="monospace" c={decodeWarn ? 'orange' : undefined}>
+              <Text
+                size="lg"
+                fw={600}
+                ff="monospace"
+                c={decodeWarn ? 'orange' : undefined}
+                className={styles.metricValue}
+              >
                 {metrics.decode.full.toLocaleString()} full
               </Text>
               <Text size="xs" c="dimmed">
@@ -250,7 +368,7 @@ export default function OverviewView({
             </Card>
           </Group>
 
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 1 }}>
+          <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
             Event activity
           </Text>
           <MetricsCharts
@@ -264,7 +382,7 @@ export default function OverviewView({
         </>
       )}
 
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 1 }}>
+      <Text size="xs" c="dimmed" tt="uppercase" className={styles.sectionHeader}>
         Breakdown
       </Text>
       <Group gap="md" align="stretch" wrap="wrap">
@@ -272,14 +390,14 @@ export default function OverviewView({
           <Paper
             withBorder
             p="xs"
-            style={{ flex: '1 1 280px', minWidth: 220, display: 'flex', flexDirection: 'column' }}
+            className={styles.breakdownCol}
           >
             <Text size="xs" c="dimmed" mb="xs">
               Largest events by size
             </Text>
-            <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
-              <Table fz="xs" style={{ tableLayout: 'fixed', width: '100%' }}>
-                <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--panel)' }}>
+            <div className={styles.tableScroll}>
+              <Table fz="xs" className={styles.tableFixed}>
+                <Table.Thead className={styles.stickyHeader}>
                   <Table.Tr>
                     <Table.Th>type</Table.Th>
                     <Table.Th w="3.5rem" ta="right">
@@ -295,20 +413,24 @@ export default function OverviewView({
                 </Table.Thead>
                 <Table.Tbody>
                   {metrics.largest_events.map((e) => (
-                    <Tooltip key={e.pos} label="open event" openDelay={150} withinPortal>
-                      <Table.Tr {...clickableRow(() => onOpenEvent(e.pos))} style={{ cursor: 'pointer' }}>
-                        <Table.Td style={{ overflowWrap: 'anywhere' }}>{e.type_name}</Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {e.txn_id ? `#${e.txn_id}` : '—'}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {fmtBytes(e.size)}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {e.pos.toLocaleString()}
-                        </Table.Td>
-                      </Table.Tr>
-                    </Tooltip>
+                    <Table.Tr
+                      key={e.pos}
+                      {...clickableRow(() => onOpenEvent(e.pos))}
+                      className="cursor-pointer"
+                    >
+                      <Table.Td>
+                        <KindBadge typeName={e.type_name} size="xs" />
+                      </Table.Td>
+                      <Table.Td ta="right" className="tabular-nums">
+                        {e.txn_id ? `#${e.txn_id}` : '-'}
+                      </Table.Td>
+                      <Table.Td ta="right" className="tabular-nums">
+                        {fmtBytes(e.size)}
+                      </Table.Td>
+                      <Table.Td ta="right" className="tabular-nums">
+                        {e.pos.toLocaleString()}
+                      </Table.Td>
+                    </Table.Tr>
                   ))}
                 </Table.Tbody>
               </Table>
@@ -320,14 +442,14 @@ export default function OverviewView({
           <Paper
             withBorder
             p="xs"
-            style={{ flex: '1 1 280px', minWidth: 220, display: 'flex', flexDirection: 'column' }}
+            className={styles.breakdownCol}
           >
             <Text size="xs" c="dimmed" mb="xs">
               Largest transactions by event count
             </Text>
-            <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
-              <Table fz="xs" style={{ tableLayout: 'fixed', width: '100%' }}>
-                <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--panel)' }}>
+            <div className={styles.tableScroll}>
+              <Table fz="xs" className={styles.tableFixed}>
+                <Table.Thead className={styles.stickyHeader}>
                   <Table.Tr>
                     <Table.Th>txn</Table.Th>
                     <Table.Th w="5.5rem" ta="right">
@@ -340,19 +462,27 @@ export default function OverviewView({
                 </Table.Thead>
                 <Table.Tbody>
                   {metrics.largest_txns.map((t) => (
-                    <Tooltip key={t.id} label={t.gtid} openDelay={150} withinPortal disabled={!t.gtid}>
-                      <Table.Tr {...clickableRow(() => onOpenTxn(t.id))} style={{ cursor: 'pointer' }}>
-                        <Table.Td style={{ overflowWrap: 'anywhere' }}>
-                          {t.gtid && t.gtid !== 'ANONYMOUS' ? t.gtid : `#${t.id}`}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {t.events.toLocaleString()}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {t.rows.toLocaleString()}
-                        </Table.Td>
-                      </Table.Tr>
-                    </Tooltip>
+                    <Table.Tr
+                      key={t.id}
+                      {...clickableRow(() => onOpenTxn(t.id))}
+                      className="cursor-pointer"
+                    >
+                      <Table.Td className="wrap-anywhere">
+                        {t.gtid && t.gtid !== 'ANONYMOUS' ? (
+                          <Tooltip label={t.gtid} openDelay={200} withinPortal>
+                            <span>{t.gtid}</span>
+                          </Tooltip>
+                        ) : (
+                          `#${t.id}`
+                        )}
+                      </Table.Td>
+                      <Table.Td ta="right" className="tabular-nums">
+                        {t.events.toLocaleString()}
+                      </Table.Td>
+                      <Table.Td ta="right" className="tabular-nums">
+                        {t.rows.toLocaleString()}
+                      </Table.Td>
+                    </Table.Tr>
                   ))}
                 </Table.Tbody>
               </Table>
@@ -360,7 +490,7 @@ export default function OverviewView({
           </Paper>
         )}
 
-        <Paper withBorder p="xs" style={{ flex: '1 1 280px', minWidth: 220, display: 'flex', flexDirection: 'column' }}>
+        <Paper withBorder p="xs" className={styles.breakdownCol}>
           <Text size="xs" c="dimmed" mb="xs">
             Event types
           </Text>
@@ -369,9 +499,9 @@ export default function OverviewView({
               loading…
             </Text>
           ) : (
-            <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
-              <Table fz="xs" style={{ tableLayout: 'fixed', width: '100%' }}>
-                <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--panel)' }}>
+            <div className={styles.tableScroll}>
+              <Table fz="xs" className={styles.tableFixed}>
+                <Table.Thead className={styles.stickyHeader}>
                   <Table.Tr>
                     <Table.Th>type</Table.Th>
                     <Table.Th w="5.5rem" ta="right">
@@ -390,42 +520,37 @@ export default function OverviewView({
                     const isRow = ROW_TYPES.has(c.type_name)
                     const bytes = bytesByType.get(c.type_name)
                     return (
-                      <Tooltip
+                      <Table.Tr
                         key={c.type_name}
-                        label="show these events"
-                        openDelay={150}
-                        withinPortal
-                        disabled={!isRow}
+                        {...clickableRow(() => onOpenType(c.type_name))}
+                        className="cursor-pointer"
                       >
-                        <Table.Tr
-                          {...(isRow ? clickableRow(() => onOpenType(c.type_name)) : {})}
-                          style={{ cursor: isRow ? 'pointer' : undefined }}
-                        >
-                          <Table.Td>{c.type_name}</Table.Td>
-                          <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {c.count.toLocaleString()}
-                          </Table.Td>
-                          <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {isRow && c.rows_total > 0 ? c.rows_total.toLocaleString() : ''}
-                          </Table.Td>
-                          <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {bytes ? fmtBytes(bytes) : ''}
-                          </Table.Td>
-                        </Table.Tr>
-                      </Tooltip>
+                        <Table.Td>
+                          <KindBadge typeName={c.type_name} size="xs" />
+                        </Table.Td>
+                        <Table.Td ta="right" className="tabular-nums">
+                          {c.count.toLocaleString()}
+                        </Table.Td>
+                        <Table.Td ta="right" className="tabular-nums">
+                          {isRow && c.rows_total > 0 ? c.rows_total.toLocaleString() : ''}
+                        </Table.Td>
+                        <Table.Td ta="right" className="tabular-nums">
+                          {bytes ? fmtBytes(bytes) : ''}
+                        </Table.Td>
+                      </Table.Tr>
                     )
                   })}
-                  <Table.Tr style={{ borderTop: '1px solid var(--border)' }}>
+                  <Table.Tr className={styles.totalRow}>
                     <Table.Td c="dimmed" fw={600}>
                       total
                     </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <Table.Td ta="right" c="dimmed" fw={600} className="tabular-nums">
                       {totalEvents.toLocaleString()}
                     </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <Table.Td ta="right" c="dimmed" fw={600} className="tabular-nums">
                       {totalRows.toLocaleString()}
                     </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                    <Table.Td ta="right" c="dimmed" fw={600} className="tabular-nums">
                       {fmtBytes(metrics?.event_size.total ?? 0)}
                     </Table.Td>
                   </Table.Tr>

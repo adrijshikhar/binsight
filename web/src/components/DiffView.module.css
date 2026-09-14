@@ -1,4 +1,4 @@
-/* DiffView — before/after + diff grid styles, scoped to v2 CSS Modules.
+/* DiffView - before/after + diff grid styles, scoped to v2 CSS Modules.
    Ported from .ba-grid*, .diff-grid*, .disagree-hard, .ba-wrap, .row-label,
    .row-nav from global styles.css. Light-scheme overrides via :global(...). */
 
@@ -12,7 +12,7 @@
 /* label above each row grid, e.g. "row 1", "column types" */
 .rowLabel {
   font-size: var(--fs-sm);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 4px;
@@ -36,27 +36,27 @@
   padding: 6px 10px;
 }
 
-/* Header cell — used inside both baGrid and diffGrid */
+/* Header cell - used inside both baGrid and diffGrid */
 .h {
   background: var(--panel, #161b22);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
 
-/* Column-name cell — muted colour */
+/* Column-name cell - muted colour */
 .col {
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
 }
 
 .col span {
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   font-size: var(--fs-sm);
   display: block;
 }
 
-/* Changed value cell — amber highlight */
+/* Changed value cell - amber highlight */
 .changed {
   background: var(--warn-bg, #3a2c10);
   color: var(--warn, #d29922);
@@ -95,12 +95,13 @@
 
 .diffGrid .h {
   background: var(--panel, #161b22);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   font-size: var(--fs-sm);
   text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-/* ── field label — ALWAYS neutral, never tinted by row state ─────────────── */
+/* ── field label - ALWAYS neutral, never tinted by row state ─────────────── */
 .diffField {
   white-space: nowrap;
   color: var(--text);
@@ -109,7 +110,7 @@
 
 /* column headers neutral */
 .diffHead {
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-weight: 600;
 }
 
@@ -125,18 +126,22 @@
 
 /* ── agreement/disagreement states ─────────────────────────────────────────── */
 
-/* Agreeing rows: no fill, inherit panel background — quietly present */
+/* Agreeing rows: no fill, inherit panel background - quietly present */
 .agree {
   background: transparent !important;
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
 }
 
-/* ✓ marker on agree rows: faint green */
+/* ✓ marker on agree rows: neutral muted */
 .agree.mk {
-  color: var(--diff-ok, #34d399);
+  color: var(--muted-foreground);
 }
 
-/* Disagreeing rows: rose fill + left bar — loud and obvious */
+.agreeText {
+  color: var(--muted-foreground);
+}
+
+/* Disagreeing rows: rose fill + left bar - loud and obvious */
 .disagree {
   background: var(--diff-dis-bg, rgba(251, 113, 133, 0.16)) !important;
   box-shadow: inset 2px 0 0 var(--diff-dis-bar, #fb7185);
@@ -154,19 +159,19 @@
   font-weight: 600;
 }
 
-/* partial: only some adapters produced the field (coverage gap, not a conflict) —
+/* partial: only some adapters produced the field (coverage gap, not a conflict) -
    a neutral slate tint, distinct from muted 'agree' and rose 'disagree'. */
 .partial {
   background: var(--surface-active, #11243d);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
 }
 
 /* partial ✓ marker */
 .partial.mk {
-  color: var(--diff-ok, #34d399);
+  color: var(--muted-foreground);
 }
 
-/* disagree-hard: header-level disagreement — rose bar, same disagree-dis vars */
+/* disagree-hard: header-level disagreement - rose bar, same disagree-dis vars */
 .disagreeHard {
   background: var(--diff-dis-bg, rgba(251, 113, 133, 0.16)) !important;
   box-shadow: inset 2px 0 0 var(--diff-dis-bar, #fb7185);
@@ -184,7 +189,7 @@
 
 .rowNav {
   font-size: var(--fs-sm);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   margin-bottom: 10px;
   display: flex;
   gap: 8px;
@@ -193,4 +198,8 @@
 
 .warn {
   color: var(--warn, #d29922);
+}
+
+.error {
+  color: var(--diff-dis-bar, var(--red, #fb7185));
 }

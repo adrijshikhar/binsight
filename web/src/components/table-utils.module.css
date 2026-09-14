@@ -15,7 +15,14 @@
 :global(.sort-caret) {
   margin-left: 4px;
   font-size: var(--fs-sm);
-  color: var(--muted);
+  color: var(--muted-foreground);
+}
+:global(.sort-caret-active) {
+  margin-left: 4px;
+  font-size: var(--fs-sm);
+  color: var(--muted-foreground);
+  transform: rotate(90deg);
+  transition: transform 0.15s ease;
 }
 
 /* ── Tabular numeric columns ─────────────────────────────────────────────── */
@@ -63,7 +70,7 @@
   border-top: 1px solid var(--border);
   background: var(--panel);
   font-size: var(--fs-sm);
-  color: var(--muted);
+  color: var(--muted-foreground);
   display: flex;
   gap: 18px;
   font-family: var(--mono);
@@ -83,7 +90,7 @@
   cursor: pointer;
 }
 :global(.load-more:hover) {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }
 :global(.load-more:active) {
   background: var(--panel);
@@ -96,7 +103,7 @@
   justify-content: center;
   padding: 48px 24px;
   gap: 12px;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: var(--fs-base);
 }
 :global(.empty-state button) {
@@ -109,5 +116,5 @@
   font-size: var(--fs-base);
 }
 :global(.empty-state button:hover) {
-  border-color: var(--accent);
+  border-color: var(--primary);
 }

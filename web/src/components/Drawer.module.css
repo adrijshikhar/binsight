@@ -1,4 +1,4 @@
-/* Drawer — aside pane styles, scoped to v2 CSS Modules.
+/* Drawer - aside pane styles, scoped to v2 CSS Modules.
    Ported from .drawer*, .wrap-*, .json-pane, .close rules in global styles.css.
    The drawer shell layout is mostly handled by AppShell.Aside; this file covers
    the inner chrome: header, resize handle, wrap-panel, tabs, body scroll. */
@@ -14,7 +14,7 @@
   background: var(--panel, #161b22);
 }
 
-/* drag handle on the drawer's left edge — moving left widens the panel */
+/* drag handle on the drawer's left edge - moving left widens the panel */
 .drawerResize {
   position: absolute;
   left: -3px;
@@ -27,7 +27,7 @@
 }
 
 .drawerResize:hover {
-  background: var(--accent, #58a6ff);
+  background: var(--brand, #0075de);
 }
 
 /* ── Header ───────────────────────────────────────────────────────────── */
@@ -36,6 +36,18 @@
   padding: 12px 16px;
   border-bottom: 1px solid var(--border, #30363d);
   flex-shrink: 0;
+}
+
+.drawerHdrRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.drawerHdrCol {
+  min-width: 0;
+  flex: 1;
 }
 
 .drawerHdrType {
@@ -47,7 +59,7 @@
 
 .drawerHdrSub {
   font-size: var(--fs-sm);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   margin-top: 3px;
   font-family: var(--mono);
 }
@@ -133,7 +145,7 @@
 }
 
 .wrapNote {
-  color: var(--muted, #8b949e) !important;
+  color: var(--muted-foreground, #8b949e) !important;
   font-size: var(--fs-sm);
 }
 
@@ -171,7 +183,7 @@
 /* ── Misc ─────────────────────────────────────────────────────────────── */
 
 .muted {
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
 }
 
 /* ── Shared mono block (pre elements in DetailsTab) ───────────────────── */
@@ -188,7 +200,7 @@
 /* Header cell (column-label row) */
 .cellHead {
   background: var(--panel, #161b22);
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   font-size: var(--fs-sm);
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -199,7 +211,7 @@
 .cell {
   background: var(--panel2, #1c2330);
   padding: 6px 10px;
-  color: var(--muted, #8b949e);
+  color: var(--muted-foreground, #8b949e);
   font-family: var(--mono);
   font-size: var(--fs-sm);
 }

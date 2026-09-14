@@ -1,0 +1,190 @@
+.bar {
+  border-bottom: 1px solid var(--border);
+}
+
+.topBar {
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  min-height: 38px;
+}
+
+.filterRow {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  min-height: 34px;
+}
+
+.searchInput {
+  height: 28px;
+  font-size: 12px;
+}
+
+.jumpInput {
+  height: 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.liveSwitch {
+  display: flex;
+  align-items: center;
+}
+
+.livePulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--emerald, #34d399);
+  box-shadow: 0 0 6px var(--emerald, #34d399);
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.liveInactiveDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--muted);
+  display: inline-block;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+.jumpErr {
+  font-size: var(--fs-sm);
+  color: var(--mantine-color-red-6);
+  align-self: center;
+}
+
+.multiInput {
+  min-height: 28px;
+  max-height: 28px;
+  height: 28px;
+  overflow: hidden;
+  align-items: center;
+  padding-left: 6px;
+  padding-right: 28px;
+}
+
+.multiInput :global(.mantine-MultiSelect-pillsList) {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-height: 24px;
+  gap: 4px;
+  scrollbar-width: none;
+}
+
+.multiInput :global(.mantine-MultiSelect-pillsList)::-webkit-scrollbar {
+  display: none;
+}
+
+.multiInput :global(.mantine-MultiSelect-inputField) {
+  height: 22px;
+  line-height: 22px;
+  font-size: 11px;
+}
+
+.kindPill {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 2px;
+}
+
+.kindPill :global(.mantine-Pill-label) {
+  padding: 0 !important;
+}
+
+.kindPill :global(.mantine-Pill-remove) {
+  margin-left: 2px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.kindPill :global(.mantine-Pill-remove):hover {
+  color: var(--text);
+}
+
+.summaryPill {
+  background: var(--panel2) !important;
+  color: var(--text2) !important;
+  font-family: var(--mono) !important;
+  font-size: 11px !important;
+  border: 1px solid var(--border) !important;
+  height: 20px !important;
+  padding: 0 8px !important;
+  border-radius: 4px !important;
+  white-space: nowrap !important;
+}
+
+.morePill {
+  background: var(--panel2) !important;
+  color: var(--muted-foreground) !important;
+  font-family: var(--mono) !important;
+  font-size: 11px !important;
+  border: 1px solid var(--border) !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  border-radius: 4px !important;
+}
+
+.activeFilters {
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  align-items: center;
+}
+
+.activeFiltersLabel {
+  font-size: var(--fs-sm);
+  color: var(--muted-foreground);
+  font-family: var(--mono);
+  margin-right: 2px;
+}
+
+.filterPill {
+  background: var(--panel2);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.clearAllBtn {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  color: var(--muted-foreground);
+  padding: 0 4px;
+}
+.clearAllBtn:hover {
+  color: var(--text);
+}
+
+.txnPill {
+  background: var(--surface-active);
+  color: var(--brand-foreground);
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}

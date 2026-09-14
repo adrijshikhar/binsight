@@ -1,4 +1,4 @@
-/* .tableWrap — scroll container for the virtualized events table */
+/* .tableWrap - scroll container for the virtualized events table */
 .tableWrap {
   flex: 1;
   overflow-y: auto;
@@ -25,18 +25,33 @@
   background: var(--muted);
 }
 
-/* .eventsTable — fixed-layout table inside the scroll container.
+/* .eventsTable - fixed-layout table inside the scroll container.
    min-width keeps columns legible at small window / open-drawer widths: below
    it the .tableWrap scrolls horizontally instead of crushing every column. */
 .eventsTable {
   table-layout: fixed;
   width: 100%;
-  /* Fixed columns sum to 746px; reserve ~154px more so the flexible summary
+  /* Fixed columns sum to 806px; reserve ~154px more so the flexible summary
      column stays readable when the drawer/window narrows. */
-  min-width: 900px;
+  min-width: 960px;
+  font-family: var(--mono);
+  font-size: 12px;
 }
 
-/* Truncating td cells — className applied by caller (e.g. "tbl") */
+/* 32px dense data rows */
+.eventsTable tbody tr[data-index] {
+  height: 32px;
+}
+
+.eventsTable tbody tr[data-index] > td {
+  height: 32px;
+  padding: 0 10px;
+  line-height: 18px;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Truncating td cells - className applied by caller (e.g. "tbl") */
 .eventsTable :global(td.tbl) {
   overflow: hidden;
   white-space: nowrap;
@@ -44,7 +59,7 @@
 }
 
 /* Summary column in fixed-layout context: take remaining width and truncate to
-   a single line (full text is in the cell's tooltip) — never wrap per-word. */
+   a single line (full text is in the cell's tooltip) - never wrap per-word. */
 .eventsTable :global(td.summary) {
   width: auto;
   max-width: none;
@@ -53,16 +68,16 @@
   text-overflow: ellipsis;
 }
 
-/* .vSpacer — virtual scroll top/bottom padding rows */
+/* .vSpacer - virtual scroll top/bottom padding rows */
 .vSpacer td {
   padding: 0;
   border: 0;
 }
 
-/* .skeleton — shimmer placeholder shown while events are loading */
+/* .skeleton - shimmer placeholder shown while events are loading */
 .skeleton {
   animation: shimmer 1s ease-in-out alternate infinite;
-  color: var(--muted);
+  color: var(--muted-foreground);
   padding: 5px 10px;
   font-family: var(--mono);
   font-size: var(--fs-sm);
@@ -120,9 +135,9 @@
 /* Transaction group-header row */
 :global(.txn-hdr td) {
   background: var(--panel);
-  font-family: -apple-system, sans-serif;
+  font-family: var(--mono);
   font-size: var(--fs-sm);
-  color: var(--muted);
+  color: var(--muted-foreground);
   padding: 6px 10px;
   cursor: pointer;
 }
@@ -131,7 +146,7 @@
   font-family: var(--mono);
 }
 :global(.txn-hdr .caret) {
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 /* Greedy text column (auto-table context): fills remaining width + ellipsis-

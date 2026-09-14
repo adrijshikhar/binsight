@@ -1,0 +1,124 @@
+.kindBadge {
+  cursor: pointer !important;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: 6px !important;
+  height: 20px !important;
+  padding: 0 6px !important;
+  overflow: visible !important;
+  text-transform: uppercase;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  box-sizing: border-box !important;
+  transition: opacity 120ms ease;
+}
+
+.kindBadge:hover {
+  opacity: 0.85;
+}
+
+.kindBadge :global(.mantine-Badge-label) {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  padding-top: 1px; /* Optical center: compensates for font descender box */
+}
+
+/* UPDATE_ROWS: Solid accent blue matching shot3.png */
+.kindBadge[data-kind="UPDATE"] {
+  background-color: var(--brand) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--brand) !important;
+}
+
+/* WRITE_ROWS: Matte emerald green */
+.kindBadge[data-kind="WRITE"] {
+  background-color: rgba(39, 166, 68, 0.16) !important;
+  color: #34d399 !important;
+  border: 1px solid var(--border) !important;
+}
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="WRITE"] {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid rgba(5, 150, 105, 0.25) !important;
+}
+
+/* DELETE_ROWS: Matte rose red */
+.kindBadge[data-kind="DELETE"] {
+  background-color: rgba(244, 63, 94, 0.16) !important;
+  color: #fb7185 !important;
+  border: 1px solid var(--border) !important;
+}
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="DELETE"] {
+  background-color: #fff1f2 !important;
+  color: #be123c !important;
+  border: 1px solid rgba(225, 29, 72, 0.25) !important;
+}
+
+/* Neutral dark charcoal chip matching shot3.png for TABLE_MAP, XID, QUERY, GTID, default */
+.kindBadge[data-kind="TABLE_MAP"],
+.kindBadge[data-kind="XID"],
+.kindBadge[data-kind="QUERY"],
+.kindBadge[data-kind="GTID"],
+.kindBadge[data-kind="default"] {
+  background-color: var(--panel2) !important;
+  color: var(--text2) !important;
+  border: 1px solid var(--border) !important;
+}
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="TABLE_MAP"],
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="XID"],
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="QUERY"],
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="GTID"],
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="default"] {
+  background-color: var(--panel2) !important;
+  color: var(--text2) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* DDL Kinds (CREATE, ALTER, DROP, TRUNCATE) */
+.kindBadge[data-kind="CREATE"] {
+  background-color: rgba(39, 166, 68, 0.16) !important;
+  color: #34d399 !important;
+  border: 1px solid var(--border) !important;
+}
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="CREATE"] {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid rgba(5, 150, 105, 0.25) !important;
+}
+
+.kindBadge[data-kind="ALTER"] {
+  background-color: var(--brand) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--brand) !important;
+}
+
+.kindBadge[data-kind="DROP"] {
+  background-color: rgba(244, 63, 94, 0.16) !important;
+  color: #fb7185 !important;
+  border: 1px solid var(--border) !important;
+}
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="DROP"] {
+  background-color: #fff1f2 !important;
+  color: #be123c !important;
+  border: 1px solid rgba(225, 29, 72, 0.25) !important;
+}
+
+.kindBadge[data-kind="TRUNCATE"] {
+  background-color: rgba(251, 191, 36, 0.16) !important;
+  color: #fbbf24 !important;
+  border: 1px solid var(--border) !important;
+}
+:global([data-mantine-color-scheme="light"]) .kindBadge[data-kind="TRUNCATE"] {
+  background-color: #fffbeb !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(217, 119, 6, 0.25) !important;
+}
