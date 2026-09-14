@@ -2,13 +2,22 @@ import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { clickable } from '../lib/a11y'
 import type { Anomaly, Severity } from '../lib/types'
-import { severityColor } from '../components/icons'
-import { Alert, Anchor, Badge, Button, Center, Group, NativeSelect, Stack, Table, Text } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Table } from '@/components/ui/table'
+import styles from './AnomaliesView.module.css'
 
 interface AnomaliesViewProps {
   fileId: number
   onOpenTxn: (id: number) => void
   onOpenEvent: (pos: number) => void
+}
+
+const severityToBadgeVariant = (sev: Severity): 'destructive' | 'warning' | 'secondary' => {
+  if (sev === 'critical' || sev === 'high') return 'destructive'
+  if (sev === 'medium') return 'warning'
+  return 'secondary'
 }
 
 export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: AnomaliesViewProps) {
@@ -54,133 +63,99 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
   }
 
   return (
-    <Stack gap={0} style={{ height: '100%', overflow: 'hidden' }}>
-      <Group px="md" py="xs" gap="sm" style={{ borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-        <Text size="sm" c="dimmed">
+    <div className={`flex flex-col h-full overflow-hidden ${styles.container}`}>
+      <div className={`flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 ${styles.filterBar}`}>
+        <span className="text-xs text-muted-foreground">
           severity
-        </Text>
-        <NativeSelect
-          size="xs"
+        </span>
+        <select
+          className="h-7 text-xs rounded-md border border-input bg-background px-2 text-foreground"
           value={sev}
           onChange={(e) => setSev(e.target.value as Severity | '')}
-          data={[
-            { value: '', label: 'all' },
-            { value: 'critical', label: 'critical' },
-            { value: 'high', label: 'high' },
-            { value: 'medium', label: 'medium' },
-            { value: 'low', label: 'low' },
-          ]}
-        />
-        <Button size="xs" variant="default" onClick={rerunDetection} disabled={detecting}>
-          {detecting ? 'detecting…' : 're-run detection'}
+        >
+          <option value="">all</option>
+          <option value="critical">critical</option>
+          <option value="high">high</option>
+          <option value="medium">medium</option>
+          <option value="low">low</option>
+        </select>
+        <Button size="xs" variant="outline" onClick={rerunDetection} disabled={detecting}>
+          {detecting ? 'detecting...' : 're-run detection'}
         </Button>
-      </Group>
+      </div>
       {err && (
-        <Alert color="red" role="alert" radius={0} mb={0}>
-          {err}
-          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => setFetchKey((k) => k + 1)}>
+        <Alert variant="error" role="alert" className="flex items-center justify-between rounded-none mb-0">
+          <span>{err}</span>
+          <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
       )}
       {loading && anomalies.length === 0 ? (
-        <Text c="dimmed" p="md">
-          loading anomalies…
-        </Text>
+        <p className="text-muted-foreground p-4 text-sm">
+          loading anomalies...
+        </p>
       ) : anomalies.length === 0 ? (
-        <Center py="xl">
-          <Text c="dimmed" role="status">
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground text-sm" role="status">
             No anomalies detected for this file.
-          </Text>
-        </Center>
+          </p>
+        </div>
       ) : (
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <Table stickyHeader fz="sm">
+        <div className={styles.tableWrap}>
+          <Table stickyHeader className="text-sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>severity</Table.Th>
                 <Table.Th>detector</Table.Th>
                 <Table.Th>db.table</Table.Th>
-                <Table.Th>metric / threshold</Table.Th>
+                <Table.Th className="text-right">metric / threshold</Table.Th>
                 <Table.Th>message</Table.Th>
                 <Table.Th>link</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {anomalies.map((a) => (
-                <Table.Tr key={a.id}>
+                <Table.Tr
+                  key={a.id}
+                  className={a.severity === 'critical' || a.severity === 'high' ? styles.criticalRow : undefined}
+                >
                   <Table.Td>
-                    <Badge color={severityColor(a.severity)} variant="light" size="sm">
+                    <Badge
+                      variant={severityToBadgeVariant(a.severity)}
+                      size="sm"
+                      data-severity={a.severity}
+                    >
                       {a.severity}
                     </Badge>
                   </Table.Td>
-                  <Table.Td ff="monospace">{a.detector}</Table.Td>
+                  <Table.Td className="font-mono">{a.detector}</Table.Td>
                   <Table.Td>{[a.db_name, a.table_name].filter(Boolean).join('.')}</Table.Td>
-                  <Table.Td style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
+                  <Table.Td className="tabular-nums text-right">
                     {a.threshold > 0 ? `${a.metric.toLocaleString()} / ${a.threshold.toLocaleString()}` : '-'}
                   </Table.Td>
-                  <Table.Td
-                    style={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                  >
+                  <Table.Td className={styles.messageCell}>
                     {a.message || '-'}
                   </Table.Td>
                   <Table.Td>
                     {a.txn_id ? (
-                      <Anchor
-                        size="xs"
-                        ff="monospace"
-                        style={{
-                          display: 'inline-block',
-                          padding: '2px 7px',
-                          borderRadius: 4,
-                          background: 'var(--panel2)',
-                          border: '1px solid var(--border)',
-                          color: 'var(--accent)',
-                          textDecoration: 'none',
-                          fontWeight: 500,
-                          transition: 'border-color 150ms ease, background 150ms ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--accent)'
-                          e.currentTarget.style.background = 'var(--surface-active)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border)'
-                          e.currentTarget.style.background = 'var(--panel2)'
-                        }}
+                      <button
+                        type="button"
+                        className={styles.jumpLink}
                         {...clickable(() => onOpenTxn(a.txn_id!))}
                       >
                         txn #{a.txn_id}
-                      </Anchor>
+                      </button>
                     ) : a.event_pos ? (
-                      <Anchor
-                        size="xs"
-                        ff="monospace"
-                        style={{
-                          display: 'inline-block',
-                          padding: '2px 7px',
-                          borderRadius: 4,
-                          background: 'var(--panel2)',
-                          border: '1px solid var(--border)',
-                          color: 'var(--accent)',
-                          textDecoration: 'none',
-                          fontWeight: 500,
-                          transition: 'border-color 150ms ease, background 150ms ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--accent)'
-                          e.currentTarget.style.background = 'var(--surface-active)'
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = 'var(--border)'
-                          e.currentTarget.style.background = 'var(--panel2)'
-                        }}
+                      <button
+                        type="button"
+                        className={styles.jumpLink}
                         {...clickable(() => onOpenEvent(a.event_pos!))}
                       >
                         @ {a.event_pos}
-                      </Anchor>
+                      </button>
                     ) : (
-                      '—'
+                      '-'
                     )}
                   </Table.Td>
                 </Table.Tr>
@@ -189,6 +164,6 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
           </Table>
         </div>
       )}
-    </Stack>
+    </div>
   )
 }
