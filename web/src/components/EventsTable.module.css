@@ -104,8 +104,9 @@
 :global(tbody tr.zebra-odd) {
   background: rgba(33, 38, 45, 0.55);
 }
-:global([data-mantine-color-scheme='light'] tbody tr.zebra-odd) {
-  background: rgba(208, 215, 222, 0.35);
+:global([data-theme='light'] tbody tr.zebra-odd),
+:global(.light tbody tr.zebra-odd) {
+  background: var(--surface-2);
 }
 
 /* Selected event row */

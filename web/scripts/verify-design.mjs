@@ -161,17 +161,57 @@ async function runVerification() {
     }
     console.log('PASS: Segmented control capsule height verified.')
 
-    // Verify badge border radius
-    const badgeRadius = await page.evaluate(() => {
-      const b = document.querySelector('[data-slot="badge"]')
-      return b ? window.getComputedStyle(b).borderRadius : null
+    // Verify design foundation tokens
+    const resolvedTokens = await page.evaluate(() => {
+      const root = window.getComputedStyle(document.documentElement)
+      const body = window.getComputedStyle(document.body)
+      const table = document.querySelector('table')
+      const tableStyle = table ? window.getComputedStyle(table) : null
+      return {
+        fontSans: root.getPropertyValue('--font-sans').trim(),
+        fontMono: root.getPropertyValue('--font-mono').trim(),
+        radiusSm: root.getPropertyValue('--radius-sm').trim(),
+        radiusMd: root.getPropertyValue('--radius-md').trim(),
+        radiusLg: root.getPropertyValue('--radius-lg').trim(),
+        bodyFontFamily: body.fontFamily,
+        tableFontFamily: tableStyle?.fontFamily,
+        tableBorderCollapse: tableStyle?.borderCollapse,
+      }
     })
-    if (!badgeRadius) throw new Error('Badge element not found for radius check')
-    console.log(`Badge border radius: ${badgeRadius}`)
-    if (badgeRadius !== '6px') {
-      throw new Error(`Expected 6px badge border radius, got ${badgeRadius}`)
+    console.log('Resolved design foundation tokens:', resolvedTokens)
+    if (!resolvedTokens.fontSans) throw new Error('Assertion failed: --font-sans must not be empty')
+    if (!resolvedTokens.fontMono) throw new Error('Assertion failed: --font-mono must not be empty')
+    if (resolvedTokens.radiusSm !== '6px') {
+      throw new Error(`Assertion failed: Expected --radius-sm 6px, got ${resolvedTokens.radiusSm}`)
     }
-    console.log('PASS: 6px badge border radius verified.')
+    if (resolvedTokens.bodyFontFamily.toLowerCase().includes('times')) {
+      throw new Error(`Assertion failed: body font family resolved to Times fallback: ${resolvedTokens.bodyFontFamily}`)
+    }
+    if (resolvedTokens.tableFontFamily.toLowerCase().includes('times')) {
+      throw new Error(`Assertion failed: table font family resolved to Times fallback: ${resolvedTokens.tableFontFamily}`)
+    }
+    if (resolvedTokens.tableBorderCollapse !== 'collapse') {
+      throw new Error(`Assertion failed: Expected table border-collapse: collapse, got ${resolvedTokens.tableBorderCollapse}`)
+    }
+    console.log('PASS: Non-circular font/radius tokens and table preflight verified.')
+
+    // Verify real event badge border radius (not sidebar anomaly badge)
+    const eventBadgeMetrics = await page.evaluate(() => {
+      const b = document.querySelector('[data-slot="badge"][data-kind]')
+      if (!b) return null
+      const style = window.getComputedStyle(b)
+      return {
+        radius: style.borderRadius,
+        fontFamily: style.fontFamily,
+        kind: b.getAttribute('data-kind'),
+      }
+    })
+    if (!eventBadgeMetrics) throw new Error('Real event badge [data-slot="badge"][data-kind] not found')
+    console.log(`Event badge (${eventBadgeMetrics.kind}) radius: ${eventBadgeMetrics.radius}, font: ${eventBadgeMetrics.fontFamily}`)
+    if (eventBadgeMetrics.radius !== '6px') {
+      throw new Error(`Expected 6px event badge border radius, got ${eventBadgeMetrics.radius}`)
+    }
+    console.log('PASS: Real event badge 6px border radius verified.')
 
     // Verify active tab underline navigation
     const activeTabBorder = await page.evaluate(() => {
@@ -308,6 +348,18 @@ async function runVerification() {
     await page.waitForTimeout(300)
     await page.screenshot({ path: path.join(OUT_DIR, '06-light-events.png') })
 
+    // Verify light mode zebra stripe uses semantic token, NOT dark zebra rgba(33, 38, 45, 0.55)
+    const lightZebraBg = await page.evaluate(() => {
+      const row = document.querySelector('tbody tr.zebra-odd')
+      return row ? window.getComputedStyle(row).backgroundColor : null
+    })
+    console.log('Light mode zebra row background:', lightZebraBg)
+    if (!lightZebraBg) throw new Error('tr.zebra-odd row not found in light mode')
+    if (lightZebraBg.includes('33, 38, 45') || lightZebraBg.includes('33,38,45')) {
+      throw new Error(`Assertion failed: Light zebra row received dark row background ${lightZebraBg}`)
+    }
+    console.log('PASS: Light mode zebra striping verified.')
+
     const tablesTab = page.locator('[role="tab"]:has-text("Tables")').first()
     await tablesTab.click()
     await page.waitForSelector('#tabpanel-tables', { timeout: 5000 })
@@ -335,13 +387,14 @@ async function runVerification() {
     // Phase 3: 200% Zoom Emulation
     // -------------------------------------------------------------------------
     console.log('\n--- Phase 3: 200% Browser Zoom Emulation ---')
-    console.log('NOTE: Actual user zoom (Cmd+plus) is emulated via CDP Emulation.setPageScaleFactor at 2x.')
+    console.log('NOTE: Automated testing evaluates visual page-scale factor via CDP setPageScaleFactor(2).')
+    console.log('Actual 200% desktop browser zoom reflow (Cmd+plus) is explicitly marked as requiring manual browser verification because headless CDP does not invoke browser chrome zoom controls.')
     try {
       const cdp = await desktopContext.newCDPSession(page)
       await cdp.send('Emulation.setPageScaleFactor', { pageScaleFactor: 2 })
       await page.waitForTimeout(300)
       await page.screenshot({ path: path.join(OUT_DIR, '09-desktop-200pct-zoom.png') })
-      console.log('PASS: Captured 09-desktop-200pct-zoom.png without layout collapse.')
+      console.log('PASS: Captured 09-desktop-200pct-zoom.png without visual page scale collapse.')
       await cdp.send('Emulation.setPageScaleFactor', { pageScaleFactor: 1 })
     } catch (e) {
       console.warn('CDP 200% zoom emulation notice:', e.message)

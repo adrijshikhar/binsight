@@ -35,6 +35,12 @@ describe('theme.css', () => {
       })
     })
 
+    root.walkAtRules('theme', (atRule) => {
+      atRule.walkDecls((decl) => {
+        sharedTokens[decl.prop] = decl.value
+      })
+    })
+
     // Exact primary values
     expect(darkTokens['--primary']).toBe('#0075de')
     expect(lightTokens['--primary']).toBe('#0062bd')
@@ -270,5 +276,46 @@ describe('theme.css', () => {
 
     expect(hasFocusRing).toBe(true)
     expect(hasReducedMotion).toBe(true)
+  })
+
+  it('prohibits circular self-referential tokens in theme definitions', () => {
+    const root = postcss.parse(css)
+    const circularDecls: string[] = []
+
+    root.walkDecls((decl) => {
+      // Check for self-referential var(--prop) pattern
+      const selfVarRegex = new RegExp(`var\\(\\s*${decl.prop}\\s*\\)`)
+      if (selfVarRegex.test(decl.value)) {
+        circularDecls.push(`${decl.prop}: ${decl.value}`)
+      }
+    })
+
+    expect(circularDecls).toEqual([])
+  })
+
+  it('verifies Tailwind preflight is imported in ui.css', () => {
+    const uiCssPath = path.resolve(process.cwd(), 'src/styles/ui.css')
+    const uiCss = fs.readFileSync(uiCssPath, 'utf-8')
+    // Must import preflight (either via full tailwindcss or tailwindcss/preflight.css)
+    const hasPreflight =
+      uiCss.includes('tailwindcss/preflight.css') ||
+      uiCss.includes('@import "tailwindcss";') ||
+      uiCss.includes("@import 'tailwindcss';")
+    expect(hasPreflight).toBe(true)
+  })
+
+  it('verifies light-theme zebra selector in EventsTable.module.css targets data-theme without legacy mantine attributes', () => {
+    const tableCssPath = path.resolve(process.cwd(), 'src/components/EventsTable.module.css')
+    const tableCss = fs.readFileSync(tableCssPath, 'utf-8')
+
+    // Must not contain obsolete mantine selector
+    expect(tableCss).not.toContain('data-mantine-color-scheme')
+
+    // Must target data-theme="light" or :root.light
+    const hasLightZebra =
+      tableCss.includes("data-theme='light'") ||
+      tableCss.includes('data-theme="light"') ||
+      tableCss.includes('.light')
+    expect(hasLightZebra).toBe(true)
   })
 })
