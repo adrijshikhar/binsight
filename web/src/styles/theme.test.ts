@@ -125,7 +125,69 @@ describe('theme.css', () => {
     expect(darkTokens['--status-ready']).toBe('#34d399')
     expect(lightTokens['--status-ready']).toBe('#059669')
 
-    // Font heading
+    // Task 20B: Font stacks and headings
+    expect(sharedTokens['--font-sans']).toBe(
+      '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif',
+    )
+    expect(sharedTokens['--font-mono']).toBe(
+      "'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, Consolas, monospace",
+    )
     expect(sharedTokens['--font-heading'] || darkTokens['--font-heading']).toBe('var(--font-sans)')
+
+    // Task 20B: Binsight type scale and zero tracking
+    expect(sharedTokens['--fs-badge']).toBe('11px')
+    expect(sharedTokens['--lh-badge']).toBe('14px')
+    expect(sharedTokens['--fs-compact']).toBe('12px')
+    expect(sharedTokens['--lh-compact']).toBe('16px')
+    expect(sharedTokens['--fs-body']).toBe('13px')
+    expect(sharedTokens['--lh-body']).toBe('20px')
+    expect(sharedTokens['--fs-section']).toBe('16px')
+    expect(sharedTokens['--lh-section']).toBe('22px')
+    expect(sharedTokens['--fs-heading']).toBe('20px')
+    expect(sharedTokens['--lh-heading']).toBe('26px')
+    expect(sharedTokens['--fs-metric']).toBe('24px')
+    expect(sharedTokens['--lh-metric']).toBe('30px')
+    expect(sharedTokens['--letter-spacing-zero']).toBe('0')
+
+    // Legacy aliases preserved
+    expect(sharedTokens['--fs-sm']).toBe('var(--fs-badge)')
+    expect(sharedTokens['--fs-base']).toBe('var(--fs-body)')
+    expect(sharedTokens['--fs-lg']).toBe('var(--fs-section)')
+    expect(sharedTokens['--fs-xl']).toBe('var(--fs-heading)')
+  })
+
+  it('verifies global.css enforces zero letter-spacing on headings and controls', () => {
+    const globalCssPath = path.resolve(process.cwd(), 'src/global.css')
+    const globalCss = fs.readFileSync(globalCssPath, 'utf-8')
+    const globalRoot = postcss.parse(globalCss)
+
+    let headingSpacing: string | undefined
+    let controlsSpacing: string | undefined
+    let bodyFontFamily: string | undefined
+
+    globalRoot.walkRules((rule: Rule) => {
+      if (rule.selector === 'body') {
+        rule.walkDecls('font-family', (decl) => {
+          bodyFontFamily = decl.value
+        })
+      }
+      if (rule.selector === 'h1, h2, h3, h4, h5, h6') {
+        rule.walkDecls('letter-spacing', (decl) => {
+          headingSpacing = decl.value
+        })
+      }
+      if (
+        rule.selector.includes('button') &&
+        rule.selector.includes('[data-slot="badge"]')
+      ) {
+        rule.walkDecls('letter-spacing', (decl) => {
+          controlsSpacing = decl.value
+        })
+      }
+    })
+
+    expect(bodyFontFamily).toBe('var(--font-sans)')
+    expect(headingSpacing).toBe('0')
+    expect(controlsSpacing).toBe('0')
   })
 })

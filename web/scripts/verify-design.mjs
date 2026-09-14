@@ -58,7 +58,7 @@ async function runVerification() {
     })
     console.log('Computed theme tokens:', themeTokens)
 
-    // 2. Nonempty virtual rows check on Events tab
+    // 2. Nonempty virtual rows and control density check on Events tab
     await page.waitForSelector('table', { timeout: 10000 })
     const rows = page.locator('tr[data-index]')
     const rowCount = await rows.count()
@@ -67,6 +67,34 @@ async function runVerification() {
       const firstBox = await rows.first().boundingBox()
       if (firstBox) {
         console.log(`First row height: ${firstBox.height}px`)
+        if (Math.round(firstBox.height) !== 32) {
+          throw new Error(`Expected 32px event row height, got ${firstBox.height}px`)
+        }
+      }
+    }
+
+    // Measure FilterBar dense controls
+    const searchControl = await page.locator('[data-slot="input-control"]').first().boundingBox()
+    if (searchControl) {
+      console.log(`Search input control height: ${searchControl.height}px`)
+      if (Math.round(searchControl.height) !== 28) {
+        throw new Error(`Expected 28px search input control height, got ${searchControl.height}px`)
+      }
+    }
+
+    const goBtn = await page.locator('button[aria-label="Go to position"]').first().boundingBox()
+    if (goBtn) {
+      console.log(`Go button height: ${goBtn.height}px`)
+      if (Math.round(goBtn.height) !== 28) {
+        throw new Error(`Expected 28px Go button height, got ${goBtn.height}px`)
+      }
+    }
+
+    const segmented = await page.locator('[aria-label="View mode"]').first().boundingBox()
+    if (segmented) {
+      console.log(`Segmented control height: ${segmented.height}px`)
+      if (Math.round(segmented.height) !== 28) {
+        throw new Error(`Expected 28px segmented control height, got ${segmented.height}px`)
       }
     }
 

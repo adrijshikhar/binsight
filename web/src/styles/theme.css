@@ -7,10 +7,29 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-pill: 9999px;
-  --fs-sm: 11px;
-  --fs-base: 13px;
-  --fs-lg: 16px;
-  --fs-xl: 20px;
+
+  /* Type scale (font-size and line-height) */
+  --fs-badge: 11px;
+  --lh-badge: 14px;
+  --fs-compact: 12px;
+  --lh-compact: 16px;
+  --fs-body: 13px;
+  --lh-body: 20px;
+  --fs-section: 16px;
+  --lh-section: 22px;
+  --fs-heading: 20px;
+  --lh-heading: 26px;
+  --fs-metric: 24px;
+  --lh-metric: 30px;
+
+  /* Zero tracking across headings, badges, and controls */
+  --letter-spacing-zero: 0;
+
+  /* Legacy alias compatibility */
+  --fs-sm: var(--fs-badge);
+  --fs-base: var(--fs-body);
+  --fs-lg: var(--fs-section);
+  --fs-xl: var(--fs-heading);
 }
 
 @theme inline {
@@ -22,6 +41,7 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-pill: var(--radius-pill);
+  --tracking-zero: var(--letter-spacing-zero);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

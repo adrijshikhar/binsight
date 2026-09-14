@@ -7,7 +7,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-size: var(--fs-base);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -16,10 +16,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Linear negative letter-spacing on display headlines */
+/* Zero letter-spacing across all headings, badges, and controls */
 h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   font-weight: 600;
+}
+
+button, input, select, textarea, [data-slot="badge"], [data-slot="button"], [data-slot="input-control"] {
+  letter-spacing: 0;
 }
 
 * {

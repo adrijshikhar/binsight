@@ -191,7 +191,7 @@ export default function FilterBar(props: FilterBarProps) {
               disabled={jump.trim() === ''}
               aria-label="Go to position"
               variant="outline"
-              size="xs"
+              size="sm"
             >
               Go
             </Button>
