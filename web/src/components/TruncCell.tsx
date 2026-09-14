@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
-import { Table, Tooltip } from '@mantine/core'
+import { TableCell } from '@/components/ui/table'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { api } from '../lib/api'
+import { cn } from '@/lib/utils'
 
 interface TruncCellProps {
   /** Preview text rendered in the cell (may be a server-truncated summary). */
@@ -9,7 +11,7 @@ interface TruncCellProps {
   /**
    * When both are set, the tooltip lazily fetches the event detail on first
    * hover and shows the COMPLETE decoded statement (decoded.sql) instead of the
-   * truncated preview — used for QUERY/DDL summary columns whose cell text ends
+   * truncated preview - used for QUERY/DDL summary columns whose cell text ends
    * in `…`. Omit for columns whose text is already complete (e.g. db.table).
    */
   fileId?: number
@@ -47,16 +49,23 @@ export default function TruncCell({ label, className, fileId, pos, mono }: Trunc
 
   const tip = full ? full : label
   return (
-    <Tooltip label={tip} disabled={!label || !truncated} position="top-start" openDelay={200} withinPortal>
-      <Table.Td
-        ref={ref}
-        className={className}
-        ff={mono ? 'monospace' : undefined}
-        aria-label={label || undefined}
-        onMouseEnter={onEnter}
-      >
-        {label}
-      </Table.Td>
+    <Tooltip disabled={!label || !truncated}>
+      <TooltipTrigger
+        render={
+          <TableCell
+            ref={ref}
+            className={cn(className, mono && 'font-mono')}
+            style={mono ? { fontFamily: 'monospace' } : undefined}
+            aria-label={label || undefined}
+            onMouseEnter={onEnter}
+          >
+            {label}
+          </TableCell>
+        }
+      />
+      <TooltipPopup align="start" side="top">
+        {tip}
+      </TooltipPopup>
     </Tooltip>
   )
 }

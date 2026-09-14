@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Virtualizer } from '@tanstack/react-virtual'
-import { Alert, Badge, Button, Table, Tooltip } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Table } from '@/components/ui/table'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { IconChevronRight } from '@tabler/icons-react'
 import '../components/table-utils.module.css'
 import { api } from '../lib/api'
@@ -12,17 +15,27 @@ import type { EventRow, Severity } from '../lib/types'
 import EventsTable, { type VisualRow } from '../components/EventsTable'
 import FilterBar, { type Filters, emptyFilters } from '../components/FilterBar'
 import TruncCell from '../components/TruncCell'
-import { Warning, WrapArrow, kindBadgeStyle } from '../components/icons'
+import KindBadge from '../components/KindBadge'
+import { Warning, WrapArrow } from '../components/icons'
+import styles from './EventsView.module.css'
 
 /** Columns that can be sorted client-side. Unsorted = stream/load order (default). */
 type SortKey = 'pos' | 'ts' | 'size' | 'rows'
 
 /** Group type used inside the VisualRow union */
 // ordinal: a per-file, 1-based transaction number assigned in stream order at
-// grouping time. Readable and contiguous for ANY binlog — GTID or not (a
+// grouping time. Readable and contiguous for ANY binlog - GTID or not (a
 // GTID-less file has no seqno; GTID seqnos can also be huge/non-contiguous on
 // replicas). The exact GTID stays visible in each row for precise reference.
 type TxnGroup = { txnId: number; ordinal: number; events: EventRow[] }
+
+function kindToDataAttr(typeName: string): string {
+  if (typeName.startsWith('WRITE_ROWS_')) return typeName
+  if (typeName.startsWith('UPDATE_ROWS_')) return typeName
+  if (typeName.startsWith('DELETE_ROWS_')) return typeName
+  if (typeName === 'QUERY' || typeName === 'XID' || typeName === 'TABLE_MAP') return typeName
+  return 'default'
+}
 
 /** Number of body columns (kept in sync with the <colgroup> / colSpan usage). */
 const COL_COUNT = 9
@@ -298,8 +311,7 @@ export default function EventsView(props: EventsViewProps) {
     sortKey === key ? (
       <IconChevronRight
         size={12}
-        className="sort-caret"
-        style={{ transform: sortDir === 'asc' ? 'rotate(90deg)' : undefined, transition: 'transform 0.15s ease' }}
+        className={`sort-caret ${sortDir === 'asc' ? 'sort-caret-active' : ''}`}
       />
     ) : null
 
@@ -364,15 +376,10 @@ export default function EventsView(props: EventsViewProps) {
         {...clickableRow(() => toggleCollapsed(g.txnId))}
       >
         <Table.Td colSpan={COL_COUNT}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <span className={styles.groupRowContent}>
             <IconChevronRight
               size={12}
-              className="caret"
-              style={{
-                transform: !isCollapsed ? 'rotate(90deg)' : undefined,
-                transition: 'transform 0.15s ease',
-                flexShrink: 0,
-              }}
+              className={`caret ${styles.caret} ${!isCollapsed ? styles.caretExpanded : ''}`}
             />
             <span>
               <span className="gtid">{label}</span> · {g.events.length} events · {rows} rows
@@ -400,20 +407,34 @@ export default function EventsView(props: EventsViewProps) {
       >
         <Table.Td className="anom-marker">
           {wrapped ? (
-            <Tooltip label={wrapTitle} openDelay={150} withinPortal>
-              <span className="warn pos-wrap-marker" aria-label={wrapTitle}>
-                <WrapArrow size={12} />
-              </span>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="warn pos-wrap-marker" aria-label={wrapTitle}>
+                    <WrapArrow size={12} />
+                  </span>
+                }
+              />
+              <TooltipPopup side="top" align="center">
+                {wrapTitle}
+              </TooltipPopup>
             </Tooltip>
           ) : (
             props.posSeverity.has(e.pos) && (
-              <Tooltip label={`anomaly: ${props.posSeverity.get(e.pos)}`} openDelay={150} withinPortal>
-                <span
-                  className={`warn sev-${props.posSeverity.get(e.pos)}`}
-                  aria-label={`anomaly: ${props.posSeverity.get(e.pos)}`}
-                >
-                  <Warning size={12} />
-                </span>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <span
+                      className={`warn sev-${props.posSeverity.get(e.pos)}`}
+                      aria-label={`anomaly: ${props.posSeverity.get(e.pos)}`}
+                    >
+                      <Warning size={12} />
+                    </span>
+                  }
+                />
+                <TooltipPopup side="top" align="center">
+                  {`anomaly: ${props.posSeverity.get(e.pos)}`}
+                </TooltipPopup>
               </Tooltip>
             )
           )}
@@ -421,25 +442,31 @@ export default function EventsView(props: EventsViewProps) {
         <Table.Td className="pos num">{e.pos}</Table.Td>
         <Table.Td>{fmtTime(e.ts)}</Table.Td>
         <Table.Td>
-          <Badge variant="light" size="sm" style={{ ...kindBadgeStyle(e.type_name), cursor: 'inherit' }}>
-            {e.type_name}
-          </Badge>
+          <KindBadge typeName={e.type_name} size="sm" />
         </Table.Td>
         <TruncCell label={tblLabel} className="tbl" />
         <TruncCell label={e.summary} className="summary" fileId={props.fileId} pos={e.pos} />
         <Table.Td className="num">{e.rows_count > 0 ? e.rows_count : ''}</Table.Td>
         <Table.Td className="num">{fmtBytes(e.size)}</Table.Td>
-        <Tooltip label={wrapped ? wrapTitle : undefined} openDelay={150} withinPortal disabled={!wrapped}>
-          <Table.Td className="pos num" aria-label={wrapped ? wrapTitle : undefined}>
+        {wrapped ? (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Table.Td className="pos num" aria-label={wrapTitle}>
+                  {e.end_pos}{' '}
+                  <WrapArrow size={12} />
+                </Table.Td>
+              }
+            />
+            <TooltipPopup side="top" align="center">
+              {wrapTitle}
+            </TooltipPopup>
+          </Tooltip>
+        ) : (
+          <Table.Td className="pos num">
             {e.end_pos}
-            {wrapped && (
-              <>
-                {' '}
-                <WrapArrow size={12} />
-              </>
-            )}
           </Table.Td>
-        </Tooltip>
+        )}
       </Table.Tr>
     )
   }
@@ -448,15 +475,15 @@ export default function EventsView(props: EventsViewProps) {
 
   const colgroup = (
     <colgroup>
-      <col style={{ width: 26 }} />
-      <col style={{ width: 100 }} />
-      <col style={{ width: 140 }} />
-      <col style={{ width: 120 }} />
-      <col style={{ width: 130 }} />
+      <col className={styles.colAnom} />
+      <col className={styles.colPos} />
+      <col className={styles.colTime} />
+      <col className={styles.colType} />
+      <col className={styles.colTable} />
       <col />
-      <col style={{ width: 55 }} />
-      <col style={{ width: 75 }} />
-      <col style={{ width: 100 }} />
+      <col className={styles.colRows} />
+      <col className={styles.colSize} />
+      <col className={styles.colEndPos} />
     </colgroup>
   )
 
@@ -513,11 +540,13 @@ export default function EventsView(props: EventsViewProps) {
         onToggleGrouped={() => setGrouped((g) => !g)}
         onJump={(pos) => setFilters((f) => ({ ...f, from_pos: pos, to_pos: 0 }))}
         searchRef={searchRef}
+        live={props.live}
+        onToggleLive={props.onToggleLive}
       />
       {err && (
-        <Alert color="red" role="alert" mb={0} radius={0} style={{ borderBottom: '1px solid var(--border)' }}>
-          {err}
-          <Button size="xs" variant="outline" color="accent" ml="xs" onClick={() => load(0, false)}>
+        <Alert variant="error" className="rounded-none border-x-0 border-t-0 flex items-center justify-between py-2 px-4">
+          <span className="text-xs font-mono">{err}</span>
+          <Button size="xs" variant="outline" onClick={() => load(0, false)}>
             retry
           </Button>
         </Alert>
@@ -538,7 +567,7 @@ export default function EventsView(props: EventsViewProps) {
       {!loading && !live && nextCursor > 0 && (
         <Button
           className="load-more"
-          variant="subtle"
+          variant="ghost"
           size="xs"
           onClick={() => load(nextCursor, true)}
           aria-label={`load more (${events.length} / ${total})`}
