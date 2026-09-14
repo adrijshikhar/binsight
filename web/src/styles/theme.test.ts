@@ -213,5 +213,42 @@ describe('theme.css', () => {
     const appCss = fs.readFileSync(appCssPath, 'utf-8')
     expect(appCss).toContain('border-bottom: 2px solid transparent')
     expect(appCss).toContain('border-bottom-color: var(--primary)')
+
+    // 5. Dialog uses rounded-md (8px)
+    const dialogPath = path.resolve(process.cwd(), 'src/components/ui/dialog.tsx')
+    const dialogCode = fs.readFileSync(dialogPath, 'utf-8')
+    expect(dialogCode).toContain('rounded-md')
+    expect(dialogCode).not.toContain('rounded-2xl')
+  })
+
+  it('verifies elevation and interaction states (focus rings and reduced motion)', () => {
+    const globalCssPath = path.resolve(process.cwd(), 'src/global.css')
+    const globalCss = fs.readFileSync(globalCssPath, 'utf-8')
+    const globalRoot = postcss.parse(globalCss)
+
+    let hasFocusRing = false
+    let hasReducedMotion = false
+
+    globalRoot.walkRules((rule: Rule) => {
+      if (rule.selector === ':focus-visible') {
+        const outline = rule.nodes.find((n) => n.type === 'decl' && n.prop === 'outline')
+        const offset = rule.nodes.find((n) => n.type === 'decl' && n.prop === 'outline-offset')
+        if (outline && offset) {
+          hasFocusRing = true
+        }
+      }
+    })
+
+    globalRoot.walkAtRules((atRule) => {
+      if (
+        atRule.name === 'media' &&
+        atRule.params.includes('prefers-reduced-motion: reduce')
+      ) {
+        hasReducedMotion = true
+      }
+    })
+
+    expect(hasFocusRing).toBe(true)
+    expect(hasReducedMotion).toBe(true)
   })
 })
