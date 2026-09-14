@@ -1,40 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
 import TxnsView from './TxnsView'
-import { theme } from '../theme'
 import * as apiModule from '../lib/api'
 import type { Txn } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
-// jsdom doesn't implement ResizeObserver — Mantine needs it.
-;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-
 function wrap(ui: React.ReactElement) {
-  return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      {ui}
-    </MantineProvider>,
-  )
+  return render(ui)
 }
 
 const MOCK_TXNS: Txn[] = [
@@ -98,11 +70,15 @@ describe('TxnsView', () => {
     })
   })
 
-  it('shows status badges', async () => {
+  it('shows status badges with committed and incomplete semantic variants', async () => {
     wrap(<TxnsView {...makeProps()} />)
     await waitFor(() => {
-      expect(screen.getByText('committed')).toBeTruthy()
-      expect(screen.getByText('incomplete')).toBeTruthy()
+      const committedBadge = screen.getByText('committed').closest('[data-slot="badge"]')
+      const incompleteBadge = screen.getByText('incomplete').closest('[data-slot="badge"]')
+      expect(committedBadge).toBeTruthy()
+      expect(incompleteBadge).toBeTruthy()
+      expect(committedBadge?.getAttribute('data-status')).toBe('committed')
+      expect(incompleteBadge?.getAttribute('data-status')).toBe('incomplete')
     })
   })
 
@@ -114,6 +90,15 @@ describe('TxnsView', () => {
       .getByText('txn 1')
       .closest('tr')
       ?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(onOpenTxn).toHaveBeenCalledWith(1)
+  })
+
+  it('activates transaction callback on Enter or Space key', async () => {
+    const onOpenTxn = vi.fn()
+    wrap(<TxnsView {...makeProps({ onOpenTxn })} />)
+    await waitFor(() => screen.getByText('txn 1'))
+    const row = screen.getByText('txn 1').closest('tr')!
+    row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
     expect(onOpenTxn).toHaveBeenCalledWith(1)
   })
 
