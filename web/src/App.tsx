@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
-import { AppShell, Button, Group, Text, Alert, Box, Switch, Tooltip } from '@mantine/core'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconSettings } from '@tabler/icons-react'
 import { api } from './lib/api'
 import type { Anomaly, BinlogFile, EventRow, Severity, StreamStatus } from './lib/types'
@@ -387,159 +388,113 @@ export default function App() {
 
   return (
     <SSEContext.Provider value={lastIndexEvent}>
-      <AppShell
-        header={{ height: 44 }}
-        navbar={{
-          width: sidebar.collapsed ? 48 : sidebar.width,
-          breakpoint: 'sm',
-          collapsed: {
-            desktop: FULL_PAGE_TABS.has(tab),
-            mobile: FULL_PAGE_TABS.has(tab),
-          },
-        }}
-        aside={{
-          width: drawerWidth,
-          breakpoint: 'sm',
-          collapsed: {
-            desktop: !selected || tab !== 'events',
-            mobile: !selected || tab !== 'events',
-          },
-        }}
-        padding={0}
-        styles={{
-          header: {
-            background: 'var(--panel)',
-            borderBottom: '1px solid var(--border)',
-          },
-          navbar: {
-            background: 'var(--panel)',
-            borderRight: '1px solid var(--border)',
-          },
-          aside: {
-            background: 'var(--panel)',
-            borderLeft: '1px solid var(--border)',
-          },
-          main: {
-            background: 'var(--bg)',
-            display: 'flex',
-            flexDirection: 'column',
-            // Bound Main to the viewport (Mantine defaults to min-height:100dvh,
-            // which grows with content and - under body{overflow:hidden} - clips
-            // instead of letting the inner panes scroll). Fixed height + overflow
-            // hidden makes .content's flex:1 children the actual scroll regions.
-            height: '100dvh',
-            minHeight: 0,
-            overflow: 'hidden',
-          },
-        }}
-      >
-        <AppShell.Header>
-          <Group h="100%" px="md" justify="space-between" wrap="nowrap">
-            {/* Left side: Brand + Active File breadcrumb */}
-            <Group gap="md" wrap="nowrap" className="min-w-0" align="center">
-              <Text fw={700} c="var(--primary)" ff="monospace" size="sm" className="flex-shrink-0 tracking-wider">
-                binsight
-              </Text>
+      <div className={styles.shell}>
+        <header className={styles.shellHeader}>
+          {/* Left side: Brand + Active File breadcrumb */}
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="font-mono text-sm font-bold text-primary shrink-0 tracking-wider">
+              binsight
+            </span>
 
-              {file && (
-                <Group gap={4} wrap="nowrap" className="min-w-0">
-                  <span className={styles.headerDivider} />
-                  <Text
-                    size="xs"
-                    c="dimmed"
-                    ff="monospace"
-                    className="truncate"
-                  >
-                    {file.path.split('/').slice(0, -1).join('/') || '/'}
-                    <span className={styles.slash}>/</span>
-                    <span className={styles.fileName}>{file.path.split('/').pop()}</span>
-                  </Text>
-                </Group>
-              )}
-            </Group>
+            {file && (
+              <div className="flex items-center gap-1 min-w-0">
+                <span className={styles.headerDivider} />
+                <span className="text-xs text-muted-foreground font-mono truncate">
+                  {file.path.split('/').slice(0, -1).join('/') || '/'}
+                  <span className={styles.slash}>/</span>
+                  <span className={styles.fileName}>{file.path.split('/').pop()}</span>
+                </span>
+              </div>
+            )}
+          </div>
 
-            {/* Right side: Settings button */}
-            <Group gap="xs" wrap="nowrap" align="center">
-              <Button
-                variant="subtle"
-                color="gray"
-                size="xs"
-                leftSection={<IconSettings size={14} />}
-                onClick={() => {
+          {/* Right side: Settings button */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => {
+                setSettingsSection('decoding')
+                setSettingsOpen(true)
+              }}
+              aria-label="Settings"
+              className={styles.settingsHeaderBtn}
+            >
+              <IconSettings size={14} />
+              Settings
+            </Button>
+          </div>
+        </header>
+
+        <div className={styles.shellBody}>
+          {!FULL_PAGE_TABS.has(tab) && (
+            <nav
+              className={styles.shellNav}
+              style={{ width: sidebar.collapsed ? 48 : sidebar.width }}
+              aria-label="Binlog files"
+            >
+              <Sidebar
+                files={files}
+                activeId={fileId}
+                collapsed={sidebar.collapsed}
+                onToggle={toggleSidebar}
+                onSelect={(id) => {
+                  setFileId(id)
+                  setTab('overview')
+                }}
+                onSettings={() => {
                   setSettingsSection('decoding')
                   setSettingsOpen(true)
                 }}
-                aria-label="Settings"
-                className={styles.settingsHeaderBtn}
+                onArchitecture={() => {
+                  setSettingsSection('how-it-works')
+                  setSettingsOpen(true)
+                }}
+                streamStatus={streamStatus ?? undefined}
+              />
+              {!sidebar.collapsed && (
+                <div
+                  onPointerDown={startResize}
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    const STEP = 20
+                    if (e.key === 'ArrowRight') {
+                      e.preventDefault()
+                      setSidebar((s) => ({ ...s, width: clampWidth(s.width + STEP) }))
+                    } else if (e.key === 'ArrowLeft') {
+                      e.preventDefault()
+                      setSidebar((s) => ({ ...s, width: clampWidth(s.width - STEP) }))
+                    }
+                  }}
+                  role="separator"
+                  aria-orientation="vertical"
+                  aria-label="Resize sidebar"
+                  aria-valuenow={sidebar.width}
+                  aria-valuemin={150}
+                  aria-valuemax={480}
+                  tabIndex={0}
+                  title="Drag or use Arrow keys to resize"
+                  className={styles.resizer}
+                />
+              )}
+            </nav>
+          )}
+
+          <main className={styles.shellMain}>
+            {filesErr && !FULL_PAGE_TABS.has(tab) && (
+              <Alert
+                variant="error"
+                className="rounded-none border-x-0 border-t-0 border-b border-border py-2 px-3"
               >
-                Settings
-              </Button>
-            </Group>
-          </Group>
-        </AppShell.Header>
-
-        <AppShell.Navbar>
-          <Sidebar
-            files={files}
-            activeId={fileId}
-            collapsed={sidebar.collapsed}
-            onToggle={toggleSidebar}
-            onSelect={(id) => {
-              setFileId(id)
-              setTab('overview')
-            }}
-            onSettings={() => {
-              setSettingsSection('decoding')
-              setSettingsOpen(true)
-            }}
-            onArchitecture={() => {
-              setSettingsSection('how-it-works')
-              setSettingsOpen(true)
-            }}
-            streamStatus={streamStatus ?? undefined}
-          />
-          {!sidebar.collapsed && (
-            <div
-              onPointerDown={startResize}
-              onKeyDown={(e: React.KeyboardEvent) => {
-                const STEP = 20
-                if (e.key === 'ArrowRight') {
-                  e.preventDefault()
-                  setSidebar((s) => ({ ...s, width: clampWidth(s.width + STEP) }))
-                } else if (e.key === 'ArrowLeft') {
-                  e.preventDefault()
-                  setSidebar((s) => ({ ...s, width: clampWidth(s.width - STEP) }))
-                }
-              }}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="Resize sidebar"
-              aria-valuenow={sidebar.width}
-              aria-valuemin={150}
-              aria-valuemax={480}
-              tabIndex={0}
-              title="Drag or use Arrow keys to resize"
-              className={styles.resizer}
-            />
-          )}
-        </AppShell.Navbar>
-
-        <AppShell.Main>
-          {filesErr && !FULL_PAGE_TABS.has(tab) && (
-            <Alert
-              icon={<IconAlertTriangle size={16} />}
-              color="red"
-              variant="light"
-              radius={0}
-              styles={{ root: { borderBottom: '1px solid var(--border)', borderRadius: 0 } }}
-            >
-              file list unavailable: {filesErr}{' '}
-              <Button size="xs" variant="outline" ml="xs" onClick={refreshFiles}>
-                retry
-              </Button>
-            </Alert>
-          )}
-          <main className={styles.content}>
+                <IconAlertTriangle size={16} />
+                <AlertDescription className="flex items-center justify-between">
+                  <span>file list unavailable: {filesErr}</span>
+                  <Button size="xs" variant="outline" onClick={refreshFiles}>
+                    retry
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
+            <div className={styles.content}>
             {!FULL_PAGE_TABS.has(tab) && (
               <div className={styles.tabs} role="tablist">
                 {tabs.map((t, idx) => (
@@ -718,11 +673,15 @@ export default function App() {
                 </div>
               )}
             </div>
-          </main>
-        </AppShell.Main>
+          </div>
+        </main>
 
         {selected && tab === 'events' && (
-          <AppShell.Aside>
+          <aside
+            className={styles.shellAside}
+            style={{ width: drawerWidth }}
+            aria-label="Event inspector"
+          >
             <Drawer
               fileId={fileId}
               event={selected}
@@ -731,9 +690,10 @@ export default function App() {
               onWidthChange={setDrawerWidth}
               onClose={() => setSelected(null)}
             />
-          </AppShell.Aside>
+          </aside>
         )}
-      </AppShell>
+      </div>
+    </div>
       <SettingsView
         opened={settingsOpen}
         onClose={() => setSettingsOpen(false)}

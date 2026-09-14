@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
+import { render, screen, within, fireEvent, waitFor, act } from '@testing-library/react'
 import App from './App'
-import { theme, cssVariablesResolver } from './theme'
+import { ColorSchemeProvider } from './lib/colorScheme'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
+// jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -19,14 +18,14 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// jsdom doesn't implement ResizeObserver — Mantine's SegmentedControl needs it.
+// jsdom doesn't implement ResizeObserver - Mantine's SegmentedControl needs it.
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
   disconnect() {}
 }
 
-// Stub EventSource — not available in jsdom
+// Stub EventSource - not available in jsdom
 class MockEventSource {
   onmessage: ((e: MessageEvent) => void) | null = null
   onerror: ((e: Event) => void) | null = null
@@ -69,7 +68,7 @@ vi.mock('./lib/api', () => ({
   },
 }))
 
-// Stub fetch — fallback for any remaining non-api.ts fetch calls
+// Stub fetch - fallback for any remaining non-api.ts fetch calls
 beforeEach(() => {
   vi.stubGlobal(
     'fetch',
@@ -84,9 +83,9 @@ async function renderApp() {
   let result!: ReturnType<typeof render>
   await act(async () => {
     result = render(
-      <MantineProvider theme={theme} defaultColorScheme="dark" cssVariablesResolver={cssVariablesResolver}>
+      <ColorSchemeProvider>
         <App />
-      </MantineProvider>,
+      </ColorSchemeProvider>,
     )
   })
   // Let any post-render state updates (fetch mock resolutions) settle.
@@ -94,7 +93,7 @@ async function renderApp() {
   return result
 }
 
-describe('App — AppShell + tab routing', () => {
+describe('App - AppShell + tab routing', () => {
   afterEach(() => {
     // Reset URL so tests don't pollute each other via readUrlState().
     window.history.replaceState(null, '', '/')
@@ -152,23 +151,15 @@ describe('App — AppShell + tab routing', () => {
     expect(screen.getByText('binsight')).toBeTruthy()
   })
 
-  it('hides the tab strip when a FULL_PAGE_TABS tab is active (settings)', async () => {
-    // Set the URL to the settings tab before render so App initialises into that tab.
+  it('opens the Settings modal when URL has ?tab=settings', async () => {
     window.history.replaceState(null, '', '/?tab=settings')
     await renderApp()
-    // Settings is a FULL_PAGE_TABS member — the main app tab strip (Overview/Events/…)
-    // must be absent. SettingsView renders its own internal Mantine Tabs with 5 sections;
-    // wait for those to appear, then verify none of the main-strip tabs are present.
     await waitFor(() => {
-      const tabs = screen.getAllByRole('tab')
-      const labels = tabs.map((t) => t.textContent)
-      expect(labels).not.toContain('Overview')
-      expect(labels).not.toContain('Events')
-      expect(labels).not.toContain('Transactions')
+      expect(screen.getByRole('dialog', { name: 'Settings' })).toBeTruthy()
     })
   })
 
-  it('renders Live switch on tab strip only when Events tab is active', async () => {
+  it('renders Live switch on FilterBar only when Events tab is active', async () => {
     await renderApp()
     // Overview tab is active by default; Live switch must not be present
     expect(screen.queryByRole('switch', { name: /follow new events as they are indexed/i })).toBeNull()
@@ -177,7 +168,7 @@ describe('App — AppShell + tab routing', () => {
     const eventsTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Events')!
     fireEvent.click(eventsTab)
 
-    // Live switch should now appear in the tab strip
+    // Live switch should now appear in the FilterBar
     const switchEl = screen.getByRole('switch', { name: /follow new events as they are indexed/i })
     expect(switchEl).toBeTruthy()
     expect((switchEl as HTMLInputElement).checked).toBe(false)
@@ -185,5 +176,42 @@ describe('App — AppShell + tab routing', () => {
     // Toggling the switch updates its state
     fireEvent.click(switchEl)
     expect((switchEl as HTMLInputElement).checked).toBe(true)
+  })
+
+  it('renders Settings button on the right side of the header', async () => {
+    await renderApp()
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeTruthy()
+  })
+
+  it('switches to Settings view, accesses How It Works tab, and returns to Inspector', async () => {
+    await renderApp()
+
+    // Switch to Events tab first
+    const eventsTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Events')!
+    fireEvent.click(eventsTab)
+    expect(eventsTab.getAttribute('aria-selected')).toBe('true')
+
+    const settingsBtn = screen.getByRole('button', { name: 'Settings' })
+
+    // Click Settings button
+    fireEvent.click(settingsBtn)
+
+    // Modal dialog is displayed
+    const modal = await screen.findByRole('dialog', { name: 'Settings' })
+    expect(modal).toBeTruthy()
+
+    // Inside Settings, click the "How it works" tab
+    const howTab = screen.getAllByRole('tab').find((t) => t.textContent === 'How it works')!
+    fireEvent.click(howTab)
+    expect(screen.getByText(/- Pluggable Decoder Architecture/)).toBeTruthy()
+
+    // Click Cancel to close modal
+    const cancelBtn = screen.getByRole('button', { name: 'Cancel' })
+    fireEvent.click(cancelBtn)
+
+    await waitFor(() => {
+      const restoredEventsTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Events')
+      expect(restoredEventsTab?.getAttribute('aria-selected')).toBe('true')
+    })
   })
 })

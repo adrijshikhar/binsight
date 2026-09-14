@@ -1,4 +1,64 @@
-/* content area inside AppShell.Main - fills the main slot and stacks tabs + panels */
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.shellHeader {
+  height: 44px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 10;
+}
+
+.shellBody {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.shellNav {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: width 150ms ease;
+}
+
+.shellMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.shellAside {
+  width: var(--drawer-width);
+  flex-shrink: 0;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  height: 100%;
+  overflow: hidden;
+}
+
+/* content area inside shellMain - fills the main slot and stacks tabs + panels */
 .content {
   flex: 1;
   display: flex;

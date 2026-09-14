@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { Alert, Button, Code, Stack, Text } from '@mantine/core'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -11,7 +12,7 @@ interface ErrorBoundaryState {
 
 /**
  * Top-level error boundary. Without it, a render-time exception in any view
- * unmounts the tree and leaves a SILENT BLANK pane — the hardest failure mode
+ * unmounts the tree and leaves a SILENT BLANK pane - the hardest failure mode
  * to debug. This catches it, logs the error + component stack to the console
  * (the UI's log channel), and shows a visible fallback with a reload action so
  * the failure is never invisible.
@@ -32,24 +33,27 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     const { error } = this.state
     if (!error) return this.props.children
     return (
-      <Stack p="xl" gap="md" style={{ maxWidth: 720 }}>
-        <Alert color="red" title="Something broke rendering this view" role="alert">
-          <Stack gap="sm">
-            <Text size="sm">The error was logged to the browser console. This is a UI bug — the data is fine.</Text>
-            <Code block style={{ whiteSpace: 'pre-wrap' }}>
-              {error.message}
-            </Code>
-            <Button
-              size="xs"
-              variant="default"
-              onClick={() => window.location.reload()}
-              style={{ alignSelf: 'flex-start' }}
-            >
-              Reload
-            </Button>
-          </Stack>
+      <div className="flex flex-col p-6 gap-4 max-w-[720px]">
+        <Alert variant="error" role="alert">
+          <AlertTitle>Something broke rendering this view</AlertTitle>
+          <AlertDescription>
+            <div className="flex flex-col gap-3 mt-2">
+              <p className="text-sm">The error was logged to the browser console. This is a UI bug - the data is fine.</p>
+              <pre className="p-3 bg-muted/60 rounded-md font-mono text-xs whitespace-pre-wrap overflow-x-auto">
+                {error.message}
+              </pre>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => window.location.reload()}
+                className="self-start"
+              >
+                Reload
+              </Button>
+            </div>
+          </AlertDescription>
         </Alert>
-      </Stack>
+      </div>
     )
   }
 }

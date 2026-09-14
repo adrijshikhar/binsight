@@ -1,24 +1,8 @@
 import { it, expect, vi, describe } from 'vitest'
 import React from 'react'
 import { render, screen, act } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
 import Sidebar from './Sidebar'
 import type { BinlogFile, StreamStatus } from '../lib/types'
-
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
 
 // Mock the api module so TypeBreakdown's fetch doesn't fire real requests.
 vi.mock('../lib/api', () => ({
@@ -28,7 +12,7 @@ vi.mock('../lib/api', () => ({
 }))
 
 function wrap(ui: React.ReactElement) {
-  return render(<MantineProvider defaultColorScheme="dark">{ui}</MantineProvider>)
+  return render(ui)
 }
 
 const baseFile: BinlogFile = {
@@ -62,7 +46,7 @@ function defaultProps() {
   }
 }
 
-describe('Sidebar — expanded', () => {
+describe('Sidebar - expanded', () => {
   it('renders a file entry and fires onSelect on click', async () => {
     const props = defaultProps()
     await act(async () => {
@@ -79,30 +63,12 @@ describe('Sidebar — expanded', () => {
     expect(screen.getByText('Files')).toBeTruthy()
   })
 
-  it('shows Architecture and Settings nav links', async () => {
+  it('does not render duplicate Architecture and Settings links in files sidebar', async () => {
     await act(async () => {
       wrap(<Sidebar {...defaultProps()} />)
     })
-    expect(screen.getByLabelText('Open architecture overview')).toBeTruthy()
-    expect(screen.getByLabelText('Open settings')).toBeTruthy()
-  })
-
-  it('calls onSettings when Settings is clicked', async () => {
-    const props = defaultProps()
-    await act(async () => {
-      wrap(<Sidebar {...props} />)
-    })
-    screen.getByLabelText('Open settings').click()
-    expect(props.onSettings).toHaveBeenCalledOnce()
-  })
-
-  it('calls onArchitecture when Architecture is clicked', async () => {
-    const props = defaultProps()
-    await act(async () => {
-      wrap(<Sidebar {...props} />)
-    })
-    screen.getByLabelText('Open architecture overview').click()
-    expect(props.onArchitecture).toHaveBeenCalledOnce()
+    expect(screen.queryByLabelText('Open architecture overview')).toBeNull()
+    expect(screen.queryByLabelText('Open settings')).toBeNull()
   })
 
   it('calls onToggle when collapse button is clicked', async () => {
@@ -163,7 +129,7 @@ describe('Sidebar — expanded', () => {
   })
 })
 
-describe('Sidebar — collapsed', () => {
+describe('Sidebar - collapsed', () => {
   it('renders the expand button', async () => {
     await act(async () => {
       wrap(<Sidebar {...defaultProps()} collapsed={true} />)
@@ -184,7 +150,7 @@ describe('Sidebar — collapsed', () => {
     await act(async () => {
       wrap(<Sidebar {...defaultProps()} collapsed={true} />)
     })
-    // In collapsed mode there is no text label — only icon boxes with aria-labels.
+    // In collapsed mode there is no text label - only icon boxes with aria-labels.
     const btn = screen.getByRole('button', { name: /mysql-bin\.000001/ })
     expect(btn).toBeTruthy()
   })
