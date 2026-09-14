@@ -30,38 +30,23 @@
   align-items: center;
 }
 
-.livePulse {
+.liveDotActive {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: var(--emerald, #34d399);
-  box-shadow: 0 0 6px var(--emerald, #34d399);
+  background-color: var(--primary);
   display: inline-block;
-  animation: pulse 2s infinite;
 }
 
 .liveInactiveDot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: var(--muted);
+  background-color: var(--muted-foreground);
+  opacity: 0.5;
   display: inline-block;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 4px rgba(52, 211, 153, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
-  }
-}
 
 .jumpErr {
   font-size: var(--fs-sm);

@@ -4,7 +4,7 @@ import { MantineProvider } from '@mantine/core'
 import React from 'react'
 import FilterBar, { emptyFilters, type Filters } from './FilterBar'
 
-// jsdom doesn't implement ResizeObserver — used by Mantine's SegmentedControl FloatingIndicator
+// jsdom doesn't implement ResizeObserver - used by Mantine's SegmentedControl FloatingIndicator
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -26,11 +26,6 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// Mock useHotkeys to avoid keyboard event listener issues in jsdom
-vi.mock('@mantine/hooks', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@mantine/hooks')>()
-  return { ...actual, useHotkeys: vi.fn() }
-})
 
 function wrap(ui: React.ReactNode) {
   return render(<MantineProvider>{ui}</MantineProvider>)
@@ -58,9 +53,9 @@ describe('FilterBar', () => {
 
   it('renders type, db, and table MultiSelects', () => {
     wrap(<FilterBar {...makeProps()} />)
-    expect(screen.getByPlaceholderText('type')).toBeTruthy()
-    expect(screen.getByPlaceholderText('db')).toBeTruthy()
-    expect(screen.getByPlaceholderText('table')).toBeTruthy()
+    expect(screen.getByPlaceholderText('Type')).toBeTruthy()
+    expect(screen.getByPlaceholderText('Database')).toBeTruthy()
+    expect(screen.getByPlaceholderText('Table')).toBeTruthy()
   })
 
   it('renders search input', () => {
@@ -91,7 +86,7 @@ describe('FilterBar', () => {
   it('onChange called when db MultiSelect option is selected', async () => {
     const onChange = vi.fn()
     wrap(<FilterBar {...makeProps({ onChange })} />)
-    const dbInput = screen.getByRole('combobox', { name: /db/i })
+    const dbInput = screen.getByRole('combobox', { name: /database|db/i })
     fireEvent.click(dbInput)
     await waitFor(() => {
       expect(screen.getByText('mydb')).toBeTruthy()
@@ -188,6 +183,88 @@ describe('FilterBar', () => {
     expect(onToggleGrouped).not.toHaveBeenCalled()
   })
 
+  it('renders active filter pills for types, dbs, and tables with remove buttons', () => {
+    const onChange = vi.fn()
+    wrap(
+      <FilterBar
+        {...makeProps({
+          filters: {
+            ...emptyFilters,
+            types: ['WRITE_ROWS_V2', 'UPDATE_ROWS_V2'],
+            dbs: ['mydb'],
+            tables: ['users'],
+          },
+          onChange,
+        })}
+      />,
+    )
+    expect(screen.getByText('active:')).toBeTruthy()
+    expect(screen.getByText('db: mydb')).toBeTruthy()
+    expect(screen.getByText('table: users')).toBeTruthy()
+    expect(screen.getByLabelText('Remove WRITE_ROWS_V2 filter')).toBeTruthy()
+    expect(screen.getByLabelText('Remove UPDATE_ROWS_V2 filter')).toBeTruthy()
+    expect(screen.getByLabelText('Remove database mydb filter')).toBeTruthy()
+    expect(screen.getByLabelText('Remove table users filter')).toBeTruthy()
+
+    const removeTypeBtn = screen.getByLabelText('Remove WRITE_ROWS_V2 filter')
+    fireEvent.click(removeTypeBtn)
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        types: ['UPDATE_ROWS_V2'],
+      }),
+    )
+  })
+
+  it('clear all button clears all active filters and transactions', () => {
+    const onChange = vi.fn()
+    const onRemoveTxn = vi.fn()
+    wrap(
+      <FilterBar
+        {...makeProps({
+          filters: {
+            ...emptyFilters,
+            types: ['WRITE_ROWS_V2'],
+            dbs: ['mydb'],
+          },
+          txnIds: [42],
+          onChange,
+          onRemoveTxn,
+        })}
+      />,
+    )
+    const clearAllBtn = screen.getByRole('button', { name: /clear filters|clear all/i })
+    fireEvent.click(clearAllBtn)
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        types: [],
+        dbs: [],
+        tables: [],
+      }),
+    )
+    expect(onRemoveTxn).toHaveBeenCalledWith(42)
+  })
+
+  it('pressing / focuses the search input when outside input or textarea', () => {
+    wrap(<FilterBar {...makeProps()} />)
+    const searchInput = screen.getByRole('textbox', { name: /search event summary/i })
+    expect(document.activeElement).not.toBe(searchInput)
+
+    fireEvent.keyDown(document.body, { key: '/' })
+    expect(document.activeElement).toBe(searchInput)
+  })
+
+  it('pressing / does not hijack focus when already inside another text input', () => {
+    wrap(<FilterBar {...makeProps()} />)
+    const searchInput = screen.getByRole('textbox', { name: /search event summary/i })
+    const jumpInput = screen.getByRole('textbox', { name: /jump to byte position/i })
+    jumpInput.focus()
+    expect(document.activeElement).toBe(jumpInput)
+
+    fireEvent.keyDown(jumpInput, { key: '/' })
+    expect(document.activeElement).toBe(jumpInput)
+    expect(document.activeElement).not.toBe(searchInput)
+  })
+
   it('emptyFilters has expected shape', () => {
     expect(emptyFilters).toEqual({
       types: [],
@@ -199,3 +276,4 @@ describe('FilterBar', () => {
     })
   })
 })
+
