@@ -8,6 +8,7 @@ import { theme, cssVariablesResolver } from './theme'
 import App from './App'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ColorSchemeProvider, useColorScheme, applyInitialScheme } from './lib/colorScheme'
+import { ToastProvider } from './components/ui/toast'
 
 // Apply initial scheme before mounting to avoid wrong-theme flash
 applyInitialScheme()
@@ -21,9 +22,11 @@ function RootApp() {
   const { resolved } = useColorScheme()
   return (
     <MantineProvider theme={theme} forceColorScheme={resolved} cssVariablesResolver={cssVariablesResolver}>
-      <ErrorBoundary>
-        <App />
-      </ErrorBoundary>
+      <ToastProvider>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </ToastProvider>
     </MantineProvider>
   )
 }

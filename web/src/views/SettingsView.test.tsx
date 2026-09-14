@@ -2,34 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MantineProvider } from '@mantine/core'
-import { Notifications } from '@mantine/notifications'
 import SettingsView from './SettingsView'
-import { theme } from '../theme'
+import { ToastProvider, toastManager } from '../components/ui/toast'
 import * as apiModule from '../lib/api'
 import type { Settings, AdapterInfo } from '../lib/types'
-
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
-// jsdom doesn't implement ResizeObserver — Mantine needs it.
-;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
 
 const MOCK_SETTINGS: Settings = {
   port: 8080,
@@ -65,18 +41,17 @@ const MOCK_ADAPTERS: AdapterInfo[] = [
 
 function wrap(ui: React.ReactElement) {
   return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      <Notifications />
+    <ToastProvider>
       {ui}
-    </MantineProvider>,
+    </ToastProvider>,
   )
 }
 
-/** Wait until settings have loaded — the Tabs render only after settings resolves. */
+/** Wait until settings have loaded - the Tabs render only after settings resolves. */
 async function waitForLoad() {
   await waitFor(() => {
     const tabs = screen.getAllByRole('tab')
-    expect(tabs.length).toBe(5)
+    expect(tabs.length).toBe(7)
   })
 }
 
@@ -87,7 +62,7 @@ describe('SettingsView', () => {
     vi.spyOn(apiModule.api, 'saveSettings').mockResolvedValue({ ...MOCK_SETTINGS })
   })
 
-  it('renders the vertical tabs nav with all 5 sections', async () => {
+  it('renders the vertical tabs nav with all 7 sections', async () => {
     wrap(<SettingsView onClose={() => {}} />)
 
     await waitForLoad()
@@ -95,10 +70,12 @@ describe('SettingsView', () => {
     const tabs = screen.getAllByRole('tab')
     const tabLabels = tabs.map((t) => t.textContent)
     expect(tabLabels).toContain('Adapters & roles')
+    expect(tabLabels).toContain('How it works')
     expect(tabLabels).toContain('Display')
     expect(tabLabels).toContain('Anomalies')
     expect(tabLabels).toContain('Remote streaming')
     expect(tabLabels).toContain('Watch')
+    expect(tabLabels).toContain('Backup & transfer')
   })
 
   it('switches to Display tab and shows page size input', async () => {
@@ -109,9 +86,8 @@ describe('SettingsView', () => {
     const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
     fireEvent.click(displayTab)
 
-    // Mantine NumberInput v8 renders type="text" not type="number" — use textbox role
     await waitFor(() => {
-      expect(screen.getByRole('textbox', { name: /page size/i })).toBeTruthy()
+      expect(screen.getByRole('spinbutton', { name: /page size/i })).toBeTruthy()
     })
   })
 
@@ -127,17 +103,14 @@ describe('SettingsView', () => {
     const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
     await user.click(displayTab)
 
-    // Mantine NumberInput uses type="text" — find by label
-    const pageSizeInput = await screen.findByRole('textbox', { name: /page size/i })
+    const pageSizeInput = await screen.findByRole('spinbutton', { name: /page size/i })
 
-    // Clear the field and type the new value using userEvent (proper Mantine NumberInput handling)
     await user.clear(pageSizeInput)
     await user.type(pageSizeInput, '250')
 
     const saveBtn = screen.getByRole('button', { name: /save settings/i })
     await user.click(saveBtn)
 
-    // Verify the payload was called with the coerced number value
     await waitFor(() => {
       expect(saveSpy).toHaveBeenCalledOnce()
       const payload: Settings = saveSpy.mock.calls[0][0]
@@ -156,7 +129,7 @@ describe('SettingsView', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
-  it('switches to Anomalies tab and shows threshold text inputs', async () => {
+  it('switches to Anomalies tab and shows threshold inputs', async () => {
     wrap(<SettingsView onClose={() => {}} />)
 
     await waitForLoad()
@@ -164,11 +137,11 @@ describe('SettingsView', () => {
     const anomaliesTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Anomalies')!
     fireEvent.click(anomaliesTab)
 
-    // Mantine NumberInput renders type="text" so they are textboxes
     await waitFor(() => {
-      // txn bytes, txn rows, txn seconds, event rows
-      const txnBytesInput = screen.getByRole('textbox', { name: /txn bytes/i })
-      expect(txnBytesInput).toBeTruthy()
+      expect(screen.getByRole('spinbutton', { name: /txn bytes/i })).toBeTruthy()
+      expect(screen.getByRole('spinbutton', { name: /txn rows/i })).toBeTruthy()
+      expect(screen.getByRole('spinbutton', { name: /txn seconds/i })).toBeTruthy()
+      expect(screen.getByRole('spinbutton', { name: /event rows/i })).toBeTruthy()
     })
   })
 
@@ -219,6 +192,113 @@ describe('SettingsView', () => {
 
     await waitFor(() => {
       expect(screen.getByText('/data/binlogs')).toBeTruthy()
+    })
+  })
+
+  it('shows toast notification on save success', async () => {
+    const toastSpy = vi.spyOn(toastManager, 'add')
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    const saveBtn = screen.getByRole('button', { name: /save settings/i })
+    await act(async () => {
+      fireEvent.click(saveBtn)
+    })
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'info',
+          title: 'Settings saved',
+        }),
+      )
+    })
+  })
+
+  it('blocks save when numeric field is cleared or invalid without coercing to zero', async () => {
+    const saveSpy = vi.spyOn(apiModule.api, 'saveSettings')
+    const user = userEvent.setup()
+
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
+    await user.click(displayTab)
+
+    const pageSizeInput = await screen.findByRole('spinbutton', { name: /page size/i })
+    await user.clear(pageSizeInput)
+
+    const saveBtn = screen.getByRole('button', { name: /save settings/i })
+    await user.click(saveBtn)
+
+    expect(saveSpy).not.toHaveBeenCalled()
+  })
+
+  it('retains field values when save fails', async () => {
+    vi.spyOn(apiModule.api, 'saveSettings').mockRejectedValueOnce(new Error('Network error'))
+    const toastSpy = vi.spyOn(toastManager, 'add')
+    const user = userEvent.setup()
+
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
+    await user.click(displayTab)
+
+    const pageSizeInput = await screen.findByRole('spinbutton', { name: /page size/i })
+    await user.clear(pageSizeInput)
+    await user.type(pageSizeInput, '750')
+
+    const saveBtn = screen.getByRole('button', { name: /save settings/i })
+    await user.click(saveBtn)
+
+    await waitFor(() => {
+      expect(toastSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'error',
+          title: 'Save failed',
+        }),
+      )
+    })
+
+    expect((pageSizeInput as HTMLInputElement).value).toBe('750')
+  })
+
+  it('performs no restart when confirmation is canceled', async () => {
+    const restartSpy = vi.spyOn(apiModule.api, 'restartStreamFromCurrent')
+    vi.spyOn(window, 'confirm').mockReturnValue(false)
+    const user = userEvent.setup()
+
+    // Mock settings with stream enabled
+    vi.spyOn(apiModule.api, 'settings').mockResolvedValue({
+      ...MOCK_SETTINGS,
+      stream: { ...MOCK_SETTINGS.stream, enabled: true },
+    })
+
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    const streamTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Remote streaming')!
+    await user.click(streamTab)
+
+    const restartBtn = await screen.findByRole('button', { name: /restart from current position/i })
+    await user.click(restartBtn)
+
+    expect(restartSpy).not.toHaveBeenCalled()
+  })
+
+  it('handles JSON import validation and export links', async () => {
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    const advTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Backup & transfer')!
+    fireEvent.click(advTab)
+
+    await waitFor(() => {
+      const exportLink = screen.getByRole('link', { name: /export json/i })
+      expect(exportLink).toBeTruthy()
+      expect(exportLink.getAttribute('href')).toContain('data:application/json')
+      expect(exportLink.getAttribute('download')).toBe('binsight-settings.json')
     })
   })
 })

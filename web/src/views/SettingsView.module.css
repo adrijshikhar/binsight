@@ -74,6 +74,8 @@
   color: var(--text) !important;
 }
 
+.tab[data-active],
+.tab[data-selected],
 .tab[data-active="true"] {
   background: var(--panel2) !important;
   color: var(--text) !important;
@@ -81,6 +83,10 @@
   border: 1px solid var(--border) !important;
 }
 
+.tab[data-active]::before,
+.tab[data-active]::after,
+.tab[data-selected]::before,
+.tab[data-selected]::after,
 .tab[data-active="true"]::before,
 .tab[data-active="true"]::after {
   display: none !important;
