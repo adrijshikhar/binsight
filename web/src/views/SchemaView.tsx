@@ -2,29 +2,16 @@ import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { clickableRow } from '../lib/a11y'
 import type { EventRow } from '../lib/types'
-import { Alert, Badge, Center, Stack, Table, Text } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Table } from '@/components/ui/table'
 import TruncCell from '../components/TruncCell'
+import KindBadge from '../components/KindBadge'
 
 const DDL_PREFIXES = ['CREATE', 'ALTER', 'DROP', 'TRUNCATE']
 
 function ddlKind(sql: string): string | null {
   const u = sql.trim().toUpperCase()
   return DDL_PREFIXES.find((p) => u.startsWith(p)) ?? null
-}
-
-function ddlBadgeColor(kind: string | null): string {
-  switch (kind) {
-    case 'CREATE':
-      return 'teal'
-    case 'ALTER':
-      return 'accent'
-    case 'DROP':
-      return 'red'
-    case 'TRUNCATE':
-      return 'orange'
-    default:
-      return 'grape'
-  }
 }
 
 // Split a unix-seconds timestamp into [date, clock] so the time column can
@@ -41,27 +28,25 @@ function fmtTimeParts(ts: number): [string, string] {
 function DdlRow({ fileId, e, onOpen }: { fileId: number; e: EventRow; onOpen: (pos: number) => void }) {
   const kind = ddlKind(e.summary)
   return (
-    <Table.Tr {...clickableRow(() => onOpen(e.pos))} style={{ cursor: 'pointer' }}>
-      <Table.Td style={{ fontVariantNumeric: 'tabular-nums' }} ff="monospace">
+    <Table.Tr {...clickableRow(() => onOpen(e.pos))} className="cursor-pointer">
+      <Table.Td className="tabular-nums font-mono">
         {e.pos}
       </Table.Td>
-      <Table.Td ff="monospace" style={{ whiteSpace: 'nowrap', width: '1%' }}>
+      <Table.Td className="font-mono w-fit">
         {(() => {
           const [date, clock] = fmtTimeParts(e.ts)
           return (
             <>
               <div>{date}</div>
-              <Text size="xs" c="dimmed">
+              <span className="text-xs text-muted-foreground">
                 {clock}
-              </Text>
+              </span>
             </>
           )
         })()}
       </Table.Td>
-      <Table.Td style={{ width: '1%', whiteSpace: 'nowrap' }}>
-        <Badge color={ddlBadgeColor(kind)} variant="light" size="sm" ff="monospace" styles={{ label: { overflow: 'visible' } }}>
-          {kind}
-        </Badge>
+      <Table.Td className="w-fit">
+        <KindBadge typeName={kind ?? 'DDL'} size="xs" />
       </Table.Td>
       <TruncCell label={e.summary} className="summary" fileId={fileId} pos={e.pos} mono />
     </Table.Tr>
@@ -101,25 +86,25 @@ export default function SchemaView({ fileId, onOpenEvent }: SchemaViewProps) {
   }, [fileId])
 
   return (
-    <Stack gap={0} style={{ height: '100%', overflow: 'hidden' }}>
+    <div className="flex flex-col gap-0 h-full overflow-hidden">
       {err && (
-        <Alert color="red" role="alert" radius={0} mb={0}>
+        <Alert variant="error" role="alert" className="rounded-none mb-0">
           {err}
         </Alert>
       )}
       {loading && events.length === 0 ? (
-        <Text c="dimmed" p="md">
-          loading schema timeline…
-        </Text>
+        <p className="text-muted-foreground p-4 text-sm">
+          loading schema timeline...
+        </p>
       ) : events.length === 0 ? (
-        <Center py="xl">
-          <Text c="dimmed" role="status">
+        <div className="flex items-center justify-center py-12">
+          <p className="text-muted-foreground text-sm" role="status">
             No DDL statements in this file.
-          </Text>
-        </Center>
+          </p>
+        </div>
       ) : (
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <Table stickyHeader fz="sm">
+        <div className="flex-1 overflow-y-auto">
+          <Table stickyHeader className="text-sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>pos</Table.Th>
@@ -136,6 +121,6 @@ export default function SchemaView({ fileId, onOpenEvent }: SchemaViewProps) {
           </Table>
         </div>
       )}
-    </Stack>
+    </div>
   )
 }

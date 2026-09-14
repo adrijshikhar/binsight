@@ -62,6 +62,7 @@ export function Badge({
   const defaultProps = {
     className: cn(badgeVariants({ className, size, variant })),
     'data-slot': 'badge',
+    'data-variant': variant,
   }
 
   return useRender({
