@@ -246,3 +246,16 @@
   background: var(--panel2);
   border-color: var(--border-strong);
 }
+
+@media (max-width: 767px) {
+  .shellNav {
+    display: none;
+  }
+  .shellAside {
+    display: none;
+  }
+  .shellHeader {
+    padding: 0 12px;
+  }
+}
+

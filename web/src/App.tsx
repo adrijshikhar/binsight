@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconSettings } from '@tabler/icons-react'
+import { Sheet, SheetPopup } from '@/components/ui/sheet'
+import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconMenu2, IconSettings } from '@tabler/icons-react'
 import { api } from './lib/api'
 import type { Anomaly, BinlogFile, EventRow, Severity, StreamStatus } from './lib/types'
 import Sidebar from './components/Sidebar'
+import { useIsMobile } from './lib/useMediaQuery'
 import { readUrlState, writeUrlState, pushUrlState } from './lib/url'
 import { SSEContext, type IndexEvent } from './lib/sse'
 import {
@@ -84,6 +86,9 @@ export default function App() {
     const t = normalizeTab(initialUrl.tab)
     return t
   })
+
+  const isMobile = useIsMobile(768)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   // Remember the last active inspector tab so closing Settings/Architecture returns to it
   useEffect(() => {
@@ -392,6 +397,17 @@ export default function App() {
         <header className={styles.shellHeader}>
           {/* Left side: Brand + Active File breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
+            {isMobile && !FULL_PAGE_TABS.has(tab) && (
+              <Button
+                variant="ghost"
+                size="xs"
+                onClick={() => setMobileSidebarOpen(true)}
+                aria-label="Open sidebar"
+                className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
+              >
+                <IconMenu2 size={16} />
+              </Button>
+            )}
             <span className="font-mono text-sm font-bold text-primary shrink-0 tracking-wider">
               binsight
             </span>
@@ -427,7 +443,7 @@ export default function App() {
         </header>
 
         <div className={styles.shellBody}>
-          {!FULL_PAGE_TABS.has(tab) && (
+          {!isMobile && !FULL_PAGE_TABS.has(tab) && (
             <nav
               className={styles.shellNav}
               style={{ width: sidebar.collapsed ? 48 : sidebar.width }}
@@ -477,6 +493,35 @@ export default function App() {
                 />
               )}
             </nav>
+          )}
+
+          {isMobile && !FULL_PAGE_TABS.has(tab) && (
+            <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+              <SheetPopup side="left" className="w-[280px] max-w-[85vw] p-0 border-e border-border bg-popover">
+                <Sidebar
+                  files={files}
+                  activeId={fileId}
+                  collapsed={false}
+                  onToggle={() => setMobileSidebarOpen(false)}
+                  onSelect={(id) => {
+                    setFileId(id)
+                    setTab('overview')
+                    setMobileSidebarOpen(false)
+                  }}
+                  onSettings={() => {
+                    setSettingsSection('decoding')
+                    setSettingsOpen(true)
+                    setMobileSidebarOpen(false)
+                  }}
+                  onArchitecture={() => {
+                    setSettingsSection('how-it-works')
+                    setSettingsOpen(true)
+                    setMobileSidebarOpen(false)
+                  }}
+                  streamStatus={streamStatus ?? undefined}
+                />
+              </SheetPopup>
+            </Sheet>
           )}
 
           <main className={styles.shellMain}>
@@ -676,7 +721,7 @@ export default function App() {
           </div>
         </main>
 
-        {selected && tab === 'events' && (
+        {selected && tab === 'events' && !isMobile && (
           <aside
             className={styles.shellAside}
             style={{ width: drawerWidth }}
@@ -691,6 +736,24 @@ export default function App() {
               onClose={() => setSelected(null)}
             />
           </aside>
+        )}
+
+        {selected && tab === 'events' && isMobile && (
+          <Sheet
+            open={Boolean(selected)}
+            onOpenChange={(open) => {
+              if (!open) setSelected(null)
+            }}
+          >
+            <SheetPopup side="right" className="w-full max-w-none p-0 border-s border-border bg-popover">
+              <Drawer
+                fileId={fileId}
+                event={selected}
+                width="100%"
+                onClose={() => setSelected(null)}
+              />
+            </SheetPopup>
+          </Sheet>
         )}
       </div>
     </div>

@@ -20,9 +20,9 @@ type Tab = 'details' | 'diff' | 'hex' | 'json'
 export interface DrawerProps {
   fileId: number
   event: EventRow
-  width: number
-  onResizeStart: (e: React.PointerEvent) => void
-  onWidthChange: (w: number) => void
+  width?: number | string
+  onResizeStart?: (e: React.PointerEvent) => void
+  onWidthChange?: (w: number) => void
   onClose: () => void
 }
 
@@ -103,36 +103,39 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
   const tabLabel = (t: Tab) => (t === 'details' ? 'Details' : t === 'diff' ? 'Diff' : t === 'hex' ? 'Hex' : 'Raw JSON')
 
   return (
-    <aside className={styles.drawer} style={{ width }} aria-label="Event inspector">
+    <aside className={styles.drawer} style={{ width: width ?? '100%' }} aria-label="Event inspector">
       {/* Resize handle - drag leftward to widen the panel */}
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <div
-              className={styles.drawerResize}
-              onPointerDown={onResizeStart}
-              onKeyDown={(e: React.KeyboardEvent) => {
-                const STEP = 20
-                if (e.key === 'ArrowLeft') {
-                  e.preventDefault()
-                  onWidthChange(clampDrawerWidth(width + STEP))
-                } else if (e.key === 'ArrowRight') {
-                  e.preventDefault()
-                  onWidthChange(clampDrawerWidth(width - STEP))
-                }
-              }}
-              role="separator"
-              aria-orientation="vertical"
-              aria-label="Resize details panel"
-              aria-valuenow={width}
-              aria-valuemin={DRAWER_MIN_WIDTH}
-              aria-valuemax={DRAWER_MAX_WIDTH}
-              tabIndex={0}
-            />
-          }
-        />
-        <TooltipPopup>Drag or use Arrow keys to resize</TooltipPopup>
-      </Tooltip>
+      {onResizeStart && (
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <div
+                className={styles.drawerResize}
+                onPointerDown={onResizeStart}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (!onWidthChange || typeof width !== 'number') return
+                  const STEP = 20
+                  if (e.key === 'ArrowLeft') {
+                    e.preventDefault()
+                    onWidthChange(clampDrawerWidth(width + STEP))
+                  } else if (e.key === 'ArrowRight') {
+                    e.preventDefault()
+                    onWidthChange(clampDrawerWidth(width - STEP))
+                  }
+                }}
+                role="separator"
+                aria-orientation="vertical"
+                aria-label="Resize details panel"
+                aria-valuenow={typeof width === 'number' ? width : undefined}
+                aria-valuemin={DRAWER_MIN_WIDTH}
+                aria-valuemax={DRAWER_MAX_WIDTH}
+                tabIndex={0}
+              />
+            }
+          />
+          <TooltipPopup>Drag or use Arrow keys to resize</TooltipPopup>
+        </Tooltip>
+      )}
 
       {/* Header */}
       <div className={styles.drawerHdr}>

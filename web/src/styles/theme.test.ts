@@ -59,6 +59,10 @@ describe('theme.css', () => {
     expect(darkTokens['--muted-foreground']).toBe('#8a8f98')
     expect(lightTokens['--muted-foreground']).toBe('#62666d')
 
+    // Panel highlight
+    expect(darkTokens['--panel-highlight']).toBe('inset 0 1px 0 rgba(255, 255, 255, 0.05)')
+    expect(lightTokens['--panel-highlight']).toBe('none')
+
     // Preserved behavioral variables from former theme.test.ts
     const requiredVars = [
       '--brand',
@@ -214,11 +218,27 @@ describe('theme.css', () => {
     expect(appCss).toContain('border-bottom: 2px solid transparent')
     expect(appCss).toContain('border-bottom-color: var(--primary)')
 
-    // 5. Dialog uses rounded-md (8px)
+    // 5. Dialog uses rounded-lg (12px framed panel)
     const dialogPath = path.resolve(process.cwd(), 'src/components/ui/dialog.tsx')
     const dialogCode = fs.readFileSync(dialogPath, 'utf-8')
-    expect(dialogCode).toContain('rounded-md')
+    expect(dialogCode).toContain('rounded-lg')
     expect(dialogCode).not.toContain('rounded-2xl')
+
+    // 6. Segmented control uses rounded-full (capsule) with neutral track and 1px border
+    const segmentedPath = path.resolve(process.cwd(), 'src/lib/segmented-control.ts')
+    const segmentedCode = fs.readFileSync(segmentedPath, 'utf-8')
+    expect(segmentedCode).toContain('rounded-full')
+    expect(segmentedCode).toContain('border border-border')
+    expect(segmentedCode).toContain('min-h-7')
+
+    // 7. Buttons and inputs use rounded-md (8px)
+    const buttonPath = path.resolve(process.cwd(), 'src/components/ui/button.tsx')
+    const buttonCode = fs.readFileSync(buttonPath, 'utf-8')
+    expect(buttonCode).toContain('rounded-md')
+
+    const inputPath = path.resolve(process.cwd(), 'src/components/ui/input.tsx')
+    const inputCode = fs.readFileSync(inputPath, 'utf-8')
+    expect(inputCode).toContain('rounded-md')
   })
 
   it('verifies elevation and interaction states (focus rings and reduced motion)', () => {

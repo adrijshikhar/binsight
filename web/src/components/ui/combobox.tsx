@@ -110,7 +110,7 @@ export function ComboboxPopup({
       >
         <span
           className={cn(
-            'relative flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) min-w-36 flex-col rounded-lg border bg-popover text-popover-foreground shadow-md/5 outline-none transition-[scale,opacity] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] data-ending-style:scale-98 data-starting-style:scale-98 data-ending-style:opacity-0 data-starting-style:opacity-0 dark:before:shadow-[0_-1px_--theme(--color-white/6%)]',
+            'relative flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) min-w-36 flex-col rounded-lg border bg-popover text-popover-foreground [box-shadow:var(--panel-highlight)] outline-none transition-[scale,opacity] data-ending-style:scale-98 data-starting-style:scale-98 data-ending-style:opacity-0 data-starting-style:opacity-0',
             className,
           )}
         >
@@ -299,7 +299,7 @@ export function ComboboxChips({
   return (
     <ComboboxPrimitive.Chips
       className={cn(
-        'relative inline-flex min-h-8 w-full flex-wrap items-center gap-1 rounded-md border border-input bg-background not-dark:bg-clip-padding p-1 text-sm shadow-xs/5 outline-none ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-md)-1px)] not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] focus-within:border-ring focus-within:ring-2 has-disabled:pointer-events-none has-aria-invalid:border-destructive/36 has-disabled:opacity-64 has-[:disabled,:focus-within,[aria-invalid]]:shadow-none focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/16 dark:not-has-disabled:bg-input/32 dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:not-focus-within:not-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/6%)]',
+        'relative inline-flex min-h-8 w-full flex-wrap items-center gap-1 rounded-md border border-input bg-background p-1 text-sm outline-none ring-ring/24 transition-shadow focus-within:border-ring focus-within:ring-2 has-disabled:pointer-events-none has-aria-invalid:border-destructive/36 has-disabled:opacity-64 focus-within:has-aria-invalid:border-destructive/64 focus-within:has-aria-invalid:ring-destructive/16 dark:not-has-disabled:bg-input/32 dark:has-aria-invalid:ring-destructive/24',
         className,
       )}
       data-slot="combobox-chips"

@@ -70,6 +70,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --shadow-panel-highlight: var(--panel-highlight);
 }
 
 :root[data-theme="dark"],
@@ -95,6 +96,7 @@
   --ring: #7eb8ff;
   --selection: #0b2543;
   --row-selected: rgba(0, 117, 222, 0.10);
+  --panel-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   --brand: var(--primary);
   --card: var(--surface-1);
@@ -203,6 +205,7 @@
   --ring: #0a67c2;
   --selection: #ebf3fd;
   --row-selected: rgba(0, 98, 189, 0.08);
+  --panel-highlight: none;
 
   --brand: var(--primary);
   --card: var(--surface-1);
