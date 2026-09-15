@@ -125,11 +125,11 @@ export default function SettingsView(props: SettingsViewProps) {
           if (!open) props.onClose()
         }}
       >
-        <DialogPopup closeProps={{ 'aria-label': 'Close settings' }}>
+        <DialogPopup className="max-w-4xl sm:h-[min(80vh,720px)]" closeProps={{ 'aria-label': 'Close settings' }}>
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
-          <DialogPanel>
+          <DialogPanel className="min-h-0 flex-1">
             {loadError ? (
               <Alert variant="error">
                 <AlertDescription>{loadError}</AlertDescription>
@@ -265,22 +265,25 @@ export default function SettingsView(props: SettingsViewProps) {
         if (!open) props.onClose()
       }}
     >
-      <DialogPopup closeProps={{ 'aria-label': 'Close settings' }}>
+      <DialogPopup className="max-w-4xl sm:h-[min(80vh,720px)]" closeProps={{ 'aria-label': 'Close settings' }}>
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
 
-        <DialogPanel>
-          <Tabs value={active} onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}>
-            <div className="overflow-x-auto">
-              <TabsList>
+        <DialogPanel className="min-h-0 flex-1">
+          <Tabs
+            value={active}
+            orientation="vertical"
+            className="min-h-0 sm:flex-row"
+            onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}
+          >
+            <TabsList className="w-full shrink-0 sm:w-48 sm:flex-col sm:items-stretch">
                 {SECTIONS.map((s) => (
                   <TabsTab key={s.id} value={s.id}>
                     {s.label}
                   </TabsTab>
                 ))}
-              </TabsList>
-            </div>
+            </TabsList>
 
             {/* Adapters & roles */}
             <TabsPanel value="decoding" className="min-w-0">
