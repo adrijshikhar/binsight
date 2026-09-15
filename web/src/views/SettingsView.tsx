@@ -277,7 +277,7 @@ export default function SettingsView(props: SettingsViewProps) {
           >
             <TabsList className="w-full h-fit shrink-0 rounded-none bg-transparent p-0 sm:w-48 sm:flex-col sm:items-stretch">
                 {SECTIONS.map((s) => (
-                  <TabsTab key={s.id} value={s.id} className="rounded-md">
+                  <TabsTab key={s.id} value={s.id} className="rounded-md data-active:bg-surface-3 data-active:text-foreground">
                     {s.label}
                   </TabsTab>
                 ))}
