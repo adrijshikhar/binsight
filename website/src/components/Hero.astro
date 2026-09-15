@@ -7,7 +7,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 <section class="relative pt-16 pb-24 md:pt-20 md:pb-36 px-4 sm:px-6 overflow-hidden">
   <div class="max-w-5xl mx-auto text-center flex flex-col items-center">
     <!-- Tagline Badge -->
-    <div data-anime="reveal" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-8 shadow-sm">
+    <div data-anime="reveal" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#58a6ff] mb-8 shadow-sm">
       <span class="w-1.5 h-1.5 rounded-full bg-[#3fb950] animate-pulse"></span>
       <span>mysqlbinlog, but visual.</span>
       <span class="w-px h-3 bg-[#2d3b4f]"></span>
@@ -16,7 +16,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 
     <!-- Unified Display Headline (No mixed font families) -->
     <h1 data-anime="reveal" class="text-4xl sm:text-6xl md:text-7xl font-sans font-extrabold text-[#f0f6fc] tracking-tight leading-[1.12] mb-6 max-w-4xl text-center">
-      See what's <span class="text-[#38bdf8]">really happening</span> inside your binlogs.
+      See what's <span class="text-[#58a6ff]">really happening</span> inside your binlogs.
     </h1>
 
     <!-- Subtitle (18 words, fits in ≤ 20 word budget) -->
@@ -26,7 +26,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 
     <!-- Canonical Install Box with Keyboard Hint -->
     <div data-anime="reveal" class="w-full max-w-xl mb-10">
-      <div class="relative flex items-center justify-between gap-2 rounded-xl border border-[#2d3b4f] bg-[#11161d] p-3.5 sm:px-5 font-mono text-sm shadow-xl hover:border-[#38bdf8]/50 transition-colors">
+      <div class="relative flex items-center justify-between gap-2 rounded-xl border border-[#2d3b4f] bg-[#11161d] p-3.5 sm:px-5 font-mono text-sm shadow-xl hover:border-[#0075de]/60 transition-colors">
         <div class="flex items-center gap-2 overflow-x-auto text-left py-0.5 min-w-0 flex-1">
           <span class="text-[#8b949e] select-none">$</span>
           <span class="text-[#f0f6fc] select-all font-medium truncate sm:overflow-visible">{SITE_CONFIG.heroCommand}</span>
@@ -41,7 +41,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     <div data-anime="reveal" class="flex flex-wrap items-center justify-center gap-4 mb-20">
       <a
         href="#install"
-        class="px-6 py-3.5 rounded-lg bg-[#38bdf8] text-[#0b0f14] font-semibold text-sm hover:bg-[#38bdf8]/90 transition-all flex items-center gap-2"
+        class="px-6 py-3.5 rounded-lg bg-[#0075de] text-white font-semibold text-sm hover:bg-[#005bab] transition-all flex items-center gap-2"
       >
         <span>Install Now</span>
         <svg class="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
@@ -50,10 +50,10 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       </a>
       <a
         href="#benchmarks"
-        class="px-5 py-3.5 rounded-lg bg-[#151d28] border border-[#2d3b4f] hover:border-[#38bdf8] text-[#f0f6fc] font-medium text-sm transition-all flex items-center gap-2"
+        class="px-5 py-3.5 rounded-lg bg-[#151d28] border border-[#2d3b4f] hover:border-[#0075de] text-[#f0f6fc] font-medium text-sm transition-all flex items-center gap-2"
       >
         <span>Telemetry & Benchmarks</span>
-        <span class="text-xs text-[#38bdf8] font-mono">⚡ 1.4s</span>
+        <span class="text-xs text-[#58a6ff] font-mono">⚡ 1.4s</span>
       </a>
       <GitHubBadge size="md" label="GitHub" />
     </div>
@@ -85,12 +85,12 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       <!-- Workbench Feature Switcher Tabs (Dev-Tool Style) -->
       <div class="flex border-b border-[#212c3d] bg-[#0f151f] text-xs font-mono overflow-x-auto max-w-full scrollbar-none" id="showcase-tabs" role="tablist">
         <button
-          class="showcase-tab active px-4 py-2.5 border-b-2 border-[#38bdf8] text-[#f0f6fc] font-semibold bg-[#161f2c]/70 flex items-center gap-2 whitespace-nowrap transition-colors"
+          class="showcase-tab active px-4 py-2.5 border-b-2 border-[#0075de] text-[#f0f6fc] font-semibold bg-[#161f2c]/70 flex items-center gap-2 whitespace-nowrap transition-colors"
           data-tab="events"
           role="tab"
           aria-selected="true"
         >
-          <svg class="w-3.5 h-3.5 text-[#38bdf8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg class="w-3.5 h-3.5 text-[#58a6ff]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round"/>
           </svg>
           <span>Virtual Table</span>
@@ -128,7 +128,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
             loading="eager"
           />
           <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex flex-wrap gap-2 pointer-events-none">
-            <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#38bdf8] backdrop-blur-md">
+            <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#58a6ff] backdrop-blur-md">
               ⚡ GTID Grouping
             </span>
             <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#e3b341]/50 text-[11px] font-mono text-[#e3b341] backdrop-blur-md">
@@ -154,7 +154,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
             <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#3fb950]/50 text-[11px] font-mono text-[#3fb950] backdrop-blur-md">
               ✓ Before & After Values
             </span>
-            <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#38bdf8] backdrop-blur-md">
+            <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#58a6ff] backdrop-blur-md">
               🔍 Column-level Change Badges
             </span>
             <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#c9d1d9] backdrop-blur-md">
@@ -174,7 +174,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
             loading="lazy"
           />
           <div class="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 flex flex-wrap gap-2 pointer-events-none">
-            <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#38bdf8] backdrop-blur-md">
+            <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#58a6ff] backdrop-blur-md">
               📊 Write Distribution
             </span>
             <span class="px-2.5 py-1 rounded-md bg-[#0b0f14]/90 border border-[#2d3b4f] text-[11px] font-mono text-[#c9d1d9] backdrop-blur-md">
@@ -206,7 +206,7 @@ import GitHubBadge from './ui/GitHubBadge.astro';
     tabs.forEach((tab) => {
       const match = tab.getAttribute('data-tab') === name;
       tab.classList.toggle('active', match);
-      tab.classList.toggle('border-[#38bdf8]', match);
+      tab.classList.toggle('border-[#0075de]', match);
       tab.classList.toggle('text-[#f0f6fc]', match);
       tab.classList.toggle('bg-[#161f2c]/70', match);
       tab.classList.toggle('border-transparent', !match);
