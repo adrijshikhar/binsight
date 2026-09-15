@@ -71,7 +71,7 @@ export default function App() {
   const [settingsSection, setSettingsSection] = useState<
     'decoding' | 'display' | 'anomalies' | 'streaming' | 'watch'
   >(() => {
-    return initialUrl.tab === 'how-it-works' || initialUrl.tab === 'architecture' ? 'how-it-works' : 'decoding'
+    return 'decoding'
   })
   const [lastInspectorTab, setLastInspectorTab] = useState<MainTab>(() => {
     const t = normalizeTab(initialUrl.tab)

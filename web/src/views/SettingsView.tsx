@@ -123,7 +123,7 @@ export default function SettingsView(props: SettingsViewProps) {
           if (!open) props.onClose()
         }}
       >
-        <DialogPopup className="max-w-4xl sm:h-[min(80vh,720px)]" closeProps={{ 'aria-label': 'Close settings' }}>
+        <DialogPopup className="max-w-4xl sm:h-[min(80vh,640px)]" closeProps={{ 'aria-label': 'Close settings' }}>
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
@@ -263,7 +263,7 @@ export default function SettingsView(props: SettingsViewProps) {
         if (!open) props.onClose()
       }}
     >
-      <DialogPopup className="max-w-4xl sm:h-[min(80vh,720px)]" closeProps={{ 'aria-label': 'Close settings' }}>
+      <DialogPopup className="max-w-4xl sm:h-[min(80vh,640px)]" closeProps={{ 'aria-label': 'Close settings' }}>
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
@@ -275,9 +275,9 @@ export default function SettingsView(props: SettingsViewProps) {
             className="min-h-0 items-start sm:flex-row"
             onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}
           >
-            <TabsList className="w-full h-fit shrink-0 sm:w-48 sm:flex-col sm:items-stretch">
+            <TabsList className="w-full h-fit shrink-0 rounded-none bg-transparent p-0 sm:w-48 sm:flex-col sm:items-stretch">
                 {SECTIONS.map((s) => (
-                  <TabsTab key={s.id} value={s.id}>
+                  <TabsTab key={s.id} value={s.id} className="rounded-md">
                     {s.label}
                   </TabsTab>
                 ))}
