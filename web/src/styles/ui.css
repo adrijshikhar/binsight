@@ -249,6 +249,23 @@
   background-color: var(--primary-hover);
 }
 
+/* Toast icons use semantic ink tokens because their stock classes otherwise inherit fill tokens. */
+[data-type='info'] [data-slot='toast-icon'] {
+  --info: var(--info-foreground);
+}
+
+[data-type='success'] [data-slot='toast-icon'] {
+  --success: var(--success-foreground);
+}
+
+[data-type='warning'] [data-slot='toast-icon'] {
+  --warning: var(--warning-foreground);
+}
+
+[data-type='error'] [data-slot='toast-icon'] {
+  --destructive: var(--destructive-foreground);
+}
+
 .app-prose {
   font-family: var(--font-sans);
   font-size: 13px;
