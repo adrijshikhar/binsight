@@ -21,21 +21,17 @@ export { kindToBadgeVariant, type EventBadgeVariant }
 
 export interface KindBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   typeName: string
-  size?: 'xs' | 'sm' | 'default' | 'lg'
+  size?: 'sm' | 'default' | 'lg'
 }
 
-export default function KindBadge({
-  typeName,
-  className,
-  size = 'sm',
-  ...rest
-}: KindBadgeProps): React.ReactElement {
+export default function KindBadge({ typeName, className, size = 'sm', ...rest }: KindBadgeProps): React.ReactElement {
   const variant = kindToBadgeVariant(typeName)
   return (
     <Badge
       variant={variant}
+      data-variant={variant}
       size={size}
-      className={`font-mono uppercase tracking-normal ${className ?? ''}`}
+      className={className}
       data-kind={kindToDataAttr(typeName)}
       {...rest}
     >

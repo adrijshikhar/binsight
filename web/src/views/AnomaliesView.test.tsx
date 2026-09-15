@@ -145,13 +145,13 @@ describe('AnomaliesView', () => {
     expect(screen.getByRole('button', { name: /re-run detection/i })).toBeTruthy()
   })
 
-  it('applies criticalRow styling to high and critical severity rows', async () => {
+  it('preserves high and critical severity on rows', async () => {
     wrap(<AnomaliesView {...makeProps()} />)
     await waitFor(() => {
       expect(screen.getByText('huge_txn_rows')).toBeTruthy()
     })
     const rows = screen.getAllByRole('row')
-    expect(rows[1].className).toMatch(/criticalRow/)
-    expect(rows[2].className).toMatch(/criticalRow/)
+    expect(rows[1].getAttribute('data-severity')).toMatch(/high|critical/)
+    expect(rows[2].getAttribute('data-severity')).toMatch(/high|critical/)
   })
 })

@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { useVirtualizer, type Virtualizer } from '@tanstack/react-virtual'
-import { Table } from '@/components/ui/table'
-import styles from './EventsTable.module.css'
+import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
 
 // The two kinds of visual rows EventsView produces
 export type VisualRow<G, E> = { kind: 'group'; g: G } | { kind: 'event'; e: E }
@@ -37,7 +36,7 @@ const SKELETON_COUNT = 8
 
 export default function EventsTable<G, E>({
   visualRows,
-  estimateSize = 32,
+  estimateSize = 40,
   renderEventRow,
   renderGroupRow,
   colgroup,
@@ -89,29 +88,32 @@ export default function EventsTable<G, E>({
   const paddingBottom = lastItem ? totalSize - (lastItem.start + lastItem.size) : 0
 
   return (
-    <div className={styles.tableWrap} ref={internalScrollRef}>
-      <Table className={styles.eventsTable} withRowBorders stickyHeader layout="fixed" bare>
+    <div className="min-h-0 flex-1 overflow-auto" ref={internalScrollRef}>
+      <Table
+        className="min-w-[960px] table-fixed [&_td]:overflow-hidden [&_td]:text-ellipsis [&_td]:whitespace-nowrap"
+        render={<div className="contents" />}
+      >
         {colgroup}
         {thead}
-        <Table.Tbody>
+        <TableBody>
           {loading ? (
             Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-              <Table.Tr key={i}>
-                <Table.Td colSpan={colCount}>
-                  <span className={styles.skeleton}>loading events…</span>
-                </Table.Td>
-              </Table.Tr>
+              <TableRow key={i}>
+                <TableCell colSpan={colCount}>
+                  <span>loading events…</span>
+                </TableCell>
+              </TableRow>
             ))
           ) : visualRows.length === 0 ? (
             emptyState ? (
-              <Table.Tr>
-                <Table.Td colSpan={colCount}>{emptyState}</Table.Td>
-              </Table.Tr>
+              <TableRow>
+                <TableCell colSpan={colCount}>{emptyState}</TableCell>
+              </TableRow>
             ) : null
           ) : (
             <>
               {paddingTop > 0 && (
-                <tr className={styles.vSpacer} style={{ height: paddingTop }}>
+                <tr className="[&>td]:border-0 [&>td]:p-0" style={{ height: paddingTop }}>
                   <td colSpan={colCount} />
                 </tr>
               )}
@@ -123,13 +125,13 @@ export default function EventsTable<G, E>({
                 return renderEventRow(r.e, vi.index, measureRef)
               })}
               {paddingBottom > 0 && (
-                <tr className={styles.vSpacer} style={{ height: paddingBottom }}>
+                <tr className="[&>td]:border-0 [&>td]:p-0" style={{ height: paddingBottom }}>
                   <td colSpan={colCount} />
                 </tr>
               )}
             </>
           )}
-        </Table.Tbody>
+        </TableBody>
       </Table>
     </div>
   )

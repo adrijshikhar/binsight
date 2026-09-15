@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
+import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Sheet, SheetPopup } from '@/components/ui/sheet'
-import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconMenu2, IconSettings } from '@tabler/icons-react'
+import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconSettings } from '@tabler/icons-react'
 import { api } from './lib/api'
 import type { Anomaly, BinlogFile, EventRow, Severity, StreamStatus } from './lib/types'
 import Sidebar from './components/Sidebar'
-import { useIsMobile } from './lib/useMediaQuery'
 import { readUrlState, writeUrlState, pushUrlState } from './lib/url'
 import { SSEContext, type IndexEvent } from './lib/sse'
 import {
@@ -27,20 +26,10 @@ import SchemaView from './views/SchemaView'
 import SettingsView from './views/SettingsView'
 import ArchitectureView from './views/ArchitectureView'
 import Drawer from './components/Drawer'
-import { animateViewTransition } from './lib/motion'
 import { Agentation } from 'agentation'
-import styles from './App.module.css'
 
 export type MainTab =
-  | 'overview'
-  | 'events'
-  | 'txns'
-  | 'tables'
-  | 'anomalies'
-  | 'schema'
-  | 'settings'
-  | 'architecture'
-  | 'how-it-works'
+  'overview' | 'events' | 'txns' | 'tables' | 'anomalies' | 'schema' | 'settings' | 'architecture' | 'how-it-works'
 
 const VALID_TABS = new Set<MainTab>([
   'overview',
@@ -68,7 +57,7 @@ function normalizeTab(s: string | undefined): MainTab {
 
 export default function App() {
   // Restore file/tab from URL on first mount
-  const initialUrl = readUrlState()
+  const [initialUrl] = useState(readUrlState)
   const [files, setFiles] = useState<BinlogFile[]>([])
   const [fileId, setFileId] = useState<number>(initialUrl.file ?? 0)
   const [tab, setTab] = useState<MainTab>(normalizeTab(initialUrl.tab))
@@ -78,17 +67,12 @@ export default function App() {
   const [settingsSection, setSettingsSection] = useState<
     'decoding' | 'how-it-works' | 'display' | 'anomalies' | 'streaming' | 'watch'
   >(() => {
-    return initialUrl.tab === 'how-it-works' || initialUrl.tab === 'architecture'
-      ? 'how-it-works'
-      : 'decoding'
+    return initialUrl.tab === 'how-it-works' || initialUrl.tab === 'architecture' ? 'how-it-works' : 'decoding'
   })
   const [lastInspectorTab, setLastInspectorTab] = useState<MainTab>(() => {
     const t = normalizeTab(initialUrl.tab)
     return t
   })
-
-  const isMobile = useIsMobile(768)
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   // Remember the last active inspector tab so closing Settings/Architecture returns to it
   useEffect(() => {
@@ -96,13 +80,6 @@ export default function App() {
   }, [tab])
 
   const activePanelRef = useRef<HTMLDivElement | null>(null)
-
-  // Animate tab transitions with snappy anime.js motion
-  useEffect(() => {
-    if (activePanelRef.current) {
-      animateViewTransition(activePanelRef.current)
-    }
-  }, [tab])
 
   const [selected, setSelected] = useState<EventRow | null>(null)
   const [txnIds, setTxnIds] = useState<number[]>(() => {
@@ -393,32 +370,19 @@ export default function App() {
 
   return (
     <SSEContext.Provider value={lastIndexEvent}>
-      <div className={styles.shell}>
-        <header className={styles.shellHeader}>
+      <div className="flex h-dvh w-full flex-col overflow-hidden bg-background">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b px-4">
           {/* Left side: Brand + Active File breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
-            {isMobile && !FULL_PAGE_TABS.has(tab) && (
-              <Button
-                variant="ghost"
-                size="xs"
-                onClick={() => setMobileSidebarOpen(true)}
-                aria-label="Open sidebar"
-                className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
-              >
-                <IconMenu2 size={16} />
-              </Button>
-            )}
-            <span className="font-mono text-sm font-bold text-primary shrink-0 tracking-wider">
-              binsight
-            </span>
+            <span className="shrink-0">binsight</span>
 
             {file && (
               <div className="flex items-center gap-1 min-w-0">
-                <span className={styles.headerDivider} />
-                <span className="text-xs text-muted-foreground font-mono truncate">
+                <span />
+                <span className="truncate">
                   {file.path.split('/').slice(0, -1).join('/') || '/'}
-                  <span className={styles.slash}>/</span>
-                  <span className={styles.fileName}>{file.path.split('/').pop()}</span>
+                  <span className="mx-1">/</span>
+                  <span>{file.path.split('/').pop()}</span>
                 </span>
               </div>
             )}
@@ -434,7 +398,6 @@ export default function App() {
                 setSettingsOpen(true)
               }}
               aria-label="Settings"
-              className={styles.settingsHeaderBtn}
             >
               <IconSettings size={14} />
               Settings
@@ -442,10 +405,10 @@ export default function App() {
           </div>
         </header>
 
-        <div className={styles.shellBody}>
-          {!isMobile && !FULL_PAGE_TABS.has(tab) && (
+        <div className="relative flex min-h-0 flex-1 overflow-hidden">
+          {!FULL_PAGE_TABS.has(tab) && (
             <nav
-              className={styles.shellNav}
+              className="relative h-full shrink-0 overflow-hidden border-r"
               style={{ width: sidebar.collapsed ? 48 : sidebar.width }}
               aria-label="Binlog files"
             >
@@ -489,47 +452,15 @@ export default function App() {
                   aria-valuemax={480}
                   tabIndex={0}
                   title="Drag or use Arrow keys to resize"
-                  className={styles.resizer}
+                  className="absolute inset-y-0 right-0 w-1 cursor-col-resize"
                 />
               )}
             </nav>
           )}
 
-          {isMobile && !FULL_PAGE_TABS.has(tab) && (
-            <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-              <SheetPopup side="left" className="w-[280px] max-w-[85vw] p-0 border-e border-border bg-popover">
-                <Sidebar
-                  files={files}
-                  activeId={fileId}
-                  collapsed={false}
-                  onToggle={() => setMobileSidebarOpen(false)}
-                  onSelect={(id) => {
-                    setFileId(id)
-                    setTab('overview')
-                    setMobileSidebarOpen(false)
-                  }}
-                  onSettings={() => {
-                    setSettingsSection('decoding')
-                    setSettingsOpen(true)
-                    setMobileSidebarOpen(false)
-                  }}
-                  onArchitecture={() => {
-                    setSettingsSection('how-it-works')
-                    setSettingsOpen(true)
-                    setMobileSidebarOpen(false)
-                  }}
-                  streamStatus={streamStatus ?? undefined}
-                />
-              </SheetPopup>
-            </Sheet>
-          )}
-
-          <main className={styles.shellMain}>
+          <main className="flex h-full min-w-0 flex-1 flex-col overflow-hidden">
             {filesErr && !FULL_PAGE_TABS.has(tab) && (
-              <Alert
-                variant="error"
-                className="rounded-none border-x-0 border-t-0 border-b border-border py-2 px-3"
-              >
+              <Alert variant="error">
                 <IconAlertTriangle size={16} />
                 <AlertDescription className="flex items-center justify-between">
                   <span>file list unavailable: {filesErr}</span>
@@ -539,229 +470,170 @@ export default function App() {
                 </AlertDescription>
               </Alert>
             )}
-            <div className={styles.content}>
-            {!FULL_PAGE_TABS.has(tab) && (
-              <div className={styles.tabs} role="tablist">
-                {tabs.map((t, idx) => (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {!FULL_PAGE_TABS.has(tab) && (
+                <Tabs
+                  value={tab}
+                  onValueChange={(value) => {
+                    if (value !== 'events') setSelected(null)
+                    setTab(value as MainTab)
+                  }}
+                  className="shrink-0 overflow-x-auto"
+                >
+                  <TabsList aria-label="Views">
+                    {tabs.map((t) => (
+                      <TabsTab key={t} value={t} id={`tab-${t}`} aria-controls={`tabpanel-${t}`}>
+                        {tabLabel(t)}
+                      </TabsTab>
+                    ))}
+                  </TabsList>
+                </Tabs>
+              )}
+              {files.length === 0 && !filesErr && !FULL_PAGE_TABS.has(tab) && (
+                <div role="status" className="p-6">
+                  No binlog files found.
+                </div>
+              )}
+
+              {/* Tab content - animated on tab switch */}
+              <div ref={activePanelRef} className="flex min-h-0 flex-1 flex-col overflow-auto">
+                {tab === 'overview' && (
                   <div
-                    key={t}
-                    id={`tab-${t}`}
-                    className={`${styles.tab}${tab === t ? ` ${styles.active}` : ''}`}
-                    role="tab"
-                    tabIndex={tab === t ? 0 : -1}
-                    aria-selected={tab === t}
-                    aria-controls={`tabpanel-${t}`}
-                    onClick={() => {
-                      if (t !== 'events') setSelected(null)
-                      setTab(t)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        if (t !== 'events') setSelected(null)
-                        setTab(t)
-                      } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-                        e.preventDefault()
-                        const next =
-                          e.key === 'ArrowRight' ? (idx + 1) % tabs.length : (idx - 1 + tabs.length) % tabs.length
-                        setTab(tabs[next])
-                        const tabEls = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLElement>(
-                          '[role="tab"]',
-                        )
-                        tabEls?.[next]?.focus()
-                      } else if (e.key === 'Home') {
-                        e.preventDefault()
-                        setTab(tabs[0])
-                        const tabEls = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLElement>(
-                          '[role="tab"]',
-                        )
-                        tabEls?.[0]?.focus()
-                      } else if (e.key === 'End') {
-                        e.preventDefault()
-                        setTab(tabs[tabs.length - 1])
-                        const tabEls = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLElement>(
-                          '[role="tab"]',
-                        )
-                        tabEls?.[tabs.length - 1]?.focus()
-                      }
-                    }}
+                    id="tabpanel-overview"
+                    role="tabpanel"
+                    aria-labelledby="tab-overview"
+                    tabIndex={0}
+                    className="flex min-h-0 flex-1 flex-col overflow-auto"
                   >
-                    {tabLabel(t)}
+                    {file ? (
+                      <OverviewView
+                        file={file}
+                        onOpenType={(type) => {
+                          setTypeFilter(type)
+                          setTab('events')
+                        }}
+                        onOpenEvent={(pos) => {
+                          setTab('events')
+                          api
+                            .events({ file: fileId, from_pos: pos, to_pos: pos, limit: 1 })
+                            .then((page) => {
+                              if (page.events[0]) setSelected(page.events[0])
+                            })
+                            .catch(() => {})
+                        }}
+                        onOpenTxn={(id) => {
+                          setTxnIds([id])
+                          setTab('events')
+                        }}
+                        anomalies={anomalies}
+                        onShowAnomalies={() => setTab('anomalies')}
+                      />
+                    ) : (
+                      <div className="p-6">no file selected</div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
-            {files.length === 0 && !filesErr && !FULL_PAGE_TABS.has(tab) && (
-              <div role="status" className={styles.emptyStatus}>
-                No binlog files found.
-              </div>
-            )}
-
-            {/* Tab content - animated on tab switch */}
-            <div ref={activePanelRef} className={styles.tabpanelFill}>
-              {tab === 'overview' && (
-                <div
-                  id="tabpanel-overview"
-                  role="tabpanel"
-                  aria-labelledby="tab-overview"
-                  tabIndex={0}
-                  className={styles.tabpanelFill}
-                >
-                  {file ? (
-                    <OverviewView
-                      file={file}
-                      onOpenType={(type) => {
-                        setTypeFilter(type)
-                        setTab('events')
-                      }}
-                      onOpenEvent={(pos) => {
-                        setTab('events')
-                        api
-                          .events({ file: fileId, from_pos: pos, to_pos: pos, limit: 1 })
-                          .then((page) => {
-                            if (page.events[0]) setSelected(page.events[0])
-                          })
-                          .catch(() => {})
-                      }}
-                      onOpenTxn={(id) => {
-                        setTxnIds([id])
-                        setTab('events')
-                      }}
-                      anomalies={anomalies}
-                      onShowAnomalies={() => setTab('anomalies')}
-                    />
-                  ) : (
-                    <div className={styles.noFile}>no file selected</div>
-                  )}
-                </div>
-              )}
-              {tab === 'events' && (
-                <div
-                  id="tabpanel-events"
-                  role="tabpanel"
-                  aria-labelledby="tab-events"
-                  tabIndex={0}
-                  className={styles.tabpanelFill}
-                >
-                  <EventsView
-                    key={navKey}
-                    fileId={fileId}
-                    txnIds={txnIds}
-                    dbFilter={dbFilter}
-                    tableFilter={tableFilter}
-                    typeFilter={typeFilter}
-                    selectedPos={selected?.pos ?? -1}
-                    onSelect={(e) => setSelected(e)}
-                    posSeverity={posSeverity}
-                    onConsumeFilters={() => {
-                      setDbFilter('')
-                      setTableFilter('')
-                      setTypeFilter('')
-                    }}
-                    onRemoveTxn={(id) => setTxnIds((ids) => ids.filter((i) => i !== id))}
-                    live={live}
-                    onToggleLive={setLive}
-                  />
-                </div>
-              )}
-              {tab === 'txns' && (
-                <div
-                  id="tabpanel-txns"
-                  role="tabpanel"
-                  aria-labelledby="tab-txns"
-                  tabIndex={0}
-                  className={styles.tabpanelFill}
-                >
-                  {fileId > 0 && <TxnsView fileId={fileId} onOpenTxn={openTxn} txnSeverity={txnSeverity} />}
-                </div>
-              )}
-              {tab === 'tables' && (
-                <div
-                  id="tabpanel-tables"
-                  role="tabpanel"
-                  aria-labelledby="tab-tables"
-                  tabIndex={0}
-                  className={styles.tabpanelFill}
-                >
-                  {fileId > 0 && (
-                    <TablesView
+                )}
+                {tab === 'events' && (
+                  <div
+                    id="tabpanel-events"
+                    role="tabpanel"
+                    aria-labelledby="tab-events"
+                    tabIndex={0}
+                    className="flex min-h-0 flex-1 flex-col overflow-auto"
+                  >
+                    <EventsView
+                      key={navKey}
                       fileId={fileId}
-                      onOpenTable={(db, table) => {
-                        setDbFilter(db)
-                        setTableFilter(table)
-                        setTab('events')
+                      txnIds={txnIds}
+                      dbFilter={dbFilter}
+                      tableFilter={tableFilter}
+                      typeFilter={typeFilter}
+                      selectedPos={selected?.pos ?? -1}
+                      onSelect={(e) => setSelected(e)}
+                      posSeverity={posSeverity}
+                      onConsumeFilters={() => {
+                        setDbFilter('')
+                        setTableFilter('')
+                        setTypeFilter('')
                       }}
+                      onRemoveTxn={(id) => setTxnIds((ids) => ids.filter((i) => i !== id))}
+                      live={live}
+                      onToggleLive={setLive}
                     />
-                  )}
-                </div>
-              )}
-              {tab === 'anomalies' && (
-                <div
-                  id="tabpanel-anomalies"
-                  role="tabpanel"
-                  aria-labelledby="tab-anomalies"
-                  tabIndex={0}
-                  className={styles.tabpanelFill}
-                >
-                  {fileId > 0 && <AnomaliesView fileId={fileId} onOpenTxn={openTxn} onOpenEvent={openEvent} />}
-                </div>
-              )}
-              {tab === 'schema' && (
-                <div
-                  id="tabpanel-schema"
-                  role="tabpanel"
-                  aria-labelledby="tab-schema"
-                  tabIndex={0}
-                  className={styles.tabpanelFill}
-                >
-                  {fileId > 0 && <SchemaView fileId={fileId} onOpenEvent={openEvent} />}
-                </div>
-              )}
+                  </div>
+                )}
+                {tab === 'txns' && (
+                  <div
+                    id="tabpanel-txns"
+                    role="tabpanel"
+                    aria-labelledby="tab-txns"
+                    tabIndex={0}
+                    className="flex min-h-0 flex-1 flex-col overflow-auto"
+                  >
+                    {fileId > 0 && <TxnsView fileId={fileId} onOpenTxn={openTxn} txnSeverity={txnSeverity} />}
+                  </div>
+                )}
+                {tab === 'tables' && (
+                  <div
+                    id="tabpanel-tables"
+                    role="tabpanel"
+                    aria-labelledby="tab-tables"
+                    tabIndex={0}
+                    className="flex min-h-0 flex-1 flex-col overflow-auto"
+                  >
+                    {fileId > 0 && (
+                      <TablesView
+                        fileId={fileId}
+                        onOpenTable={(db, table) => {
+                          setDbFilter(db)
+                          setTableFilter(table)
+                          setTab('events')
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
+                {tab === 'anomalies' && (
+                  <div
+                    id="tabpanel-anomalies"
+                    role="tabpanel"
+                    aria-labelledby="tab-anomalies"
+                    tabIndex={0}
+                    className="flex min-h-0 flex-1 flex-col overflow-auto"
+                  >
+                    {fileId > 0 && <AnomaliesView fileId={fileId} onOpenTxn={openTxn} onOpenEvent={openEvent} />}
+                  </div>
+                )}
+                {tab === 'schema' && (
+                  <div
+                    id="tabpanel-schema"
+                    role="tabpanel"
+                    aria-labelledby="tab-schema"
+                    tabIndex={0}
+                    className="flex min-h-0 flex-1 flex-col overflow-auto"
+                  >
+                    {fileId > 0 && <SchemaView fileId={fileId} onOpenEvent={openEvent} />}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </main>
+          </main>
 
-        {selected && tab === 'events' && !isMobile && (
-          <aside
-            className={styles.shellAside}
-            style={{ width: drawerWidth }}
-            aria-label="Event inspector"
-          >
-            <Drawer
-              fileId={fileId}
-              event={selected}
-              width={drawerWidth}
-              onResizeStart={startDrawerResize}
-              onWidthChange={setDrawerWidth}
-              onClose={() => setSelected(null)}
-            />
-          </aside>
-        )}
-
-        {selected && tab === 'events' && isMobile && (
-          <Sheet
-            open={Boolean(selected)}
-            onOpenChange={(open) => {
-              if (!open) setSelected(null)
-            }}
-          >
-            <SheetPopup side="right" className="w-full max-w-none p-0 border-s border-border bg-popover">
+          {selected && tab === 'events' && (
+            <div className="h-full shrink-0 overflow-hidden border-l" style={{ width: drawerWidth }}>
               <Drawer
                 fileId={fileId}
                 event={selected}
-                width="100%"
+                width={drawerWidth}
+                onResizeStart={startDrawerResize}
+                onWidthChange={setDrawerWidth}
                 onClose={() => setSelected(null)}
               />
-            </SheetPopup>
-          </Sheet>
-        )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-      <SettingsView
-        opened={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        initialSection={settingsSection}
-      />
+      <SettingsView opened={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} />
       {showAgentation && <Agentation endpoint="http://localhost:4747" />}
     </SSEContext.Provider>
   )
@@ -770,7 +642,4 @@ export default function App() {
 const showAgentation =
   typeof window !== 'undefined' &&
   import.meta.env.MODE !== 'test' &&
-  (import.meta.env.DEV ||
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1')
-
+  (import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')

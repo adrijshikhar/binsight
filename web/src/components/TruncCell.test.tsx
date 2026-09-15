@@ -75,9 +75,7 @@ describe('TruncCell', () => {
   it('applies monospace font family when mono prop is true', () => {
     renderInTable(<TruncCell label="SELECT 1" className="tbl" mono />)
     const td = screen.getByText('SELECT 1')
-    // Mantine renders ff as --mantine-ff- or inline style; check style attribute
-    const style = td.getAttribute('style') ?? ''
-    expect(style).toContain('monospace')
+    expect(td.tagName).toBe('CODE')
   })
 
   it('does not apply monospace font family when mono is not set', () => {

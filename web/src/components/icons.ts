@@ -1,7 +1,5 @@
 import { IconX, IconAlertTriangle, IconRotateClockwise2, IconCheck, type IconProps } from '@tabler/icons-react'
-import { createElement, type ComponentType, type CSSProperties, type FC } from 'react'
-
-import styles from './icons.module.css'
+import { createElement, type ComponentType, type FC } from 'react'
 
 /**
  * Inline icon wrapper: tabler icons default to 24px (oversized next to this
@@ -16,7 +14,7 @@ function inlineIcon(Inner: ComponentType<IconProps>): FC<IconProps> {
       size: 16,
       stroke: 1.75,
       ...props,
-      className: props.className ? `${styles.inlineIcon} ${props.className}` : styles.inlineIcon,
+      className: props.className ? `${'align-middle'} ${props.className}` : 'align-middle',
     })
 }
 
@@ -28,75 +26,17 @@ export const WrapArrow = inlineIcon(IconRotateClockwise2)
 export const Check = inlineIcon(IconCheck)
 export const Cross = inlineIcon(IconX)
 
-const KIND_CLASS: Record<string, string> = {
-  WRITE_ROWS_V2: styles.green,
-  WRITE_ROWS_V1: styles.green,
-  UPDATE_ROWS_V2: styles.orange,
-  UPDATE_ROWS_V1: styles.orange,
-  DELETE_ROWS_V2: styles.red,
-  DELETE_ROWS_V1: styles.red,
-  QUERY: styles.grape,
-  XID: styles.accent,
-  TABLE_MAP: styles.indigo,
-  default: styles.muted,
-}
-
-export type EventBadgeVariant = 'insert' | 'update' | 'delete' | 'query' | 'outline'
+export type EventBadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'outline'
 
 /** Event-kind -> semantic Badge variant following strict green quarantine and data roles. */
 export function kindToBadgeVariant(typeName: string): EventBadgeVariant {
-  if (typeName.startsWith('WRITE_ROWS')) return 'insert'
-  if (typeName.startsWith('UPDATE_ROWS')) return 'update'
-  if (typeName.startsWith('DELETE_ROWS')) return 'delete'
-  if (typeName === 'QUERY' || typeName === 'CREATE' || typeName === 'ALTER') return 'query'
-  if (typeName === 'DROP') return 'delete'
-  if (typeName === 'TRUNCATE') return 'update'
+  if (typeName.startsWith('WRITE_ROWS')) return 'success'
+  if (typeName.startsWith('UPDATE_ROWS')) return 'warning'
+  if (typeName.startsWith('DELETE_ROWS')) return 'error'
+  if (typeName === 'QUERY' || typeName === 'CREATE' || typeName === 'ALTER') return 'info'
+  if (typeName === 'DROP') return 'error'
+  if (typeName === 'TRUNCATE') return 'warning'
   return 'outline'
-}
-
-/** Event-kind -> theme color name. */
-export function kindColor(typeName: string): string {
-  if (typeName.startsWith('WRITE_ROWS_')) return 'green'
-  if (typeName.startsWith('UPDATE_ROWS_')) return 'orange'
-  if (typeName.startsWith('DELETE_ROWS_')) return 'red'
-  if (typeName === 'QUERY') return 'grape'
-  if (typeName === 'XID') return 'accent'
-  if (typeName === 'TABLE_MAP') return 'teal'
-  return 'gray'
-}
-
-
-/** Returns the scoped CSS Module class name for a given event kind badge. */
-export function kindBadgeClassName(kind: string): string {
-  const c = KIND_CLASS[kind] ?? KIND_CLASS.default
-  return `${styles.badge} ${c}`
-}
-
-/** Event-kind -> palette CSS var. Mantine's `variant="light"` renders washed-out
- *  in dark mode (~10% fill + a muted `-light-color` text). We drive the badge
- *  off our own tokens instead so the hue reads clearly in both schemes. */
-const KIND_VAR: Record<string, string> = {
-  WRITE_ROWS_V2: '--green',
-  WRITE_ROWS_V1: '--green',
-  UPDATE_ROWS_V2: '--orange',
-  UPDATE_ROWS_V1: '--orange',
-  DELETE_ROWS_V2: '--red',
-  DELETE_ROWS_V1: '--red',
-  QUERY: '--grape',
-  XID: '--brand',
-  TABLE_MAP: '--indigo',
-  default: '--muted-foreground',
-}
-
-/** Inline style for a kind badge (kept for backward compatibility). */
-export function kindBadgeStyle(kind: string): CSSProperties {
-  const v = KIND_VAR[kind] ?? KIND_VAR.default
-  return {
-    '--badge-bg': `color-mix(in srgb, var(${v}) 14%, transparent)`,
-    '--badge-color': `var(${v})`,
-    border: `1px solid color-mix(in srgb, var(${v}) 32%, transparent)`,
-    fontFamily: 'var(--mono)',
-  } as CSSProperties
 }
 
 /** Anomaly severity → standard Mantine color name. */

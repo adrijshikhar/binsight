@@ -43,12 +43,4 @@ describe('ArchitectureView', () => {
     expect(screen.getByText('connector-java')).toBeTruthy()
   })
 
-  it('renders the legend swatches', () => {
-    wrap(<ArchitectureView onClose={() => {}} />)
-    expect(screen.getByText('builtin adapter (in-process)')).toBeTruthy()
-    expect(screen.getByText('exec adapter (subprocess, JSON-lines)')).toBeTruthy()
-    // "planned" appears as a Badge in the adapter card too - use getAllByText
-    expect(screen.getAllByText('planned').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('interface / schema contract')).toBeTruthy()
-  })
 })

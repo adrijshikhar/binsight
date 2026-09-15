@@ -38,16 +38,9 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
           <AlertTitle>Something broke rendering this view</AlertTitle>
           <AlertDescription>
             <div className="flex flex-col gap-3 mt-2">
-              <p className="text-sm">The error was logged to the browser console. This is a UI bug - the data is fine.</p>
-              <pre className="p-3 bg-muted/60 rounded-md font-mono text-xs whitespace-pre-wrap overflow-x-auto">
-                {error.message}
-              </pre>
-              <Button
-                size="xs"
-                variant="outline"
-                onClick={() => window.location.reload()}
-                className="self-start"
-              >
+              <p>The error was logged to the browser console. This is a UI bug - the data is fine.</p>
+              <pre className="whitespace-pre-wrap overflow-x-auto">{error.message}</pre>
+              <Button size="xs" variant="outline" onClick={() => window.location.reload()} className="self-start">
                 Reload
               </Button>
             </div>

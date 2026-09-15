@@ -40,11 +40,7 @@ const MOCK_ADAPTERS: AdapterInfo[] = [
 ]
 
 function wrap(ui: React.ReactElement) {
-  return render(
-    <ToastProvider>
-      {ui}
-    </ToastProvider>,
-  )
+  return render(<ToastProvider>{ui}</ToastProvider>)
 }
 
 /** Wait until settings have loaded - the Tabs render only after settings resolves. */
@@ -87,7 +83,7 @@ describe('SettingsView', () => {
     fireEvent.click(displayTab)
 
     await waitFor(() => {
-      expect(screen.getByRole('spinbutton', { name: /page size/i })).toBeTruthy()
+      expect(screen.getByRole('textbox', { name: /page size/i })).toBeTruthy()
     })
   })
 
@@ -103,7 +99,7 @@ describe('SettingsView', () => {
     const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
     await user.click(displayTab)
 
-    const pageSizeInput = await screen.findByRole('spinbutton', { name: /page size/i })
+    const pageSizeInput = await screen.findByRole('textbox', { name: /page size/i })
 
     await user.clear(pageSizeInput)
     await user.type(pageSizeInput, '250')
@@ -138,10 +134,10 @@ describe('SettingsView', () => {
     fireEvent.click(anomaliesTab)
 
     await waitFor(() => {
-      expect(screen.getByRole('spinbutton', { name: /txn bytes/i })).toBeTruthy()
-      expect(screen.getByRole('spinbutton', { name: /txn rows/i })).toBeTruthy()
-      expect(screen.getByRole('spinbutton', { name: /txn seconds/i })).toBeTruthy()
-      expect(screen.getByRole('spinbutton', { name: /event rows/i })).toBeTruthy()
+      expect(screen.getByRole('textbox', { name: /txn bytes/i })).toBeTruthy()
+      expect(screen.getByRole('textbox', { name: /txn rows/i })).toBeTruthy()
+      expect(screen.getByRole('textbox', { name: /txn seconds/i })).toBeTruthy()
+      expect(screen.getByRole('textbox', { name: /event rows/i })).toBeTruthy()
     })
   })
 
@@ -225,7 +221,7 @@ describe('SettingsView', () => {
     const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
     await user.click(displayTab)
 
-    const pageSizeInput = await screen.findByRole('spinbutton', { name: /page size/i })
+    const pageSizeInput = await screen.findByRole('textbox', { name: /page size/i })
     await user.clear(pageSizeInput)
 
     const saveBtn = screen.getByRole('button', { name: /save settings/i })
@@ -245,7 +241,7 @@ describe('SettingsView', () => {
     const displayTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Display')!
     await user.click(displayTab)
 
-    const pageSizeInput = await screen.findByRole('spinbutton', { name: /page size/i })
+    const pageSizeInput = await screen.findByRole('textbox', { name: /page size/i })
     await user.clear(pageSizeInput)
     await user.type(pageSizeInput, '750')
 

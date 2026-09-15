@@ -5,8 +5,8 @@ import type { TableStat } from '../lib/types'
 import { Alert } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import styles from './TablesView.module.css'
+import { Card, CardHeader, CardTitle, CardDescription, CardPanel } from '@/components/ui/card'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
 
 export default function TablesView(props: { fileId: number; onOpenTable: (db: string, table: string) => void }) {
   const [tables, setTables] = useState<TableStat[]>([])
@@ -45,7 +45,7 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
   const totalDel = tables.reduce((n, t) => n + t.deletes, 0)
 
   return (
-    <div className={`flex flex-col gap-4 p-4 h-full overflow-y-auto ${styles.container}`}>
+    <div className="flex flex-col gap-4 p-4 h-full overflow-y-auto overflow-auto">
       {err && (
         <Alert variant="error" role="alert" className="flex items-center justify-between">
           <span>{err}</span>
@@ -54,50 +54,42 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
           </Button>
         </Alert>
       )}
-      {loading && tables.length === 0 && (
-        <p className="text-muted-foreground py-2 text-sm">
-          loading tables...
-        </p>
-      )}
+      {loading && tables.length === 0 && <p className="py-2">loading tables...</p>}
       {!loading && !err && tables.length === 0 && (
-        <div className="flex items-center justify-center py-12">
-          <div className="flex flex-col items-center gap-2" role="status">
-            <p className="text-muted-foreground">No tables in this file.</p>
-            <p className="text-muted-foreground text-xs">
+        <Empty role="status">
+          <EmptyHeader>
+            <EmptyTitle>No tables in this file.</EmptyTitle>
+            <EmptyDescription>
               Tables appear once TABLE_MAP events are indexed. Try re-indexing the file if you expect data.
-            </p>
-          </div>
-        </div>
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
       {tables.length > 0 && (
-        <div className={`flex items-center justify-between gap-4 pb-2 border-b border-border ${styles.summaryHeader}`}>
+        <div className="flex items-center justify-between gap-4 pb-2 border-b border-border shrink-0">
           <div className="flex items-center gap-3">
-            <span className={`text-xs text-muted-foreground font-mono uppercase tracking-wider ${styles.eyebrow}`}>
+            <span>
               {tables.length} {tables.length === 1 ? 'Table' : 'Tables'} Indexed
             </span>
-            <span className="text-xs text-muted-foreground">·</span>
-            <span className="text-xs text-muted-foreground font-mono">
-              {totalRows.toLocaleString()} mutations
-            </span>
-            <span className="text-xs text-muted-foreground">·</span>
-            <span className="text-xs text-muted-foreground font-mono">
-              {(totalBytes / 1024).toFixed(1)} KB payload
-            </span>
+            <span>·</span>
+            <span>{totalRows.toLocaleString()} mutations</span>
+            <span>·</span>
+            <span>{(totalBytes / 1024).toFixed(1)} KB payload</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="insert" size="sm" className="font-mono">
+            <Badge variant="success" size="sm">
               +{totalIns} ins
             </Badge>
-            <Badge variant="update" size="sm" className="font-mono">
+            <Badge variant="warning" size="sm">
               ~{totalUpd} upd
             </Badge>
-            <Badge variant="delete" size="sm" className="font-mono">
+            <Badge variant="error" size="sm">
               -{totalDel} del
             </Badge>
           </div>
         </div>
       )}
-      <div className={styles.grid}>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {tables.map((t) => {
           let cols: string[] = []
           try {
@@ -108,30 +100,32 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
           return (
             <Card
               key={t.id}
-              className={`p-4 cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:border-primary ${styles.tableCard}`}
+              className="cursor-pointer"
               {...clickable(() => props.onOpenTable(t.db_name, t.table_name))}
             >
-              <h4 className={`font-mono text-sm font-semibold mb-2 break-all ${styles.tableTitle}`}>
-                {t.db_name}.{t.table_name}
-              </h4>
-              <p className="text-xs text-muted-foreground mb-2">
-                {cols.length > 0 ? cols.join(', ') : 'no TABLE_MAP seen'}
-              </p>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="insert" size="sm" className="font-mono">
-                  {t.inserts} ins
-                </Badge>
-                <Badge variant="update" size="sm" className="font-mono">
-                  {t.updates} upd
-                </Badge>
-                <Badge variant="delete" size="sm" className="font-mono">
-                  {t.deletes} del
-                </Badge>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t.rows_total} rows · {(t.bytes_total / 1024).toFixed(1)}K ·{' '}
-                {((t.bytes_total / totalBytes) * 100).toFixed(1)}% of table bytes
-              </p>
+              <CardHeader>
+                <CardTitle className="wrap-anywhere">
+                  {t.db_name}.{t.table_name}
+                </CardTitle>
+                <CardDescription>{cols.length > 0 ? cols.join(', ') : 'no TABLE_MAP seen'}</CardDescription>
+              </CardHeader>
+              <CardPanel>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="success" size="sm">
+                    {t.inserts} ins
+                  </Badge>
+                  <Badge variant="warning" size="sm">
+                    {t.updates} upd
+                  </Badge>
+                  <Badge variant="error" size="sm">
+                    {t.deletes} del
+                  </Badge>
+                </div>
+                <CardDescription>
+                  {t.rows_total} rows · {(t.bytes_total / 1024).toFixed(1)}K ·{' '}
+                  {((t.bytes_total / totalBytes) * 100).toFixed(1)}% of table bytes
+                </CardDescription>
+              </CardPanel>
             </Card>
           )
         })}

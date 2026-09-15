@@ -128,7 +128,7 @@ describe('Drawer (stock Coss UI)', () => {
       expect(screen.getByRole('tab', { name: /hex/i }).getAttribute('aria-selected')).toBe('true')
     })
     // Hex panel should be visible (Mantine Tabs.Panel is rendered; inactive panels are unmounted with keepMounted={false})
-    const hexPanel = screen.getByRole('tabpanel')
+    const hexPanel = screen.getByRole('tabpanel', { name: 'Hex' })
     expect(hexPanel).toBeTruthy()
   })
 
@@ -293,4 +293,3 @@ describe('Drawer (stock Coss UI)', () => {
     expect(container.querySelector('[role="dialog"]')).toBeNull()
   })
 })
-

@@ -82,11 +82,7 @@ function EventsViewHarness({ ev, fileId = ACTIVE_FILE }: { ev: IndexEvent | null
   return (
     <div data-theme="dark">
       <SSEContext.Provider value={ev}>
-        <EventsView
-          {...baseProps(fileId)}
-          live={live}
-          onToggleLive={setLive}
-        />
+        <EventsView {...baseProps(fileId)} live={live} onToggleLive={setLive} />
       </SSEContext.Provider>
     </div>
   )
@@ -202,11 +198,11 @@ describe('EventsView live mode', () => {
     await settleInitialLoad()
 
     fireEvent.click(followButton())
-    await waitFor(() => expect(followButton().checked).toBe(true))
+    await waitFor(() => expect(followButton().getAttribute('aria-checked')).toBe('true'))
 
     // Switch to a new file -> live must reset to off.
     rerender(wrapEv({ type: 'index_done', file_id: OTHER_FILE, seq: 1 }, OTHER_FILE))
-    await waitFor(() => expect(followButton().checked).toBe(false))
+    await waitFor(() => expect(followButton().getAttribute('aria-checked')).toBe('false'))
 
     const before = eventsMock.mock.calls.length
     // An index_done for the new file must NOT auto-refetch since live was reset.
@@ -224,7 +220,7 @@ describe('EventsView live mode', () => {
     await settleInitialLoad()
 
     fireEvent.click(followButton())
-    await waitFor(() => expect(followButton().checked).toBe(true))
+    await waitFor(() => expect(followButton().getAttribute('aria-checked')).toBe('true'))
 
     await new Promise((r) => setTimeout(r, 30))
     expect(screen.queryByRole('button', { name: /load more/i })).toBeNull()

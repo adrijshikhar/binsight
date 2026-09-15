@@ -3,10 +3,11 @@ import { api } from '../lib/api'
 import { clickable } from '../lib/a11y'
 import type { Anomaly, Severity } from '../lib/types'
 import { Alert } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Table } from '@/components/ui/table'
-import styles from './AnomaliesView.module.css'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem } from '@/components/ui/select'
 
 interface AnomaliesViewProps {
   fileId: number
@@ -63,28 +64,27 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
   }
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden ${styles.container}`}>
-      <div className={`flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 ${styles.filterBar}`}>
-        <span className="text-xs text-muted-foreground">
-          severity
-        </span>
-        <select
-          className="h-7 text-xs rounded-md border border-input bg-background px-2 text-foreground"
-          value={sev}
-          onChange={(e) => setSev(e.target.value as Severity | '')}
-        >
-          <option value="">all</option>
-          <option value="critical">critical</option>
-          <option value="high">high</option>
-          <option value="medium">medium</option>
-          <option value="low">low</option>
-        </select>
+    <div className="flex flex-col h-full overflow-hidden min-h-0">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 p-3">
+        <span>severity</span>
+        <Select value={sev} onValueChange={(value) => setSev((value ?? '') as Severity | '')}>
+          <SelectTrigger aria-label="Severity" className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopup>
+            <SelectItem value="">all</SelectItem>
+            <SelectItem value="critical">critical</SelectItem>
+            <SelectItem value="high">high</SelectItem>
+            <SelectItem value="medium">medium</SelectItem>
+            <SelectItem value="low">low</SelectItem>
+          </SelectPopup>
+        </Select>
         <Button size="xs" variant="outline" onClick={rerunDetection} disabled={detecting}>
           {detecting ? 'detecting...' : 're-run detection'}
         </Button>
       </div>
       {err && (
-        <Alert variant="error" role="alert" className="flex items-center justify-between rounded-none mb-0">
+        <Alert variant="error" role="alert" className="flex items-center justify-between mb-0">
           <span>{err}</span>
           <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
@@ -92,75 +92,56 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
         </Alert>
       )}
       {loading && anomalies.length === 0 ? (
-        <p className="text-muted-foreground p-4 text-sm">
-          loading anomalies...
-        </p>
+        <p className="p-4">loading anomalies...</p>
       ) : anomalies.length === 0 ? (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground text-sm" role="status">
-            No anomalies detected for this file.
-          </p>
-        </div>
+        <Empty role="status">
+          <EmptyHeader>
+            <EmptyTitle>No anomalies detected for this file.</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       ) : (
-        <div className={styles.tableWrap}>
-          <Table stickyHeader className="text-sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>severity</Table.Th>
-                <Table.Th>detector</Table.Th>
-                <Table.Th>db.table</Table.Th>
-                <Table.Th className="text-right">metric / threshold</Table.Th>
-                <Table.Th>message</Table.Th>
-                <Table.Th>link</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
+        <div className="min-h-0 flex-1 overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>severity</TableHead>
+                <TableHead>detector</TableHead>
+                <TableHead>db.table</TableHead>
+                <TableHead className="text-right">metric / threshold</TableHead>
+                <TableHead>message</TableHead>
+                <TableHead>link</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {anomalies.map((a) => (
-                <Table.Tr
-                  key={a.id}
-                  className={a.severity === 'critical' || a.severity === 'high' ? styles.criticalRow : undefined}
-                >
-                  <Table.Td>
-                    <Badge
-                      variant={severityToBadgeVariant(a.severity)}
-                      size="sm"
-                      data-severity={a.severity}
-                    >
+                <TableRow key={a.id} data-severity={a.severity}>
+                  <TableCell>
+                    <Badge variant={severityToBadgeVariant(a.severity)} size="sm" data-severity={a.severity}>
                       {a.severity}
                     </Badge>
-                  </Table.Td>
-                  <Table.Td className="font-mono">{a.detector}</Table.Td>
-                  <Table.Td>{[a.db_name, a.table_name].filter(Boolean).join('.')}</Table.Td>
-                  <Table.Td className="tabular-nums text-right">
+                  </TableCell>
+                  <TableCell>{a.detector}</TableCell>
+                  <TableCell>{[a.db_name, a.table_name].filter(Boolean).join('.')}</TableCell>
+                  <TableCell className="tabular-nums text-right">
                     {a.threshold > 0 ? `${a.metric.toLocaleString()} / ${a.threshold.toLocaleString()}` : '-'}
-                  </Table.Td>
-                  <Table.Td className={styles.messageCell}>
-                    {a.message || '-'}
-                  </Table.Td>
-                  <Table.Td>
+                  </TableCell>
+                  <TableCell className="max-w-72 truncate">{a.message || '-'}</TableCell>
+                  <TableCell>
                     {a.txn_id ? (
-                      <button
-                        type="button"
-                        className={styles.jumpLink}
-                        {...clickable(() => onOpenTxn(a.txn_id!))}
-                      >
+                      <button type="button" {...clickable(() => onOpenTxn(a.txn_id!))}>
                         txn #{a.txn_id}
                       </button>
                     ) : a.event_pos ? (
-                      <button
-                        type="button"
-                        className={styles.jumpLink}
-                        {...clickable(() => onOpenEvent(a.event_pos!))}
-                      >
+                      <button type="button" {...clickable(() => onOpenEvent(a.event_pos!))}>
                         @ {a.event_pos}
                       </button>
                     ) : (
                       '-'
                     )}
-                  </Table.Td>
-                </Table.Tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </Table.Tbody>
+            </TableBody>
           </Table>
         </div>
       )}

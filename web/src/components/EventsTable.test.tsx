@@ -35,7 +35,7 @@ vi.mock('@tanstack/react-virtual', () => ({
 }))
 
 describe('EventsTable', () => {
-  it('defaults estimateSize to 32px', () => {
+  it('estimates stock rows at 40px before runtime measurement', () => {
     render(
       <EventsTable
         visualRows={[]}
@@ -45,7 +45,7 @@ describe('EventsTable', () => {
     )
     expect(capturedOptions).toBeTruthy()
     const estimateFn = capturedOptions?.estimateSize as () => number
-    expect(estimateFn()).toBe(32)
+    expect(estimateFn()).toBe(40)
   })
 
   it('honors explicit estimateSize override', () => {

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, within, fireEvent, waitFor, act } from '@testing-library/react'
 import App from './App'
 import { ColorSchemeProvider } from './lib/colorScheme'
+import { api } from './lib/api'
 
 // jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
 Object.defineProperty(window, 'matchMedia', {
@@ -39,6 +40,7 @@ vi.mock('./lib/api', () => ({
     files: vi.fn(() => Promise.resolve([])),
     events: vi.fn(() => Promise.resolve({ events: [], next_cursor: 0, total: 0 })),
     tables: vi.fn(() => Promise.resolve([])),
+    anomalies: vi.fn(() => Promise.resolve([])),
     streamStatus: vi.fn(() =>
       Promise.resolve({ state: 'disabled', file: '', pos: 0, last_event_ts: 0, skipped_events: 0 }),
     ),
@@ -112,6 +114,17 @@ describe('App - AppShell + tab routing', () => {
     expect(labels).toContain('Schema/DDL')
   })
 
+  it('does not reinterpret later event URL updates as startup deep links', async () => {
+    window.history.replaceState(null, '', '/?file=1&tab=events')
+    await renderApp()
+    vi.mocked(api.events).mockClear()
+    window.history.replaceState(null, '', '/?file=1&tab=events&event=4')
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Settings' }))
+    })
+    expect(api.events).not.toHaveBeenCalledWith(expect.objectContaining({ from_pos: 4, to_pos: 4 }))
+  })
+
   it('overview tab is selected by default', async () => {
     await renderApp()
     const tabs = screen.getAllByRole('tab')
@@ -171,11 +184,11 @@ describe('App - AppShell + tab routing', () => {
     // Live switch should now appear in the FilterBar
     const switchEl = screen.getByRole('switch', { name: /follow new events as they are indexed/i })
     expect(switchEl).toBeTruthy()
-    expect((switchEl as HTMLInputElement).checked).toBe(false)
+    expect(switchEl.getAttribute('aria-checked')).toBe('false')
 
     // Toggling the switch updates its state
     fireEvent.click(switchEl)
-    expect((switchEl as HTMLInputElement).checked).toBe(true)
+    expect(switchEl.getAttribute('aria-checked')).toBe('true')
   })
 
   it('renders Settings button on the right side of the header', async () => {

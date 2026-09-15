@@ -1,6 +1,7 @@
 import { it, expect, vi, describe } from 'vitest'
 import React from 'react'
 import { render, screen, act } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Sidebar from './Sidebar'
 import type { BinlogFile, StreamStatus } from '../lib/types'
 
@@ -161,7 +162,8 @@ describe('Sidebar - collapsed', () => {
       wrap(<Sidebar {...props} />)
     })
     const btn = screen.getByRole('button', { name: /mysql-bin\.000001/ })
-    btn.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    btn.focus()
+    await userEvent.setup().keyboard('{Enter}')
     expect(props.onSelect).toHaveBeenCalledWith(1)
   })
 })

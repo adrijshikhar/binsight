@@ -1,19 +1,9 @@
-import { useEffect, useState } from 'react'
-import {
-  IconLayoutSidebar,
-  IconLayoutSidebarRight,
-  IconTriangleInverted,
-} from '@tabler/icons-react'
+import { IconLayoutSidebar, IconLayoutSidebarRight } from '@tabler/icons-react'
+import { FileIcon, FileWarningIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPopup,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import type { BinlogFile, StreamStatus } from '../lib/types'
-import { cn } from '@/lib/utils'
-import styles from './Sidebar.module.css'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -23,19 +13,6 @@ function fmtSize(n: number): string {
   if (n > 1 << 20) return (n / (1 << 20)).toFixed(1) + ' MB'
   if (n > 1 << 10) return (n / (1 << 10)).toFixed(1) + ' KB'
   return n + ' B'
-}
-
-// ---------------------------------------------------------------------------
-// StateDot
-// ---------------------------------------------------------------------------
-
-/** Coloured dot indicating the file's indexing state. Pulse animation on
- *  "indexing" is handled by Sidebar.module.css so it never bleeds into global
- *  CSS. Reduced-motion preference disables the animation. */
-function StateDot({ state }: { state: string }) {
-  // Build the class string by composing the base + state class from the module.
-  const cls = [styles.st, styles[state as keyof typeof styles]].filter(Boolean).join(' ')
-  return <span className={cls} aria-label={state} />
 }
 
 // ---------------------------------------------------------------------------
@@ -58,13 +35,7 @@ function StreamChip({ status }: { status: StreamStatus }) {
       <TooltipTrigger
         render={
           <span className="inline-flex mx-3.5 mb-1.5">
-            <Badge
-              size="xs"
-              variant={variant}
-              role="status"
-              aria-label={`Stream: ${status.state}`}
-              className={styles.streamChip}
-            >
+            <Badge size="sm" variant={variant} role="status" aria-label={`Stream: ${status.state}`}>
               {status.state}
             </Badge>
           </span>
@@ -137,28 +108,15 @@ export default function Sidebar({
               <Tooltip key={f.id}>
                 <TooltipTrigger
                   render={
-                    <div
-                      className={`${styles.collapsedItem} ${f.id === activeId ? styles.collapsedItemActive : ''}`}
+                    <Button
+                      variant={f.id === activeId ? 'secondary' : 'ghost'}
+                      size="icon"
                       onClick={() => onSelect(f.id)}
                       aria-label={tipText}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          onSelect(f.id)
-                        }
-                      }}
+                      aria-pressed={f.id === activeId}
                     >
-                      <StateDot state={f.state} />
-                      {!!f.anomaly_count && (
-                        <IconTriangleInverted
-                          size={8}
-                          className={styles.collapsedAnomalyIcon}
-                          aria-hidden="true"
-                        />
-                      )}
-                    </div>
+                      {f.anomaly_count ? <FileWarningIcon /> : <FileIcon />}
+                    </Button>
                   }
                 />
                 <TooltipPopup side="right">{tipText}</TooltipPopup>
@@ -177,9 +135,7 @@ export default function Sidebar({
     <div className="flex flex-col h-full gap-0">
       {/* Header row: "Files" label + collapse toggle */}
       <div className="flex items-center justify-between px-3.5 pb-2 pt-3 shrink-0">
-        <span className={cn('text-xs text-muted-foreground', styles.headerLabel)}>
-          Files
-        </span>
+        <span>Files</span>
         <Tooltip>
           <TooltipTrigger
             render={
@@ -209,27 +165,13 @@ export default function Sidebar({
 
           const rightSection = (
             <div className="flex items-center gap-1 shrink-0">
-              {f.state !== 'ready' && (
-                <span
-                  className={cn(
-                    'text-xs uppercase shrink-0',
-                    f.state === 'error' ? 'text-destructive' : 'text-muted-foreground'
-                  )}
-                >
-                  {f.state}
-                </span>
-              )}
               {!!f.anomaly_count && (
-                <Badge
-                  size="xs"
-                  variant="destructive"
-                  className={cn('shrink-0', styles.anomalyBadge)}
-                >
+                <Badge size="sm" variant="destructive" className="shrink-0">
                   {f.anomaly_count}
                 </Badge>
               )}
               {f.remote && (
-                <Badge size="xs" variant="secondary" className="shrink-0">
+                <Badge size="sm" variant="secondary" className="shrink-0">
                   remote
                 </Badge>
               )}
@@ -240,37 +182,37 @@ export default function Sidebar({
             <Tooltip key={f.id}>
               <TooltipTrigger
                 render={
-                  <div
-                    role="button"
-                    tabIndex={0}
+                  <Button
+                    variant={isActive ? 'secondary' : 'ghost'}
+                    aria-pressed={isActive}
                     onClick={() => onSelect(f.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        onSelect(f.id)
-                      }
-                    }}
                     aria-label={f.error ? `${fileName} - error: ${f.error}` : `${fileName} - ${f.state}`}
-                    className={cn(
-                      styles.navLinkRoot,
-                      isActive && styles.navLinkRootActive,
-                      'w-full flex items-center justify-between gap-2 px-3.5 py-2 text-left transition-colors cursor-pointer border-l-2',
-                      isActive ? 'border-primary bg-accent/40' : 'border-transparent hover:bg-accent/20'
-                    )}
+                    className="h-auto w-full justify-between text-left sm:h-auto"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <StateDot state={f.state} />
                       <div className="flex flex-col min-w-0">
-                        <span className={cn('text-sm font-mono truncate', styles.navLinkLabel)}>
-                          {fileName}
-                        </span>
-                        <span className={cn('text-xs font-mono text-muted-foreground', styles.navLinkDesc)}>
-                          {fmtSize(f.size)}
+                        <span className="truncate">{fileName}</span>
+                        <span className="flex items-center gap-2">
+                          <span>{fmtSize(f.size)}</span>
+                          <Badge
+                            size="sm"
+                            variant={
+                              f.state === 'error'
+                                ? 'error'
+                                : f.state === 'indexing'
+                                  ? 'warning'
+                                  : f.state === 'growing'
+                                    ? 'info'
+                                    : 'secondary'
+                            }
+                          >
+                            {f.state}
+                          </Badge>
                         </span>
                       </div>
                     </div>
                     {rightSection}
-                  </div>
+                  </Button>
                 }
               />
               <TooltipPopup side="right">{tipText}</TooltipPopup>

@@ -36,31 +36,31 @@ describe('KindBadge', () => {
 
   it('maps semantic variants following strict green quarantine and data roles', () => {
     // WRITE is insert (green)
-    expect(kindToBadgeVariant('WRITE_ROWS_V1')).toBe('insert')
-    expect(kindToBadgeVariant('WRITE_ROWS_V2')).toBe('insert')
+    expect(kindToBadgeVariant('WRITE_ROWS_V1')).toBe('success')
+    expect(kindToBadgeVariant('WRITE_ROWS_V2')).toBe('success')
 
     // UPDATE is update (amber/orange), NOT primary blue
-    expect(kindToBadgeVariant('UPDATE_ROWS_V1')).toBe('update')
-    expect(kindToBadgeVariant('UPDATE_ROWS_V2')).toBe('update')
+    expect(kindToBadgeVariant('UPDATE_ROWS_V1')).toBe('warning')
+    expect(kindToBadgeVariant('UPDATE_ROWS_V2')).toBe('warning')
     expect(kindToBadgeVariant('UPDATE_ROWS_V1')).not.toBe('default')
     expect(kindToBadgeVariant('UPDATE_ROWS_V1')).not.toBe('primary')
 
     // DELETE is delete (rose/red)
-    expect(kindToBadgeVariant('DELETE_ROWS_V1')).toBe('delete')
-    expect(kindToBadgeVariant('DELETE_ROWS_V2')).toBe('delete')
+    expect(kindToBadgeVariant('DELETE_ROWS_V1')).toBe('error')
+    expect(kindToBadgeVariant('DELETE_ROWS_V2')).toBe('error')
 
     // QUERY, CREATE, ALTER are query (purple) - CREATE is NOT insert (no green for DDL)
-    expect(kindToBadgeVariant('QUERY')).toBe('query')
-    expect(kindToBadgeVariant('CREATE')).toBe('query')
-    expect(kindToBadgeVariant('CREATE')).not.toBe('insert')
-    expect(kindToBadgeVariant('ALTER')).toBe('query')
+    expect(kindToBadgeVariant('QUERY')).toBe('info')
+    expect(kindToBadgeVariant('CREATE')).toBe('info')
+    expect(kindToBadgeVariant('CREATE')).not.toBe('success')
+    expect(kindToBadgeVariant('ALTER')).toBe('info')
     expect(kindToBadgeVariant('ALTER')).not.toBe('primary')
 
     // DROP is delete (rose/red)
-    expect(kindToBadgeVariant('DROP')).toBe('delete')
+    expect(kindToBadgeVariant('DROP')).toBe('error')
 
     // TRUNCATE is update/warning (amber)
-    expect(kindToBadgeVariant('TRUNCATE')).toBe('update')
+    expect(kindToBadgeVariant('TRUNCATE')).toBe('warning')
 
     // Neutral kinds are neutral/outline
     expect(kindToBadgeVariant('TABLE_MAP')).toBe('outline')

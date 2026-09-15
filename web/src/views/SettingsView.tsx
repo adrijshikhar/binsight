@@ -2,26 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import type { AdapterInfo, Settings } from '../lib/types'
 import { ArchitectureContent } from './ArchitectureView'
-import { animateViewTransition } from '../lib/motion'
 import { useColorScheme, type ThemePreference } from '../lib/colorScheme'
-import {
-  Dialog,
-  DialogPopup,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  Tabs,
-  TabsList,
-  TabsTab,
-  TabsPanel,
-} from '@/components/ui/tabs'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectPopup,
-  SelectItem,
-} from '@/components/ui/select'
+import { Dialog, DialogPopup, DialogTitle, DialogHeader, DialogPanel, DialogFooter } from '@/components/ui/dialog'
+import { Tabs, TabsList, TabsTab, TabsPanel } from '@/components/ui/tabs'
+import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem } from '@/components/ui/select'
 import {
   NumberField,
   NumberFieldGroup,
@@ -36,29 +20,11 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipPopup,
-} from '@/components/ui/tooltip'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { toastManager } from '@/components/ui/toast'
-import { XIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import styles from './SettingsView.module.css'
 
 const GIB = 1073741824
-
-// Form fields read better narrow - a full-width number/text input across the
-// whole modal is hard to scan. Cards cap the column; inputs cap tighter.
-const PAIR_MAW = 620 // two-column field rows (host/port, user/password, etc.)
 
 /** What each adapter capability means - surfaced as a tooltip on the badge so
  *  the opaque UPPERCASE labels (FULLSCAN, SEEKDECODE, etc.) are self-explaining. */
@@ -107,13 +73,7 @@ export default function SettingsView(props: SettingsViewProps) {
   const [importError, setImportError] = useState<string>('')
   const [busy, setBusy] = useState(false)
   const [active, setActive] = useState<SectionId>(props.initialSection ?? 'decoding')
-  const panelRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    if (panelRef.current) {
-      animateViewTransition(panelRef.current)
-    }
-  }, [active])
+  const importInputRef = useRef<HTMLInputElement | null>(null)
 
   // Number fields as numbers or null when clearing input
   const [pageSize, setPageSize] = useState<number | null>(500)
@@ -159,23 +119,17 @@ export default function SettingsView(props: SettingsViewProps) {
 
   if (!settings)
     return (
-      <Dialog open={true} onOpenChange={(open) => { if (!open) props.onClose() }}>
-        <DialogPopup
-          className={cn('max-w-[850px] w-full p-0 flex flex-col overflow-hidden', styles.modalContent)}
-          showCloseButton={false}
-        >
-          <div className="flex items-center justify-between border-b px-5 py-3.5 shrink-0">
-            <DialogTitle className="text-base font-semibold">Settings</DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              onClick={props.onClose}
-              aria-label="Close settings"
-            >
-              <XIcon className="size-4" />
-            </Button>
-          </div>
-          <div className={styles.loadingContainer}>
+      <Dialog
+        open={true}
+        onOpenChange={(open) => {
+          if (!open) props.onClose()
+        }}
+      >
+        <DialogPopup closeProps={{ 'aria-label': 'Close settings' }}>
+          <DialogHeader>
+            <DialogTitle>Settings</DialogTitle>
+          </DialogHeader>
+          <DialogPanel>
             {loadError ? (
               <Alert variant="error">
                 <AlertDescription>{loadError}</AlertDescription>
@@ -183,7 +137,7 @@ export default function SettingsView(props: SettingsViewProps) {
             ) : (
               'loading...'
             )}
-          </div>
+          </DialogPanel>
         </DialogPopup>
       </Dialog>
     )
@@ -305,59 +259,40 @@ export default function SettingsView(props: SettingsViewProps) {
   const txnBytesHint = humanizeBytes(txnBytes)
 
   return (
-    <Dialog open={props.opened ?? true} onOpenChange={(open) => { if (!open) props.onClose() }}>
-      <DialogPopup
-        className={cn('max-w-[850px] w-full p-0 flex flex-col overflow-hidden', styles.modalContent)}
-        showCloseButton={false}
-      >
-        <div className="flex items-center justify-between border-b px-5 py-3.5 shrink-0">
-          <DialogTitle className="text-base font-semibold">Settings</DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            onClick={props.onClose}
-            aria-label="Close settings"
-          >
-            <XIcon className="size-4" />
-          </Button>
-        </div>
+    <Dialog
+      open={props.opened ?? true}
+      onOpenChange={(open) => {
+        if (!open) props.onClose()
+      }}
+    >
+      <DialogPopup closeProps={{ 'aria-label': 'Close settings' }}>
+        <DialogHeader>
+          <DialogTitle>Settings</DialogTitle>
+        </DialogHeader>
 
-        <div className={styles.modalInner}>
-          <Tabs
-            orientation="vertical"
-            value={active}
-            onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}
-            className={styles.tabsRoot}
-          >
-            <TabsList
-              variant="default"
-              className={styles.tabsList}
-            >
-              {SECTIONS.map((s) => (
-                <TabsTab
-                  key={s.id}
-                  value={s.id}
-                  className={styles.tab}
-                >
-                  {s.label}
-                </TabsTab>
-              ))}
-            </TabsList>
+        <DialogPanel>
+          <Tabs value={active} onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}>
+            <div className="overflow-x-auto">
+              <TabsList>
+                {SECTIONS.map((s) => (
+                  <TabsTab key={s.id} value={s.id}>
+                    {s.label}
+                  </TabsTab>
+                ))}
+              </TabsList>
+            </div>
 
             {/* Adapters & roles */}
-            <TabsPanel value="decoding" ref={active === 'decoding' ? panelRef : undefined} className={styles.tabsPanel}>
+            <TabsPanel value="decoding" className="min-w-0">
               <div className="flex flex-col gap-4">
-                <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                  <div className="font-semibold mb-2">Adapters</div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Decoders available to the viewer and what each can do. Hover a capability for a one-line definition, or{' '}
-                    <button
-                      type="button"
-                      className="text-primary underline text-sm cursor-pointer"
-                      onClick={() => setActive('how-it-works')}
-                    >
+                <div className="space-y-3">
+                  <div className="mb-2">Adapters</div>
+                  <p className="mb-3">
+                    Decoders available to the viewer and what each can do. Hover a capability for a one-line definition,
+                    or{' '}
+                    <Button variant="link" onClick={() => setActive('how-it-works')}>
                       learn more
-                    </button>{' '}
+                    </Button>{' '}
                     in How It Works.
                   </p>
                   <Table>
@@ -370,9 +305,7 @@ export default function SettingsView(props: SettingsViewProps) {
                     <TableBody>
                       {adapters.map((a) => (
                         <TableRow key={a.name}>
-                          <TableCell className="align-top whitespace-nowrap font-medium pr-6">
-                            {a.name}
-                          </TableCell>
+                          <TableCell className="align-top whitespace-nowrap">{a.name}</TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
                               {Object.entries(a.capabilities)
@@ -382,11 +315,7 @@ export default function SettingsView(props: SettingsViewProps) {
                                     <TooltipTrigger
                                       render={
                                         <span className="inline-flex">
-                                          <Badge
-                                            variant="outline"
-                                            size="sm"
-                                            className="font-mono cursor-help"
-                                          >
+                                          <Badge variant="outline" size="sm" className="cursor-help">
                                             {k}
                                           </Badge>
                                         </span>
@@ -403,12 +332,10 @@ export default function SettingsView(props: SettingsViewProps) {
                   </Table>
                 </div>
 
-                <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                  <div className="font-semibold mb-2">Roles</div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Which adapter handles indexing, the detail drawer, and the diff oracle.
-                  </p>
-                  <div className="flex flex-col gap-3 max-w-[620px]">
+                <div className="space-y-3">
+                  <div className="mb-2">Roles</div>
+                  <p className="mb-3">Which adapter handles indexing, the detail drawer, and the diff oracle.</p>
+                  <div className="flex flex-col gap-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                       <div className="flex flex-col gap-1.5 w-full">
                         <Label htmlFor="select-indexer">indexer</Label>
@@ -454,7 +381,7 @@ export default function SettingsView(props: SettingsViewProps) {
                         {adapters.map((a) => {
                           const isChecked = settings.roles.diff.includes(a.name)
                           return (
-                            <label key={a.name} className="flex items-center gap-2 cursor-pointer text-sm">
+                            <label key={a.name} className="flex items-center gap-2 cursor-pointer">
                               <Checkbox
                                 checked={isChecked}
                                 onCheckedChange={(checked) => {
@@ -476,37 +403,39 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* How it works */}
-            <TabsPanel value="how-it-works" className={styles.tabsPanelWide} ref={active === 'how-it-works' ? panelRef : undefined}>
+            <TabsPanel value="how-it-works" className="min-w-0">
               <ArchitectureContent />
             </TabsPanel>
 
             {/* Display */}
-            <TabsPanel value="display" ref={active === 'display' ? panelRef : undefined} className={styles.tabsPanel}>
+            <TabsPanel value="display" className="min-w-0">
               <div className="flex flex-col gap-4">
-                <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                  <div className="font-semibold mb-2">Theme & Appearance</div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Choose interface appearance or sync with system preferences.
-                  </p>
+                <div className="space-y-3">
+                  <div className="mb-2">Theme & Appearance</div>
+                  <p className="mb-3">Choose interface appearance or sync with system preferences.</p>
                   <Tabs
                     value={preference}
                     onValueChange={(val) => setPreference(val as ThemePreference)}
                     className="max-w-[300px]"
                   >
                     <TabsList className="w-full">
-                      <TabsTab value="dark" className="flex-1">Dark</TabsTab>
-                      <TabsTab value="light" className="flex-1">Light</TabsTab>
-                      <TabsTab value="auto" className="flex-1">System</TabsTab>
+                      <TabsTab value="dark" className="flex-1">
+                        Dark
+                      </TabsTab>
+                      <TabsTab value="light" className="flex-1">
+                        Light
+                      </TabsTab>
+                      <TabsTab value="auto" className="flex-1">
+                        System
+                      </TabsTab>
                     </TabsList>
                   </Tabs>
                 </div>
 
-                <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                  <div className="font-semibold mb-2">Display</div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Pagination and timestamp display.
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start max-w-[620px]">
+                <div className="space-y-3">
+                  <div className="mb-2">Display</div>
+                  <p className="mb-3">Pagination and timestamp display.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                     <div className="flex flex-col gap-1.5 w-full">
                       <Label htmlFor="field-page-size">page size</Label>
                       <NumberField
@@ -544,20 +473,18 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Anomalies */}
-            <TabsPanel value="anomalies" ref={active === 'anomalies' ? panelRef : undefined} className={styles.tabsPanel}>
-              <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                <div className="font-semibold mb-2">Anomaly thresholds</div>
-                <p className="text-sm text-muted-foreground mb-3">
+            <TabsPanel value="anomalies" className="min-w-0">
+              <div className="space-y-3">
+                <div className="mb-2">Anomaly thresholds</div>
+                <p className="mb-3">
                   Limits that flag oversized/long transactions. Saving re-runs anomaly detection on all indexed files.
                 </p>
-                <div className="flex flex-col gap-3 max-w-[620px]">
+                <div className="flex flex-col gap-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                     <div className="flex flex-col gap-1.5 w-full">
                       <div className="flex items-center gap-1.5">
                         <Label htmlFor="field-txn-bytes">txn bytes</Label>
-                        {txnBytesHint && (
-                          <span className="text-xs text-muted-foreground">{txnBytesHint}</span>
-                        )}
+                        {txnBytesHint && <span>{txnBytesHint}</span>}
                       </div>
                       <NumberField
                         value={txnBytes}
@@ -630,14 +557,12 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Remote streaming */}
-            <TabsPanel value="streaming" ref={active === 'streaming' ? panelRef : undefined} className={styles.tabsPanel}>
-              <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                <div className="font-semibold mb-2">Remote streaming</div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Stream events directly from a MySQL/MariaDB server via the binlog protocol.
-                </p>
-                <div className="flex flex-col gap-3 max-w-[620px]">
-                  <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+            <TabsPanel value="streaming" className="min-w-0">
+              <div className="space-y-3">
+                <div className="mb-2">Remote streaming</div>
+                <p className="mb-3">Stream events directly from a MySQL/MariaDB server via the binlog protocol.</p>
+                <div className="flex flex-col gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <Switch
                       checked={settings.stream.enabled}
                       onCheckedChange={(checked) => set('stream', { ...settings.stream, enabled: checked })}
@@ -659,13 +584,7 @@ export default function SettingsView(props: SettingsViewProps) {
                     </div>
                     <div className="flex flex-col gap-1.5 w-full">
                       <Label htmlFor="field-port">port</Label>
-                      <NumberField
-                        value={port}
-                        onValueChange={(v) => setPort(v)}
-                        min={1}
-                        step={1}
-                        className="w-full"
-                      >
+                      <NumberField value={port} onValueChange={(v) => setPort(v)} min={1} step={1} className="w-full">
                         <NumberFieldGroup>
                           <NumberFieldDecrement aria-label="Decrease port" />
                           <NumberFieldInput id="field-port" aria-label="port" />
@@ -697,9 +616,7 @@ export default function SettingsView(props: SettingsViewProps) {
                         value={settings.stream.password}
                         onChange={(e) => set('stream', { ...settings.stream, password: e.target.value })}
                       />
-                      {!settings.stream_password_set && (
-                        <span className="text-xs text-muted-foreground">not set</span>
-                      )}
+                      {!settings.stream_password_set && <span>not set</span>}
                     </div>
                   </div>
 
@@ -708,7 +625,9 @@ export default function SettingsView(props: SettingsViewProps) {
                       <Label htmlFor="stream-flavor">flavor</Label>
                       <Select
                         value={settings.stream.flavor}
-                        onValueChange={(v) => v && set('stream', { ...settings.stream, flavor: v as 'mysql' | 'mariadb' })}
+                        onValueChange={(v) =>
+                          v && set('stream', { ...settings.stream, flavor: v as 'mysql' | 'mariadb' })
+                        }
                       >
                         <SelectTrigger id="stream-flavor" aria-label="flavor">
                           <SelectValue />
@@ -796,14 +715,12 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Watch */}
-            <TabsPanel value="watch" ref={active === 'watch' ? panelRef : undefined} className={styles.tabsPanel}>
-              <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                <div className="font-semibold mb-2">Watch</div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Local directory scanned for binlog files.
-                </p>
-                <p className="text-sm mb-3">
-                  watching: <code className="bg-muted px-1.5 py-0.5 rounded font-mono text-xs">{settings.watch_dir}</code>
+            <TabsPanel value="watch" className="min-w-0">
+              <div className="space-y-3">
+                <div className="mb-2">Watch</div>
+                <p className="mb-3">Local directory scanned for binlog files.</p>
+                <p className="mb-3">
+                  watching: <code>{settings.watch_dir}</code>
                 </p>
                 <Button
                   variant="outline"
@@ -833,31 +750,37 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Backup & transfer */}
-            <TabsPanel value="advanced" ref={active === 'advanced' ? panelRef : undefined} className={styles.tabsPanel}>
+            <TabsPanel value="advanced" className="min-w-0">
               <div className="flex flex-col gap-4">
-                <div className="rounded-lg border bg-card p-4 text-card-foreground shadow-xs">
-                  <div className="font-semibold mb-2">Backup & Configuration Transfer</div>
-                  <p className="text-sm text-muted-foreground mb-3.5">
-                    Export your active settings as a JSON file or restore configuration from a previously saved JSON file.
+                <div className="space-y-3">
+                  <div className="mb-2">Backup & Configuration Transfer</div>
+                  <p className="mb-3.5">
+                    Export your active settings as a JSON file or restore configuration from a previously saved JSON
+                    file.
                   </p>
                   <div className="flex gap-2 items-center">
-                    <a
-                      href={`data:application/json,${encodeURIComponent(JSON.stringify(buildPayload() ?? settings, null, 2))}`}
-                      download="binsight-settings.json"
-                      className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent text-foreground transition-colors"
+                    <Button
+                      variant="outline"
+                      render={
+                        <a
+                          href={`data:application/json,${encodeURIComponent(JSON.stringify(buildPayload() ?? settings, null, 2))}`}
+                          download="binsight-settings.json"
+                        />
+                      }
                     >
                       Export JSON
-                    </a>
-                    <label className="inline-flex items-center justify-center rounded-md border border-input bg-background px-3 py-1.5 text-xs font-medium hover:bg-accent text-foreground transition-colors cursor-pointer">
+                    </Button>
+                    <Button variant="outline" onClick={() => importInputRef.current?.click()}>
                       Import JSON
-                      <input
-                        id="import-json"
-                        type="file"
-                        accept="application/json"
-                        className="hidden"
-                        onChange={handleImport}
-                      />
-                    </label>
+                    </Button>
+                    <input
+                      ref={importInputRef}
+                      id="import-json"
+                      type="file"
+                      accept="application/json"
+                      className="hidden"
+                      onChange={handleImport}
+                    />
                   </div>
                   {importError && (
                     <Alert variant="error" role="alert" aria-live="assertive" className="mt-3">
@@ -868,22 +791,17 @@ export default function SettingsView(props: SettingsViewProps) {
               </div>
             </TabsPanel>
           </Tabs>
-        </div>
+        </DialogPanel>
 
         {/* Modal footer: Cancel / Save */}
-        <div className="flex items-center justify-end border-t px-5 py-3 gap-2 shrink-0 bg-muted/20">
-          <Button variant="outline" size="xs" onClick={props.onClose}>
+        <DialogFooter>
+          <Button variant="outline" onClick={props.onClose}>
             Cancel
           </Button>
-          <Button
-            size="xs"
-            onClick={save}
-            disabled={busy || !canSave}
-            aria-label="Save settings"
-          >
+          <Button onClick={save} disabled={busy || !canSave} aria-label="Save settings">
             {busy ? 'Saving...' : 'Save'}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogPopup>
     </Dialog>
   )

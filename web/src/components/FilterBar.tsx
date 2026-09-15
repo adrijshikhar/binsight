@@ -1,20 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import type React from 'react'
-import { IconSearch } from '@tabler/icons-react'
 import KindBadge from './KindBadge'
 import FilterMultiSelect from './FilterMultiSelect'
-import { FilterChip } from '@/components/ui/filter-chip'
+import { XIcon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { RadioGroupPrimitive, RadioPrimitive } from '@/components/ui/radio-group'
-import {
-  segmentedControlRootClassName,
-  segmentedControlItemVariants,
-} from '@/lib/segmented-control'
-import styles from './FilterBar.module.css'
+import { segmentedControlRootClassName, segmentedControlItemVariants } from '@/lib/segmented-control'
 
 export interface Filters {
   types: string[]
@@ -72,12 +67,7 @@ export default function FilterBar(props: FilterBarProps) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === '/') {
         const target = e.target as HTMLElement | null
-        if (
-          target &&
-          (target.tagName === 'INPUT' ||
-            target.tagName === 'TEXTAREA' ||
-            target.isContentEditable)
-        ) {
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
           return
         }
         e.preventDefault()
@@ -105,7 +95,7 @@ export default function FilterBar(props: FilterBarProps) {
   return (
     <div className="flex flex-col">
       {/* Tier 1: View mode, universal search, live toggle, jump to position */}
-      <div className={`flex items-center gap-2 px-4 py-1.5 flex-nowrap ${styles.topBar}`}>
+      <div className="flex flex-wrap items-center gap-3 border-b p-3">
         <RadioGroupPrimitive
           aria-label="View mode"
           className={segmentedControlRootClassName}
@@ -131,8 +121,7 @@ export default function FilterBar(props: FilterBarProps) {
           </RadioPrimitive.Root>
         </RadioGroupPrimitive>
 
-        <div className="relative flex-1 min-w-[160px] flex items-center">
-          <IconSearch size={14} className="absolute left-2.5 text-muted-foreground pointer-events-none z-10" />
+        <div className="min-w-40 flex-1 basis-64">
           <Input
             ref={qRef as React.Ref<HTMLInputElement>}
             aria-label="Search event summary"
@@ -140,11 +129,11 @@ export default function FilterBar(props: FilterBarProps) {
             value={filters.q}
             onChange={(e) => props.onChange({ ...filters, q: e.target.value })}
             size="sm"
-            className="w-full pl-8"
+            className="w-full"
           />
         </div>
 
-        <div className="flex items-center gap-2 flex-nowrap shrink-0">
+        <div className="flex flex-wrap items-center gap-3">
           {props.onToggleLive && (
             <Tooltip>
               <TooltipTrigger
@@ -155,16 +144,11 @@ export default function FilterBar(props: FilterBarProps) {
                       onCheckedChange={(checked) => props.onToggleLive?.(checked)}
                       aria-label="Follow new events as they are indexed"
                     />
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground select-none">
-                      <span className={props.live ? styles.liveDotActive : styles.liveInactiveDot} />
-                      <span>Live</span>
-                    </span>
+                    <span>Live</span>
                   </div>
                 }
               />
-              <TooltipPopup>
-                Tail new events incrementally as they arrive
-              </TooltipPopup>
+              <TooltipPopup>Tail new events incrementally as they arrive</TooltipPopup>
             </Tooltip>
           )}
 
@@ -183,7 +167,7 @@ export default function FilterBar(props: FilterBarProps) {
                 if (e.key === 'Enter') handleJump()
               }}
               size="sm"
-              className={`w-[140px] font-mono text-xs ${jumpInvalid ? 'border-destructive ring-destructive/20' : ''}`}
+              className="w-40"
             />
             <Button
               type="button"
@@ -204,21 +188,21 @@ export default function FilterBar(props: FilterBarProps) {
           id="jump-err"
           role="alert"
           aria-live="polite"
-          className={`px-4 py-0.5 text-xs text-destructive ${styles.jumpErr}`}
+          className="px-4 py-0.5 text-destructive text-destructive-foreground"
         >
           enter a valid byte offset
         </div>
       )}
 
       {/* Tier 2: Filters row with Type, Database, Table multi-selects and active filter chips */}
-      <div className={`flex items-center gap-2 px-4 py-1.5 flex-wrap ${styles.filterRow}`}>
+      <div className="flex flex-wrap items-center gap-2 border-b p-3">
         <FilterMultiSelect
           label="Type"
           summaryNoun="types"
           options={EVENT_TYPES}
           value={filters.types}
           onChange={(types) => props.onChange({ ...filters, types })}
-          renderOption={(item) => <KindBadge typeName={item} size="xs" />}
+          renderOption={(item) => <KindBadge typeName={item} size="sm" />}
         />
 
         <FilterMultiSelect
@@ -237,94 +221,106 @@ export default function FilterBar(props: FilterBarProps) {
           onChange={(tables) => props.onChange({ ...filters, tables })}
         />
 
-
         {/* Active filter pills */}
         {(filters.types.length > 0 || filters.dbs.length > 0 || filters.tables.length > 0 || txnIds.length > 0) && (
-          <span className="text-xs text-muted-foreground font-mono">
-            active:
-          </span>
+          <span>active:</span>
         )}
         {filters.types.map((t) => (
-          <FilterChip
+          <Button
+            variant="outline"
+            size="sm"
+            data-filter-remove
             key={`type-${t}`}
-            removeLabel={`Remove ${t} filter`}
-            onRemove={() => {
+            aria-label={`Remove ${t} filter`}
+            onClick={() => {
               props.onChange({ ...filters, types: filters.types.filter((x) => x !== t) })
               setTimeout(() => {
-                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                const next = document.querySelector('[data-filter-remove]') as HTMLElement | null
                 if (next) next.focus()
                 else qRef.current?.focus()
               }, 0)
             }}
           >
-            <KindBadge typeName={t} size="xs" />
-          </FilterChip>
+            <KindBadge typeName={t} size="sm" />
+            <XIcon />
+          </Button>
         ))}
         {filters.dbs.map((db) => (
-          <FilterChip
+          <Button
+            variant="outline"
+            size="sm"
+            data-filter-remove
             key={`db-${db}`}
-            removeLabel={`Remove database ${db} filter`}
-            onRemove={() => {
+            aria-label={`Remove database ${db} filter`}
+            onClick={() => {
               props.onChange({ ...filters, dbs: filters.dbs.filter((x) => x !== db) })
               setTimeout(() => {
-                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                const next = document.querySelector('[data-filter-remove]') as HTMLElement | null
                 if (next) next.focus()
                 else qRef.current?.focus()
               }, 0)
             }}
           >
             db: {db}
-          </FilterChip>
+            <XIcon />
+          </Button>
         ))}
         {filters.tables.map((tbl) => (
-          <FilterChip
+          <Button
+            variant="outline"
+            size="sm"
+            data-filter-remove
             key={`tbl-${tbl}`}
-            removeLabel={`Remove table ${tbl} filter`}
-            onRemove={() => {
+            aria-label={`Remove table ${tbl} filter`}
+            onClick={() => {
               props.onChange({ ...filters, tables: filters.tables.filter((x) => x !== tbl) })
               setTimeout(() => {
-                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                const next = document.querySelector('[data-filter-remove]') as HTMLElement | null
                 if (next) next.focus()
                 else qRef.current?.focus()
               }, 0)
             }}
           >
             table: {tbl}
-          </FilterChip>
+            <XIcon />
+          </Button>
         ))}
 
         {/* Active transaction badges */}
         {txnIds.map((id) => (
-          <FilterChip
+          <Button
+            variant="outline"
+            size="sm"
+            data-filter-remove
             key={`tx-${id}`}
-            removeLabel={`Remove txn ${id} filter`}
-            tone="brand"
-            onRemove={() => {
+            aria-label={`Remove txn ${id} filter`}
+            onClick={() => {
               props.onRemoveTxn(id)
               setTimeout(() => {
-                const next = document.querySelector('[data-slot="filter-chip"] button') as HTMLElement | null
+                const next = document.querySelector('[data-filter-remove]') as HTMLElement | null
                 if (next) next.focus()
                 else qRef.current?.focus()
               }, 0)
             }}
           >
             txn #{id}
-          </FilterChip>
+            <XIcon />
+          </Button>
         ))}
-
 
         {/* Clear all filters */}
         {hasActiveFilters && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
             onClick={() => {
               props.onChange({ ...filters, types: [], dbs: [], tables: [] })
               txnIds.forEach((id) => props.onRemoveTxn(id))
             }}
-            className={styles.clearAllBtn}
           >
             Clear filters
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -137,9 +137,9 @@ describe('OverviewView', () => {
     wrap(<OverviewView {...makeProps({ onOpenTxn })} />)
     // Wait for the txn panel header to appear
     await screen.findByText('Largest transactions by event count')
-    // Find the "Largest transactions" paper container by walking up from the header text
+    // Scope the click to the transaction breakdown, not the event breakdown.
     const headerText = screen.getByText('Largest transactions by event count')
-    const paper = headerText.closest('[class*="Paper"]')?.parentElement
+    const paper = headerText.closest('[data-slot="breakdown-panel"]')
     expect(paper).toBeTruthy()
     // Within that paper, find the row with #1 and events=5
     const txnRows = paper?.querySelectorAll('tbody tr')

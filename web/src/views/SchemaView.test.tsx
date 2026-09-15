@@ -71,9 +71,9 @@ describe('SchemaView', () => {
       expect(createBadge).toBeTruthy()
       expect(alterBadge).toBeTruthy()
       expect(createBadge?.getAttribute('data-kind')).toBe('CREATE')
-      expect(createBadge?.getAttribute('data-variant')).toBe('query')
+      expect(createBadge?.getAttribute('data-variant')).toBe('info')
       expect(alterBadge?.getAttribute('data-kind')).toBe('ALTER')
-      expect(alterBadge?.getAttribute('data-variant')).toBe('query')
+      expect(alterBadge?.getAttribute('data-variant')).toBe('info')
     })
   })
 

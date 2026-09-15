@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type React from 'react'
 import { IconX } from '@tabler/icons-react'
 import { Alert } from '@/components/ui/alert'
@@ -12,8 +12,8 @@ import { WrapArrow } from './icons'
 import KindBadge from './KindBadge'
 import type { DiffResult, EventDetail, EventRow } from '../lib/types'
 import HexView from './HexView'
-import DiffView, { BaGrid, BaWrap, KV, RowImages, RowLabel, RowNav } from './DiffView'
-import styles from './Drawer.module.css'
+import DiffView, { KV, RowImages, RowNav } from './DiffView'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCaption } from '@/components/ui/table'
 
 type Tab = 'details' | 'diff' | 'hex' | 'json'
 
@@ -29,10 +29,7 @@ export interface DrawerProps {
 /**
  * Drawer - aside pane with four tabs: Details / Diff / Hex / Raw JSON.
  *
- * Prop interface is identical to the oracle Drawer so it can be dropped in
- * as a direct replacement. The resize handle, header, pos-wrap panel, and
- * all tab bodies are ported from the oracle; styles live in co-located CSS
- * Modules (Drawer.module.css, HexView.module.css, DiffView.module.css).
+ * Retains Binsight resizing and lazy-loaded forensic views.
  */
 export default function Drawer({ fileId, event, width, onResizeStart, onWidthChange, onClose }: DrawerProps) {
   const [tab, setTab] = useState<Tab>('details')
@@ -103,14 +100,18 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
   const tabLabel = (t: Tab) => (t === 'details' ? 'Details' : t === 'diff' ? 'Diff' : t === 'hex' ? 'Hex' : 'Raw JSON')
 
   return (
-    <aside className={styles.drawer} style={{ width: width ?? '100%' }} aria-label="Event inspector">
+    <aside
+      className="relative flex h-full min-w-0 flex-col bg-background"
+      style={{ width: width ?? '100%' }}
+      aria-label="Event inspector"
+    >
       {/* Resize handle - drag leftward to widen the panel */}
       {onResizeStart && (
         <Tooltip>
           <TooltipTrigger
             render={
               <div
-                className={styles.drawerResize}
+                className="absolute inset-y-0 -left-1 z-10 w-2 cursor-col-resize"
                 onPointerDown={onResizeStart}
                 onKeyDown={(e: React.KeyboardEvent) => {
                   if (!onWidthChange || typeof width !== 'number') return
@@ -138,29 +139,23 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
       )}
 
       {/* Header */}
-      <div className={styles.drawerHdr}>
-        <div className={styles.drawerHdrRow}>
-          <div className={styles.drawerHdrCol}>
-            <div className={styles.drawerHdrType}>
+      <div className="shrink-0 border-b p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div>
               <KindBadge typeName={event.type_name} size="sm" />
               {wrapped && (
-                <span className={styles.wrapTag}>
+                <span className="ml-2 text-warning-foreground">
                   <WrapArrow size={13} /> 4 GiB wrap
                 </span>
               )}
             </div>
-            <div className={styles.drawerHdrSub}>
-              pos {event.pos} &rarr; {event.end_pos} &middot; {[event.db_name, event.table_name].filter(Boolean).join('.')}{' '}
-              &middot; {fmtBytes(event.size)}
+            <div className="mt-1">
+              pos {event.pos} &rarr; {event.end_pos} &middot;{' '}
+              {[event.db_name, event.table_name].filter(Boolean).join('.')} &middot; {fmtBytes(event.size)}
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label="Close drawer"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
-          >
+          <Button variant="ghost" size="icon-xs" aria-label="Close drawer" onClick={onClose}>
             <IconX className="size-4" />
           </Button>
         </div>
@@ -168,8 +163,8 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
 
       {/* pos-wrap explainer */}
       {wrapped && (
-        <div className={styles.wrapPanel}>
-          <div className={styles.wrapPanelTitle}>
+        <div className="m-4 space-y-2">
+          <div className="text-warning-foreground">
             <WrapArrow /> uint32 end_log_pos overflow - this event crosses 4 GiB
           </div>
           <p>
@@ -177,23 +172,14 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
             event header stores <code>end_log_pos</code> as a <strong>uint32</strong>, which wraps at 4 GiB, so on disk
             the server records this event&apos;s end position as the small value below - not its real offset.
           </p>
-          <table className={styles.wrapKv}>
-            <tbody>
-              <tr>
-                <td>True end offset (shown here)</td>
-                <td className={styles.num}>{event.end_pos.toLocaleString()}</td>
-              </tr>
-              <tr className={styles.bad}>
-                <td>On-disk end_log_pos (server, uint32)</td>
-                <td className={styles.num}>{wrappedEndPos.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td>4 GiB boundary crossed</td>
-                <td className={styles.num}>{boundary.toLocaleString()}</td>
-              </tr>
-            </tbody>
-          </table>
-          <p className={styles.wrapNote}>
+          <KV
+            pairs={[
+              ['True end offset (shown here)', event.end_pos.toLocaleString()],
+              ['On-disk end_log_pos (server, uint32)', wrappedEndPos.toLocaleString()],
+              ['4 GiB boundary crossed', boundary.toLocaleString()],
+            ]}
+          />
+          <p>
             The viewer reconstructs the true offset with a running byte accumulator, so positions stay monotonic. Using
             the raw wrapped value (as MySQL&apos;s own <code>mysqlbinlog</code> does) would make every event after this
             one collide with early-file positions and the file would re-index endlessly. Only files &gt; 4 GiB hit this
@@ -204,54 +190,41 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
 
       {/* Per-tab error banner */}
       {err && (
-        <Alert variant="error" className="rounded-none border-x-0 border-t-0 flex items-center justify-between py-2 px-4">
-          <span className="text-xs font-mono">{err}</span>
-          <Button
-            size="xs"
-            variant="outline"
-            onClick={tab === 'diff' ? fetchDiff : fetchDetail}
-          >
+        <Alert variant="error" className="flex items-center justify-between">
+          <span>{err}</span>
+          <Button size="xs" variant="outline" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
             retry
           </Button>
         </Alert>
       )}
 
       {/* Tab strip + panels */}
-      <Tabs
-        value={tab}
-        onValueChange={(v) => v && setTab(v as Tab)}
-        className={styles.drawerTabsRoot}
-      >
-        <TabsList
-          variant="underline"
-          size="sm"
-          className={styles.drawerTabsList}
-          aria-label="Event inspector"
-        >
+      <Tabs value={tab} onValueChange={(v) => v && setTab(v as Tab)} className="flex min-h-0 flex-1 flex-col">
+        <TabsList variant="underline" size="sm" className="shrink-0" aria-label="Event inspector">
           {tabs.map((t) => (
-            <TabsTab key={t} value={t} className="font-mono text-xs">
+            <TabsTab key={t} value={t}>
               {tabLabel(t)}
             </TabsTab>
           ))}
         </TabsList>
 
-        <TabsPanel value="details" className={styles.drawerBody}>
+        <TabsPanel value="details" className="min-h-0 flex-1 overflow-auto p-4">
           <DetailsTab detail={detail} />
         </TabsPanel>
 
-        <TabsPanel value="diff" className={styles.drawerBody}>
+        <TabsPanel value="diff" className="min-h-0 flex-1 overflow-auto p-4">
           <DiffView diff={diff} />
         </TabsPanel>
 
-        <TabsPanel value="hex" className={styles.drawerBody}>
+        <TabsPanel value="hex" className="min-h-0 flex-1 overflow-auto p-4">
           <HexView fileId={fileId} pos={event.pos} />
         </TabsPanel>
 
-        <TabsPanel value="json" className={styles.drawerBody}>
+        <TabsPanel value="json" className="min-h-0 flex-1 overflow-auto p-4">
           {detail ? (
-            <pre className={styles.jsonPane}>{JSON.stringify(detail, null, 2)}</pre>
+            <pre className="whitespace-pre-wrap break-all">{JSON.stringify(detail, null, 2)}</pre>
           ) : (
-            <div className={styles.muted}>loading…</div>
+            <div>loading…</div>
           )}
         </TabsPanel>
       </Tabs>
@@ -267,7 +240,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
  * for transaction-control and DDL events.
  */
 function DetailsTab({ detail }: { detail: EventDetail | null }) {
-  if (!detail) return <div className="text-muted">loading&hellip;</div>
+  if (!detail) return <div>loading&hellip;</div>
   const d = detail.decoded
   const type = detail.header.type_name
 
@@ -287,10 +260,10 @@ function DetailsTab({ detail }: { detail: EventDetail | null }) {
       return d?.sql ? (
         <>
           <RowNav>{d.db ? `database: ${d.db}` : 'statement'}</RowNav>
-          <pre className={styles.monoBlock}>{d.sql}</pre>
+          <pre className="whitespace-pre-wrap break-all">{d.sql}</pre>
         </>
       ) : (
-        <div className="text-muted">empty query event</div>
+        <div>empty query event</div>
       )
     case 'FORMAT_DESCRIPTION':
     case 'ROTATE':
@@ -298,12 +271,12 @@ function DetailsTab({ detail }: { detail: EventDetail | null }) {
     case 'ROWS_QUERY':
     case 'STOP':
       return d?.sql ? (
-        <pre className={styles.monoBlock}>{d.sql}</pre>
+        <pre className="whitespace-pre-wrap break-all">{d.sql}</pre>
       ) : (
-        <div className="text-muted">no decoded payload - see Hex / Raw JSON</div>
+        <div>no decoded payload - see Hex / Raw JSON</div>
       )
     default:
-      return <div className="text-muted">no decoded payload for {type} - see Hex / Raw JSON</div>
+      return <div>no decoded payload for {type} - see Hex / Raw JSON</div>
   }
 }
 
@@ -329,19 +302,23 @@ function TableMapPanel({ detail }: { detail: EventDetail }) {
         ]}
       />
       {cols.length > 0 && (
-        <BaWrap>
-          <RowLabel>column types</RowLabel>
-          <BaGrid columns="1fr 1fr">
-            <div className={styles.cellHead}>{names.length > 0 ? 'column' : 'col'}</div>
-            <div className={styles.cellHead}>type</div>
+        <Table className="my-4">
+          <TableCaption>column types</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{names.length > 0 ? 'column' : 'col'}</TableHead>
+              <TableHead>type</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {cols.map((c, i) => (
-              <Fragment key={i}>
-                <div className={styles.cell}>{names[i] || `@${i + 1}`}</div>
-                <div className={styles.cellVal}>{c}</div>
-              </Fragment>
+              <TableRow key={i}>
+                <TableCell>{names[i] || `@${i + 1}`}</TableCell>
+                <TableCell>{c}</TableCell>
+              </TableRow>
             ))}
-          </BaGrid>
-        </BaWrap>
+          </TableBody>
+        </Table>
       )}
     </>
   )

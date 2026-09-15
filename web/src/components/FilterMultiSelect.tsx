@@ -39,54 +39,37 @@ export default function FilterMultiSelect({
     return Array.from(set)
   }, [options, value])
 
-  const handleRemove = (valToRemove: string) => {
-    onChange(value.filter((v) => v !== valToRemove))
-  }
-
   return (
-    <div className={`relative inline-flex min-w-[130px] max-w-[200px] ${className ?? ''}`}>
+    <div className={` inline-flex w-56 min-w-0 max-w-full  ${className ?? ''}  `}>
       <Combobox
         items={allItems}
         multiple
         value={value}
         onValueChange={(nextValues) => onChange(nextValues as string[])}
       >
-
-
-        <ComboboxChips className="min-h-7 h-7 py-0 px-1.5 flex-nowrap overflow-hidden text-xs">
+        <ComboboxChips>
           {value.length === 1 && (
-            <ComboboxChip className="h-5 shrink-0 max-w-[120px] truncate">
+            <ComboboxChip removeProps={{ 'aria-label': `Remove ${value[0]}` }}>
               {renderOption ? renderOption(value[0]) : value[0]}
             </ComboboxChip>
           )}
 
           {value.length > 1 && (
-            <span className="shrink-0 px-1.5 py-0.5 rounded text-[11px] font-mono bg-surface-2 text-foreground border border-border">
+            <span className="flex items-center px-2">
               {value.length} {summaryNoun}
             </span>
           )}
 
-          <ComboboxChipsInput
-            aria-label={label}
-            placeholder={value.length === 0 ? label : undefined}
-            size="sm"
-            className="h-6 min-w-8 text-xs py-0"
-          />
+          <ComboboxChipsInput aria-label={label} placeholder={value.length === 0 ? label : undefined} />
 
-          <ComboboxTrigger className="p-1 end-1" />
+          <ComboboxTrigger />
         </ComboboxChips>
 
         <ComboboxPopup>
-          <ComboboxEmpty className="py-2 text-xs text-muted-foreground">
-            No options found.
-          </ComboboxEmpty>
-          <ComboboxList className="max-h-52 overflow-y-auto">
+          <ComboboxEmpty>No options found.</ComboboxEmpty>
+          <ComboboxList>
             {(item) => (
-              <ComboboxItem
-                key={item}
-                value={item}
-                className="text-xs py-1 px-2 cursor-pointer"
-              >
+              <ComboboxItem key={item} value={item}>
                 {renderOption ? renderOption(item) : item}
               </ComboboxItem>
             )}

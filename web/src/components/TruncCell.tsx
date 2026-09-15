@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import { TableCell } from '@/components/ui/table'
 import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { api } from '../lib/api'
-import { cn } from '@/lib/utils'
 
 interface TruncCellProps {
   /** Preview text rendered in the cell (may be a server-truncated summary). */
@@ -52,14 +51,8 @@ export default function TruncCell({ label, className, fileId, pos, mono }: Trunc
     <Tooltip disabled={!label || !truncated}>
       <TooltipTrigger
         render={
-          <TableCell
-            ref={ref}
-            className={cn(className, mono && 'font-mono')}
-            style={mono ? { fontFamily: 'monospace' } : undefined}
-            aria-label={label || undefined}
-            onMouseEnter={onEnter}
-          >
-            {label}
+          <TableCell ref={ref} className={className} aria-label={label || undefined} onMouseEnter={onEnter}>
+            {mono ? <code>{label}</code> : label}
           </TableCell>
         }
       />

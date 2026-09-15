@@ -1,25 +1,25 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import MetricsCharts, { colorFor } from './MetricsCharts'
+import MetricsCharts, { colorFor, ChartTooltip } from './MetricsCharts'
 import type { Bucket, TypeBytes } from '../lib/types'
 
 describe('MetricsCharts color mapping', () => {
   it('maps event types to semantic theme variables', () => {
     // Write events must be data-insert
-    expect(colorFor('WRITE_ROWS_V1')).toBe('var(--data-insert)')
-    expect(colorFor('WRITE_ROWS_V2')).toBe('var(--data-insert)')
+    expect(colorFor('WRITE_ROWS_V1')).toBe('var(--success)')
+    expect(colorFor('WRITE_ROWS_V2')).toBe('var(--success)')
 
     // Update events must be data-update
-    expect(colorFor('UPDATE_ROWS_V1')).toBe('var(--data-update)')
-    expect(colorFor('UPDATE_ROWS_V2')).toBe('var(--data-update)')
+    expect(colorFor('UPDATE_ROWS_V1')).toBe('var(--warning)')
+    expect(colorFor('UPDATE_ROWS_V2')).toBe('var(--warning)')
 
     // Delete events must be data-delete
-    expect(colorFor('DELETE_ROWS_V1')).toBe('var(--data-delete)')
-    expect(colorFor('DELETE_ROWS_V2')).toBe('var(--data-delete)')
+    expect(colorFor('DELETE_ROWS_V1')).toBe('var(--destructive)')
+    expect(colorFor('DELETE_ROWS_V2')).toBe('var(--destructive)')
 
     // Query events must be data-query
-    expect(colorFor('QUERY')).toBe('var(--data-query)')
+    expect(colorFor('QUERY')).toBe('var(--info)')
 
     // Others fall back to neutral muted-foreground
     expect(colorFor('ROTATE')).toBe('var(--muted-foreground)')
@@ -30,40 +30,37 @@ describe('MetricsCharts color mapping', () => {
 })
 
 describe('MetricsCharts rendering', () => {
+  it('formats tooltip byte values and preserves the category label', () => {
+    render(<ChartTooltip active bytes label="QUERY" payload={[{ name: 'bytes', dataKey: 'bytes', value: 1024 }]} />)
+    expect(screen.getByText('QUERY')).toBeTruthy()
+    expect(screen.getByText('1.0 KB')).toBeTruthy()
+  })
+
+  it('omits zero-count stack entries without hiding zero values in other charts', () => {
+    const payload = [
+      { name: 'QUERY', dataKey: 'QUERY', value: 0 },
+      { name: 'XID', dataKey: 'XID', value: 2 },
+    ]
+    const { rerender } = render(<ChartTooltip active positiveOnly payload={payload} />)
+    expect(screen.queryByText('QUERY')).toBeNull()
+    expect(screen.getByText('XID')).toBeTruthy()
+    rerender(<ChartTooltip active payload={payload} />)
+    expect(screen.getByText('QUERY')).toBeTruthy()
+  })
+
   it('renders empty message when series is empty', () => {
-    render(
-      <MetricsCharts
-        series={[]}
-        byType={[]}
-        onOpenType={vi.fn()}
-      />,
-    )
+    render(<MetricsCharts series={[]} byType={[]} onOpenType={vi.fn()} />)
     expect(screen.getByText('no event activity to chart')).toBeTruthy()
   })
 
   it('renders loading state', () => {
-    const { container } = render(
-      <MetricsCharts
-        series={[]}
-        byType={[]}
-        onOpenType={vi.fn()}
-        loading
-      />,
-    )
+    const { container } = render(<MetricsCharts series={[]} byType={[]} onOpenType={vi.fn()} loading />)
     expect(container.querySelectorAll('[aria-busy="true"]').length).toBeGreaterThan(0)
   })
 
   it('renders error alert and retry button', () => {
     const onRetry = vi.fn()
-    render(
-      <MetricsCharts
-        series={[]}
-        byType={[]}
-        onOpenType={vi.fn()}
-        error="Network timeout"
-        onRetry={onRetry}
-      />,
-    )
+    render(<MetricsCharts series={[]} byType={[]} onOpenType={vi.fn()} error="Network timeout" onRetry={onRetry} />)
     expect(screen.getByRole('alert')).toBeTruthy()
     expect(screen.getByText(/Network timeout/)).toBeTruthy()
     const retryBtn = screen.getByRole('button', { name: /retry/i })
@@ -76,17 +73,9 @@ describe('MetricsCharts rendering', () => {
       { t: 1700000000, count: 10, bytes: 1024, dml: 10, query: 0, other: 0, by_type: { WRITE_ROWS_V2: 10 } },
       { t: 1700000010, count: 5, bytes: 512, dml: 5, query: 0, other: 0, by_type: { WRITE_ROWS_V2: 5 } },
     ]
-    const mockByType: TypeBytes[] = [
-      { type_name: 'WRITE_ROWS_V2', events: 15, bytes: 1536 },
-    ]
+    const mockByType: TypeBytes[] = [{ type_name: 'WRITE_ROWS_V2', events: 15, bytes: 1536 }]
 
-    const { container } = render(
-      <MetricsCharts
-        series={mockSeries}
-        byType={mockByType}
-        onOpenType={vi.fn()}
-      />,
-    )
+    const { container } = render(<MetricsCharts series={mockSeries} byType={mockByType} onOpenType={vi.fn()} />)
 
     // Chart panels exist with proper accessible roles/labels
     const chartImgs = container.querySelectorAll('[role="img"]')

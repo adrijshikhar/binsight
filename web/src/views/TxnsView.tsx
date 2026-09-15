@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
-import styles from './TxnsView.module.css'
 import { api } from '../lib/api'
 import { clickable, clickableRow } from '../lib/a11y'
 import type { Severity, Txn } from '../lib/types'
 import { Warning } from '../components/icons'
 import { IconChevronRight } from '@tabler/icons-react'
 import { Alert } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Table } from '@/components/ui/table'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 
 type SortKey = 'start_pos' | 'event_count' | 'rows' | 'duration'
@@ -86,59 +86,47 @@ export default function TxnsView(props: {
   })
 
   return (
-    <div className={`flex flex-col gap-0 ${styles.viewContainer}`}>
+    <div className="flex flex-col gap-0 h-full min-h-0 overflow-hidden">
       {err && (
-        <Alert variant="error" role="alert" className="flex items-center justify-between rounded-none mb-0">
+        <Alert variant="error" role="alert" className="flex items-center justify-between mb-0">
           <span>{err}</span>
           <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
       )}
-      {loading && txns.length === 0 && (
-        <p className="text-muted-foreground p-4">
-          loading transactions...
-        </p>
-      )}
+      {loading && txns.length === 0 && <p className="p-4">loading transactions...</p>}
       {!loading && txns.length === 0 && !err && (
-        <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground" role="status">
-            No transactions in this file.
-          </p>
-        </div>
+        <Empty role="status">
+          <EmptyHeader>
+            <EmptyTitle>No transactions in this file.</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       )}
       {!loading && (
-        <div className={styles.tableScroll}>
-          <Table stickyHeader className="text-sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th className="w-6"></Table.Th>
-                <Table.Th {...sortableProps('start_pos')}>
-                  txn / gtid{sortIndicator('start_pos')}
-                </Table.Th>
-                <Table.Th>start</Table.Th>
-                <Table.Th {...sortableProps('duration')}>
-                  duration{sortIndicator('duration')}
-                </Table.Th>
-                <Table.Th {...sortableProps('event_count')}>
-                  events{sortIndicator('event_count')}
-                </Table.Th>
-                <Table.Th {...sortableProps('rows')}>
-                  I / U / D{sortIndicator('rows')}
-                </Table.Th>
-                <Table.Th>status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
+        <div className="min-h-0 flex-1 overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-6"></TableHead>
+                <TableHead {...sortableProps('start_pos')}>txn / gtid{sortIndicator('start_pos')}</TableHead>
+                <TableHead>start</TableHead>
+                <TableHead {...sortableProps('duration')}>duration{sortIndicator('duration')}</TableHead>
+                <TableHead {...sortableProps('event_count')}>events{sortIndicator('event_count')}</TableHead>
+                <TableHead {...sortableProps('rows')}>I / U / D{sortIndicator('rows')}</TableHead>
+                <TableHead>status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {sorted.map((t) => (
-                <Table.Tr key={t.id} {...clickableRow(() => props.onOpenTxn(t.id))} className={styles.cursorPointer}>
-                  <Table.Td className="text-center w-6">
+                <TableRow key={t.id} {...clickableRow(() => props.onOpenTxn(t.id))} className="cursor-pointer">
+                  <TableCell className="text-center w-6">
                     {props.txnSeverity.has(t.id) && (
                       <Tooltip>
                         <TooltipTrigger
                           render={
                             <span
-                              className={`warn sev-${props.txnSeverity.get(t.id)} inline-flex items-center justify-center`}
+                              className="inline-flex items-center justify-center"
                               aria-label={`anomaly: ${props.txnSeverity.get(t.id)}`}
                             >
                               <Warning size={12} />
@@ -150,40 +138,36 @@ export default function TxnsView(props: {
                         </TooltipPopup>
                       </Tooltip>
                     )}
-                  </Table.Td>
-                  <Table.Td className="font-mono tabular-nums">
-                    <span className="font-semibold">
-                      txn {ordinalById.get(t.id)}
-                    </span>
-                    <span className="text-muted-foreground text-xs ml-1.5">
-                      {t.gtid && t.gtid !== 'ANONYMOUS' ? t.gtid : `@ ${t.start_pos}`}
-                    </span>
-                  </Table.Td>
-                  <Table.Td className="font-mono">
+                  </TableCell>
+                  <TableCell className="tabular-nums">
+                    <span>txn {ordinalById.get(t.id)}</span>
+                    <span className="ml-1.5">{t.gtid && t.gtid !== 'ANONYMOUS' ? t.gtid : `@ ${t.start_pos}`}</span>
+                  </TableCell>
+                  <TableCell>
                     {t.start_ts ? new Date(t.start_ts * 1000).toISOString().slice(0, 19).replace('T', ' ') : ''}
-                  </Table.Td>
-                  <Table.Td className="font-mono tabular-nums">
+                  </TableCell>
+                  <TableCell className="tabular-nums">
                     {t.commit_ts && t.start_ts ? `${t.commit_ts - t.start_ts}s` : ''}
-                  </Table.Td>
-                  <Table.Td className="font-mono tabular-nums">
-                    {t.event_count}
-                  </Table.Td>
-                  <Table.Td className="font-mono tabular-nums">
+                  </TableCell>
+                  <TableCell className="tabular-nums">{t.event_count}</TableCell>
+                  <TableCell className="tabular-nums">
                     {t.rows_inserted} / {t.rows_updated} / {t.rows_deleted}
-                  </Table.Td>
-                  <Table.Td>
+                  </TableCell>
+                  <TableCell>
                     <Badge
-                      variant={t.status === 'committed' ? 'secondary' : t.status === 'incomplete' ? 'destructive' : 'secondary'}
+                      variant={
+                        t.status === 'committed' ? 'secondary' : t.status === 'incomplete' ? 'destructive' : 'secondary'
+                      }
                       size="sm"
-                      className={`font-mono ${styles.cursorInherit}`}
+                      className="cursor-inherit"
                       data-status={t.status}
                     >
                       {t.status}
                     </Badge>
-                  </Table.Td>
-                </Table.Tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </Table.Tbody>
+            </TableBody>
           </Table>
         </div>
       )}

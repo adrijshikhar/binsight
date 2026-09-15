@@ -20,11 +20,7 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 function wrap(ui: React.ReactElement) {
-  return render(
-    <div data-theme="dark">
-      {ui}
-    </div>,
-  )
+  return render(<div data-theme="dark">{ui}</div>)
 }
 
 function makeDiff(overrides: Partial<DiffResult> = {}): DiffResult {
@@ -45,7 +41,7 @@ describe('DiffView', () => {
     const el = screen.getByText(/all adapters agree/i)
     expect(el).toBeTruthy()
     expect(el.textContent).toContain('✓ all adapters agree')
-    expect(el.className).toMatch(/agreeText/)
+    expect(el.getAttribute('data-status')).toBe('agreement')
   })
 
   it('shows disagreement count when disagreements exist', () => {
@@ -65,7 +61,7 @@ describe('DiffView', () => {
     expect(screen.getByText(/1 disagreement/i)).toBeTruthy()
   })
 
-  it('disagree row carries the disagree CSS module class', () => {
+  it('disagree row carries the disagree data state', () => {
     const diff = makeDiff({
       disagreement_count: 1,
       fields: [
@@ -80,11 +76,11 @@ describe('DiffView', () => {
     })
     const { container } = wrap(<DiffView diff={diff} />)
     // At least one cell should carry a class that includes "disagree" (CSS Modules mangles names)
-    const disagreeCells = container.querySelectorAll('[class*="disagree"]')
+    const disagreeCells = container.querySelectorAll('[data-status="disagreement"]')
     expect(disagreeCells.length).toBeGreaterThan(0)
   })
 
-  it('changed value cell carries diffValChanged class on a disagree row', () => {
+  it('changed value cell carries modified data state on a disagree row', () => {
     const diff = makeDiff({
       disagreement_count: 1,
       fields: [
@@ -98,14 +94,14 @@ describe('DiffView', () => {
       ],
     })
     const { container } = wrap(<DiffView diff={diff} />)
-    // The non-oracle value should be in a cell with diffValChanged class
-    const changedCells = container.querySelectorAll('[class*="diffValChanged"]')
+    // The non-oracle value should be in a cell with modified data state
+    const changedCells = container.querySelectorAll('[data-change="modified"]')
     expect(changedCells.length).toBeGreaterThan(0)
     // It should display the differing value
     expect(changedCells[0].textContent).toBe('other_val')
   })
 
-  it('agree row carries the agree CSS module class and no diffValChanged', () => {
+  it('agree row carries the agree data state and no modified data state', () => {
     const diff = makeDiff({
       disagreement_count: 0,
       fields: [
@@ -119,9 +115,9 @@ describe('DiffView', () => {
       ],
     })
     const { container } = wrap(<DiffView diff={diff} />)
-    const agreeCells = container.querySelectorAll('[class*="agree"]')
+    const agreeCells = container.querySelectorAll('[data-status="agreement"]')
     expect(agreeCells.length).toBeGreaterThan(0)
-    const changedCells = container.querySelectorAll('[class*="diffValChanged"]')
+    const changedCells = container.querySelectorAll('[data-change="modified"]')
     expect(changedCells.length).toBe(0)
   })
 
@@ -156,14 +152,10 @@ describe('DiffView', () => {
 
     // Test RowImages addition
     const { container: rowContainer } = render(
-      <RowImages
-        rows={[{ before: undefined, after: ['new_row_val'] }]}
-        colTypes={['VARCHAR']}
-      />,
+      <RowImages rows={[{ before: undefined, after: ['new_row_val'] }]} colTypes={['VARCHAR']} />,
     )
     const addition = rowContainer.querySelector('[data-change="added"]')
     expect(addition).toBeTruthy()
     expect(addition?.getAttribute('data-change')).toBe('added')
   })
 })
-
