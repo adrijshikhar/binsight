@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardPanel } from '@/components/ui/card'
@@ -102,6 +102,12 @@ function CapBadges({ caps }: { caps: string[] }) {
 }
 
 export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) {
+  useEffect(() => {
+    document.querySelectorAll<HTMLElement>('[data-slot="scroll-area-viewport"]').forEach((viewport) => {
+      if (viewport.closest('[data-slot="dialog-popup"]')) viewport.scrollTop = 0
+    })
+  }, [])
+
   return (
     <div className="architecture-content">
       {/* Header */}
