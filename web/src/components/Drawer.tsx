@@ -200,7 +200,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
 
       {/* Tab strip + panels */}
       <Tabs value={tab} onValueChange={(v) => v && setTab(v as Tab)} className="flex min-h-0 flex-1 flex-col">
-        <TabsList variant="underline" size="sm" className="shrink-0" aria-label="Event inspector">
+        <TabsList size="sm" className="shrink-0" aria-label="Event inspector">
           {tabs.map((t) => (
             <TabsTab key={t} value={t}>
               {tabLabel(t)}

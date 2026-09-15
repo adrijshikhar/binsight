@@ -277,14 +277,14 @@ export default function SettingsView(props: SettingsViewProps) {
           >
             <TabsList className="w-full h-fit shrink-0 rounded-none bg-transparent p-0 sm:w-48 sm:flex-col sm:items-stretch">
                 {SECTIONS.map((s) => (
-                  <TabsTab key={s.id} value={s.id} className="rounded-md data-active:bg-surface-3 data-active:text-foreground">
+                  <TabsTab key={s.id} value={s.id} className="rounded-md">
                     {s.label}
                   </TabsTab>
                 ))}
             </TabsList>
 
             {/* Adapters & roles */}
-            <TabsPanel value="decoding" className="min-w-0">
+            <TabsPanel value="decoding" className="settings-panel min-w-0">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <div className="mb-2">Adapters</div>
@@ -404,7 +404,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Display */}
-            <TabsPanel value="display" className="min-w-0">
+            <TabsPanel value="display" className="settings-panel min-w-0">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <div className="mb-2">Theme & Appearance</div>
@@ -469,7 +469,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Anomalies */}
-            <TabsPanel value="anomalies" className="min-w-0">
+            <TabsPanel value="anomalies" className="settings-panel min-w-0">
               <div className="space-y-3">
                 <div className="mb-2">Anomaly thresholds</div>
                 <p className="mb-3">
@@ -553,7 +553,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Remote streaming */}
-            <TabsPanel value="streaming" className="min-w-0">
+            <TabsPanel value="streaming" className="settings-panel min-w-0">
               <div className="space-y-3">
                 <div className="mb-2">Remote streaming</div>
                 <p className="mb-3">Stream events directly from a MySQL/MariaDB server via the binlog protocol.</p>
@@ -711,7 +711,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Watch */}
-            <TabsPanel value="watch" className="min-w-0">
+            <TabsPanel value="watch" className="settings-panel min-w-0">
               <div className="space-y-3">
                 <div className="mb-2">Watch</div>
                 <p className="mb-3">Local directory scanned for binlog files.</p>
@@ -746,7 +746,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Backup & transfer */}
-            <TabsPanel value="advanced" className="min-w-0">
+            <TabsPanel value="advanced" className="settings-panel min-w-0">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <div className="mb-2">Backup & Configuration Transfer</div>

@@ -107,6 +107,8 @@
   --color-ring: var(--ring);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-segmented-active: var(--segmented-active);
+  --color-tabs-active: var(--tabs-active);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
@@ -125,13 +127,13 @@
   --font-brand: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --card: var(--surface-1);
   --card-foreground: var(--foreground);
-  --popover: var(--surface-3);
+  --popover: var(--surface-1);
   --popover-foreground: var(--foreground);
   --secondary: var(--surface-2);
   --secondary-foreground: var(--foreground);
   --muted: var(--surface-2);
-  --accent: var(--surface-2);
-  --accent-foreground: var(--brand-foreground);
+  --accent: var(--surface-3);
+  --accent-foreground: var(--foreground);
   --primary-foreground: #ffffff;
   --info: var(--selection);
   --info-foreground: var(--brand-foreground);
@@ -154,6 +156,8 @@
   --border: #e1e4ea;
   --border-strong: #ced4da;
   --input: #7e838c;
+  --segmented-active: var(--surface-2);
+  --tabs-active: var(--surface-2);
   --foreground: #000000;
   --foreground-secondary: #2c313a;
   --muted-foreground: #62666d;
@@ -186,7 +190,9 @@
   --surface-4: #27282b;
   --border: #34363b;
   --border-strong: #45484f;
-  --input: #777c85;
+  --input: #34363b;
+  --segmented-active: var(--surface-4);
+  --tabs-active: var(--surface-4);
   --foreground: #f7f8f8;
   --foreground-secondary: #d0d6e0;
   --muted-foreground: #8a8f98;
@@ -366,6 +372,25 @@ td.tabular-nums {
   margin: 0 auto;
   font-size: 0.8125rem;
   line-height: 1.5;
+}
+
+.settings-panel {
+  color: var(--foreground-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.settings-panel .mb-2 {
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.settings-panel p {
+  color: var(--foreground-secondary);
+  max-width: 42rem;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .architecture-header {
