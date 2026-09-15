@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type SortingState,
+} from '@tanstack/react-table'
 import { api } from '../lib/api'
-import { clickable, clickableRow } from '../lib/a11y'
+import { clickableRow } from '../lib/a11y'
 import type { Severity, Txn } from '../lib/types'
 import { Warning } from '../components/icons'
-import { IconChevronRight } from '@tabler/icons-react'
+import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 import { Alert } from '@/components/ui/alert'
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
 import { Badge } from '@/components/ui/badge'
@@ -11,15 +18,13 @@ import { Button } from '@/components/ui/button'
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
 import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 
-type SortKey = 'start_pos' | 'event_count' | 'rows' | 'duration'
-
 export default function TxnsView(props: {
   fileId: number
   onOpenTxn: (id: number) => void
   txnSeverity: Map<number, Severity>
 }) {
   const [txns, setTxns] = useState<Txn[]>([])
-  const [sort, setSort] = useState<SortKey>('start_pos')
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'start_pos', desc: false }])
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -48,24 +53,31 @@ export default function TxnsView(props: {
     }
   }, [props.fileId, fetchKey])
 
-  const sorted = useMemo(() => {
-    const s = [...txns]
-    const rows = (t: Txn) => t.rows_inserted + t.rows_updated + t.rows_deleted
-    const dur = (t: Txn) => (t.commit_ts && t.start_ts ? t.commit_ts - t.start_ts : 0)
-    s.sort((a, b) => {
-      switch (sort) {
-        case 'event_count':
-          return b.event_count - a.event_count
-        case 'rows':
-          return rows(b) - rows(a)
-        case 'duration':
-          return dur(b) - dur(a)
-        default:
-          return a.start_pos - b.start_pos
-      }
-    })
-    return s
-  }, [txns, sort])
+  const columns = useMemo<ColumnDef<Txn>[]>(
+    () => [
+      { accessorKey: 'start_pos', sortDescFirst: false },
+      { accessorKey: 'event_count', sortDescFirst: true },
+      { id: 'rows', sortDescFirst: true, accessorFn: (txn) => txn.rows_inserted + txn.rows_updated + txn.rows_deleted },
+      {
+        id: 'duration',
+        sortDescFirst: true,
+        accessorFn: (txn) => (txn.commit_ts && txn.start_ts ? txn.commit_ts - txn.start_ts : 0),
+      },
+    ],
+    [],
+  )
+  const table = useReactTable({
+    data: txns,
+    columns,
+    state: { sorting },
+    onSortingChange: setSorting,
+    getRowId: (txn) => String(txn.id),
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    enableSortingRemoval: false,
+    enableMultiSort: false,
+    sortDescFirst: false,
+  })
 
   // Per-file transaction ordinal (1-based, by start-pos rank) - the SAME scheme
   // the grouped Events view uses for its "txn N" headers, so the two views agree
@@ -76,14 +88,14 @@ export default function TxnsView(props: {
     return m
   }, [txns])
 
-  const sortIndicator = (key: SortKey) =>
-    sort === key ? <IconChevronRight size={12} className="sort-caret-active" /> : null
-
-  const sortableProps = (key: SortKey) => ({
-    'data-sortable': true,
-    'aria-sort': sort === key ? ('descending' as const) : ('none' as const),
-    ...clickable(() => setSort(key)),
-  })
+  const sortIndicator = (key: string) => {
+    const sorted = table.getColumn(key)?.getIsSorted()
+    return sorted === 'asc' ? <IconChevronUp size={12} /> : sorted === 'desc' ? <IconChevronDown size={12} /> : null
+  }
+  const ariaSort = (key: string) => {
+    const sorted = table.getColumn(key)?.getIsSorted()
+    return sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none'
+  }
 
   return (
     <div className="flex flex-col gap-0 h-full min-h-0 overflow-hidden">
@@ -109,16 +121,32 @@ export default function TxnsView(props: {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-6"></TableHead>
-                <TableHead {...sortableProps('start_pos')}>txn / gtid{sortIndicator('start_pos')}</TableHead>
+                <TableHead aria-sort={ariaSort('start_pos')}>
+                  <Button variant="ghost" onClick={table.getColumn('start_pos')?.getToggleSortingHandler()}>
+                    txn / gtid{sortIndicator('start_pos')}
+                  </Button>
+                </TableHead>
                 <TableHead>start</TableHead>
-                <TableHead {...sortableProps('duration')}>duration{sortIndicator('duration')}</TableHead>
-                <TableHead {...sortableProps('event_count')}>events{sortIndicator('event_count')}</TableHead>
-                <TableHead {...sortableProps('rows')}>I / U / D{sortIndicator('rows')}</TableHead>
+                <TableHead aria-sort={ariaSort('duration')}>
+                  <Button variant="ghost" onClick={table.getColumn('duration')?.getToggleSortingHandler()}>
+                    duration{sortIndicator('duration')}
+                  </Button>
+                </TableHead>
+                <TableHead aria-sort={ariaSort('event_count')}>
+                  <Button variant="ghost" onClick={table.getColumn('event_count')?.getToggleSortingHandler()}>
+                    events{sortIndicator('event_count')}
+                  </Button>
+                </TableHead>
+                <TableHead aria-sort={ariaSort('rows')}>
+                  <Button variant="ghost" onClick={table.getColumn('rows')?.getToggleSortingHandler()}>
+                    I / U / D{sortIndicator('rows')}
+                  </Button>
+                </TableHead>
                 <TableHead>status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sorted.map((t) => (
+              {table.getRowModel().rows.map(({ original: t }) => (
                 <TableRow key={t.id} {...clickableRow(() => props.onOpenTxn(t.id))} className="cursor-pointer">
                   <TableCell className="text-center w-6">
                     {props.txnSeverity.has(t.id) && (

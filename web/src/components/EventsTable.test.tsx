@@ -35,28 +35,15 @@ vi.mock('@tanstack/react-virtual', () => ({
 }))
 
 describe('EventsTable', () => {
-  it('estimates stock rows at 40px before runtime measurement', () => {
-    render(
-      <EventsTable
-        visualRows={[]}
-        renderEventRow={() => null}
-        renderGroupRow={() => null}
-      />,
-    )
+  it('estimates compact event rows at 32px before runtime measurement', () => {
+    render(<EventsTable visualRows={[]} renderEventRow={() => null} renderGroupRow={() => null} />)
     expect(capturedOptions).toBeTruthy()
     const estimateFn = capturedOptions?.estimateSize as () => number
-    expect(estimateFn()).toBe(40)
+    expect(estimateFn()).toBe(32)
   })
 
   it('honors explicit estimateSize override', () => {
-    render(
-      <EventsTable
-        visualRows={[]}
-        estimateSize={40}
-        renderEventRow={() => null}
-        renderGroupRow={() => null}
-      />,
-    )
+    render(<EventsTable visualRows={[]} estimateSize={40} renderEventRow={() => null} renderGroupRow={() => null} />)
     expect(capturedOptions).toBeTruthy()
     const estimateFn = capturedOptions?.estimateSize as () => number
     expect(estimateFn()).toBe(40)
@@ -85,11 +72,7 @@ describe('EventsTable', () => {
     ))
 
     const { container } = render(
-      <EventsTable
-        visualRows={visualRows}
-        renderEventRow={renderEventRow}
-        renderGroupRow={() => null}
-      />,
+      <EventsTable visualRows={visualRows} renderEventRow={renderEventRow} renderGroupRow={() => null} />,
     )
 
     // Only index 2 and index 3 should be rendered

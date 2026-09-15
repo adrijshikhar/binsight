@@ -347,6 +347,15 @@ td.tabular-nums {
   background-color: var(--row-selected);
 }
 
+[data-density='compact'] tr[data-index] {
+  height: 32px;
+}
+
+[data-density='compact'] tr[data-index] > td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

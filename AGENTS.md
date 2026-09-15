@@ -25,9 +25,11 @@ Typography is approved. Define centralized sans and mono stacks and apply semant
 
 Ordinary Coss controls use stock default props and the stock 32px desktop size. Do not reintroduce compact 28px filter controls or CSS size overrides. The pinned Coss source in `web/coss-stock-lock.json` is immutable except for import-path changes; do not format or modify it. Run `rtk bun scripts/verify-coss-source.mjs` from `web/` when source verification is needed.
 
-This is a desktop application. Mobile sheets, mobile-specific controls, and mobile acceptance checks are out of scope. Density, 32px event-row enforcement, radii, shapes, shadows, and elevation are deferred, not current requirements. Preserve domain behavior, runtime virtualization/resizing, accessibility, the original logo, and forensic semantics.
+This is a desktop application. Mobile sheets, mobile-specific controls, and mobile acceptance checks are out of scope. Event rows are the approved density exception: keep grouped and ungrouped event rows at 32px with synchronized virtualization. Radii, shapes, shadows, and elevation remain deferred. Preserve domain behavior, runtime virtualization/resizing, accessibility, the original logo, and forensic semantics.
 
 Historical checkpoint and migration notes in `DESIGN.md` are reference only unless repeated in this current-phase section.
+
+TanStack Table v8 owns sorting and expansion; stock Coss renders the table UI and TanStack Virtual retains event virtualization. Preserve the Binsight transaction-run grouping adapter.
 
 ---
 

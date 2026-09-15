@@ -15,9 +15,11 @@ The approved charcoal dark palette is: `#141516` background; `#1b1c1e`, `#212224
 
 Typography is approved without a new font dependency. Centralize the existing system sans and mono stacks in `ui.css`; apply view headings `20px/26px`, section headings `16px/22px`, metrics `24px/30px`, and application prose `13px/20px`, with zero letter spacing. Numeric data uses tabular monospace and right alignment. Stock Coss controls and badges retain their own type recipes and geometry.
 
-Ordinary Coss controls use stock default props and the stock 32px desktop size. Do not add 28px filter controls or CSS size overrides. Mobile sheets, mobile-specific controls, and mobile acceptance checks are out of scope. Density, 32px event-row enforcement, radii, shapes, shadows, and elevation remain deferred rather than mandatory.
+Ordinary Coss controls use stock default props and the stock 32px desktop size. Do not add 28px filter controls or CSS size overrides. Mobile sheets, mobile-specific controls, and mobile acceptance checks are out of scope. Event rows are the approved density exception: grouped and ungrouped event rows remain 32px with synchronized virtualization. Radii, shapes, shadows, and elevation remain deferred rather than mandatory.
 
 The verified stock checkpoint in `web/coss-stock-lock.json` pins upstream Coss component and helper sources. Do not format or modify those files except for import-path changes; verify them with `rtk bun scripts/verify-coss-source.mjs` from `web/`. The archived neutral palette is checkpoint evidence, not the active palette.
+
+TanStack Table v8 owns sorting and expansion; stock Coss renders the table UI and TanStack Virtual retains event virtualization. Preserve the Binsight transaction-run grouping adapter.
 
 ## Historical Reference
 

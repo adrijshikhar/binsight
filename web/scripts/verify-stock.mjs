@@ -66,8 +66,8 @@ try {
     assert.equal(palette['data-query'], theme === 'dark' ? '#c4b5fd' : '#6d28d9')
     assert.equal(palette.success, palette['surface-2'], 'operational success must remain neutral')
     assert.equal(foundation.collapse, 'collapse')
-    assert.equal(foundation.cellPadding, 10, 'stock TableCell padding must not be overridden')
-    assert.ok(foundation.rowHeight > 32, 'the custom 32px row density must be removed')
+    assert.equal(foundation.cellPadding, 6, 'compact event rows must use scoped vertical padding')
+    assert.equal(foundation.rowHeight, 32, 'event and group rows must remain 32px')
     assert.ok(foundation.buttonPadding > 0, 'stock button padding must survive the cascade')
     assert.ok(foundation.badgePadding > 0, 'stock badge padding must survive the cascade')
     for (const width of [1440, 1024]) {
