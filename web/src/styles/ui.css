@@ -130,7 +130,7 @@
   --secondary: var(--surface-2);
   --secondary-foreground: var(--foreground);
   --muted: var(--surface-2);
-  --accent: var(--selection);
+  --accent: var(--surface-2);
   --accent-foreground: var(--brand-foreground);
   --primary-foreground: #ffffff;
   --info: var(--selection);
