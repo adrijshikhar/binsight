@@ -43,4 +43,11 @@ describe('ArchitectureView', () => {
     expect(screen.getByText('connector-java')).toBeTruthy()
   })
 
+  it('uses scoped layout hooks for layers and code blocks', () => {
+    const { container } = wrap(<ArchitectureView onClose={() => {}} />)
+    expect(container.querySelector('.architecture-content')).toBeTruthy()
+    expect(container.querySelectorAll('.architecture-layer')).toHaveLength(5)
+    expect(container.querySelectorAll('.architecture-pre').length).toBeGreaterThan(0)
+  })
+
 })

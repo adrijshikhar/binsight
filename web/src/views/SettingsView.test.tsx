@@ -47,7 +47,7 @@ function wrap(ui: React.ReactElement) {
 async function waitForLoad() {
   await waitFor(() => {
     const tabs = screen.getAllByRole('tab')
-    expect(tabs.length).toBe(7)
+    expect(tabs.length).toBe(6)
   })
 }
 
@@ -58,7 +58,7 @@ describe('SettingsView', () => {
     vi.spyOn(apiModule.api, 'saveSettings').mockResolvedValue({ ...MOCK_SETTINGS })
   })
 
-  it('renders the vertical tabs nav with all 7 sections', async () => {
+  it('renders the vertical tabs nav with all 6 settings sections', async () => {
     wrap(<SettingsView onClose={() => {}} />)
 
     await waitForLoad()
@@ -66,7 +66,6 @@ describe('SettingsView', () => {
     const tabs = screen.getAllByRole('tab')
     const tabLabels = tabs.map((t) => t.textContent)
     expect(tabLabels).toContain('Adapters & roles')
-    expect(tabLabels).toContain('How it works')
     expect(tabLabels).toContain('Display')
     expect(tabLabels).toContain('Anomalies')
     expect(tabLabels).toContain('Remote streaming')

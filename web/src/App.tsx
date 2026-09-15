@@ -69,7 +69,7 @@ export default function App() {
     initialUrl.tab === 'architecture' || initialUrl.tab === 'how-it-works',
   )
   const [settingsSection, setSettingsSection] = useState<
-    'decoding' | 'how-it-works' | 'display' | 'anomalies' | 'streaming' | 'watch'
+    'decoding' | 'display' | 'anomalies' | 'streaming' | 'watch'
   >(() => {
     return initialUrl.tab === 'how-it-works' || initialUrl.tab === 'architecture' ? 'how-it-works' : 'decoding'
   })
@@ -645,14 +645,14 @@ export default function App() {
           )}
         </div>
       </div>
-      <SettingsView opened={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} />
+      <SettingsView opened={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} onOpenArchitecture={() => { setSettingsOpen(false); setArchitectureOpen(true) }} />
       <Dialog open={architectureOpen} onOpenChange={setArchitectureOpen}>
         <DialogPopup className="max-w-5xl" closeProps={{ 'aria-label': 'Close architecture' }}>
           <DialogHeader>
             <DialogTitle className="sr-only">Architecture</DialogTitle>
           </DialogHeader>
           <DialogPanel className="min-h-0 overflow-auto">
-            <ArchitectureView />
+            <ArchitectureView key={architectureOpen ? 'architecture-open' : 'architecture-closed'} />
           </DialogPanel>
         </DialogPopup>
       </Dialog>

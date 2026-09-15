@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import type { AdapterInfo, Settings } from '../lib/types'
-import { ArchitectureContent } from './ArchitectureView'
 import { useColorScheme, type ThemePreference } from '../lib/colorScheme'
 import { Dialog, DialogPopup, DialogTitle, DialogHeader, DialogPanel, DialogFooter } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTab, TabsPanel } from '@/components/ui/tabs'
@@ -48,7 +47,6 @@ function humanizeBytes(n: number | null): string {
 /** Section ids - kept identical to the original so external callers don't break. */
 const SECTIONS = [
   { id: 'decoding', label: 'Adapters & roles' },
-  { id: 'how-it-works', label: 'How it works' },
   { id: 'display', label: 'Display' },
   { id: 'anomalies', label: 'Anomalies' },
   { id: 'streaming', label: 'Remote streaming' },
@@ -274,10 +272,10 @@ export default function SettingsView(props: SettingsViewProps) {
           <Tabs
             value={active}
             orientation="vertical"
-            className="min-h-0 sm:flex-row"
+            className="min-h-0 items-start sm:flex-row"
             onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}
           >
-            <TabsList className="w-full shrink-0 sm:w-48 sm:flex-col sm:items-stretch">
+            <TabsList className="w-full h-fit shrink-0 sm:w-48 sm:flex-col sm:items-stretch">
                 {SECTIONS.map((s) => (
                   <TabsTab key={s.id} value={s.id}>
                     {s.label}
@@ -293,7 +291,7 @@ export default function SettingsView(props: SettingsViewProps) {
                   <p className="mb-3">
                     Decoders available to the viewer and what each can do. Hover a capability for a one-line definition,
                     or{' '}
-                    <Button variant="link" onClick={() => setActive('how-it-works')}>
+                    <Button variant="link" onClick={() => props.onOpenArchitecture?.()}>
                       learn more
                     </Button>{' '}
                     in How It Works.
@@ -403,11 +401,6 @@ export default function SettingsView(props: SettingsViewProps) {
                   </div>
                 </div>
               </div>
-            </TabsPanel>
-
-            {/* How it works */}
-            <TabsPanel value="how-it-works" className="min-w-0">
-              <ArchitectureContent />
             </TabsPanel>
 
             {/* Display */}

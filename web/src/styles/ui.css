@@ -356,6 +356,189 @@ td.tabular-nums {
   padding-bottom: 6px;
 }
 
+.architecture-content {
+  display: flex;
+  width: 100%;
+  max-width: 68.75rem;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0 auto;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.architecture-header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.architecture-title {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.architecture-title code,
+.architecture-box-title,
+.architecture-roles > div:first-child {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.architecture-subtitle,
+.architecture-box-copy,
+.architecture-glossary-row,
+.architecture-roles {
+  color: var(--foreground-secondary);
+}
+
+.architecture-subtitle {
+  margin-top: 0.25rem;
+}
+
+.architecture-layer {
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+}
+
+.architecture-layer-label {
+  margin-bottom: 0.625rem;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.architecture-row,
+.architecture-cols,
+.architecture-schema-layers {
+  display: grid;
+  min-width: 0;
+  gap: 0.625rem;
+}
+
+.architecture-row {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.375rem), 1fr));
+}
+
+.architecture-cols {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.architecture-schema-layers {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  margin-top: 0.625rem;
+}
+
+.architecture-row > *,
+.architecture-cols > *,
+.architecture-schema-layers > * {
+  min-width: 0;
+}
+
+.architecture-box {
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.architecture-box > [data-slot='card-panel'] {
+  min-width: 0;
+  padding: 0.75rem 0.875rem;
+}
+
+.architecture-box-title {
+  margin-bottom: 0.375rem;
+  color: var(--foreground);
+  font-size: 0.75rem;
+}
+
+.architecture-box-copy {
+  overflow-wrap: anywhere;
+}
+
+.architecture-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.architecture-badges [data-slot='badge'],
+.architecture-glossary-badge {
+  flex: none;
+}
+
+.architecture-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0;
+  color: var(--muted-foreground);
+}
+
+.architecture-arrow code {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--brand-foreground);
+  font-size: 0.6875rem;
+}
+
+.architecture-interface {
+  border-color: var(--ring);
+  background: var(--selection);
+}
+
+.architecture-interface .architecture-layer-label,
+.architecture-schema .architecture-roles-title {
+  color: var(--brand-foreground);
+}
+
+.architecture-pre {
+  max-width: 100%;
+  overflow-x: auto;
+  color: var(--foreground);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+.architecture-glossary-panel,
+.architecture-roles {
+  min-width: 0;
+  margin-top: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+.architecture-glossary {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.architecture-glossary-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, auto) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
