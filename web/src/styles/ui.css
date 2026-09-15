@@ -362,10 +362,10 @@ td.tabular-nums {
   max-width: 68.75rem;
   min-width: 0;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin: 0 auto;
-  font-size: 0.75rem;
-  line-height: 1.45;
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 .architecture-header {
@@ -381,7 +381,7 @@ td.tabular-nums {
   min-width: 0;
   align-items: baseline;
   gap: 0.5rem;
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
@@ -390,6 +390,11 @@ td.tabular-nums {
 .architecture-roles > div:first-child {
   font-family: var(--font-mono);
   font-weight: 600;
+}
+
+.architecture-title code {
+  color: var(--brand-foreground);
+  font-size: inherit;
 }
 
 .architecture-subtitle,
@@ -405,19 +410,19 @@ td.tabular-nums {
 
 .architecture-layer {
   min-width: 0;
-  padding: 0.875rem 1rem;
+  padding: 1rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-1);
+  border-radius: var(--radius-lg);
+  background: var(--background);
 }
 
 .architecture-layer-label {
-  margin-bottom: 0.625rem;
+  margin-bottom: 0.75rem;
   color: var(--muted-foreground);
   font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -451,18 +456,49 @@ td.tabular-nums {
 .architecture-box {
   min-width: 0;
   border-radius: var(--radius-sm);
-  background: var(--surface-2);
+  background: var(--surface-1);
+  box-shadow: none;
 }
+
+.architecture-box::before {
+  display: none;
+}
+
+.architecture-builtin { border-color: var(--data-insert); }
+.architecture-exec { border-color: var(--data-update); }
+.architecture-planned { border-style: dashed; opacity: 0.75; }
 
 .architecture-box > [data-slot='card-panel'] {
   min-width: 0;
   padding: 0.75rem 0.875rem;
+  color: var(--foreground-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.architecture-box > [data-slot='card-panel'] > div:first-child {
+  color: var(--foreground);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.architecture-box > [data-slot='card-panel'] code {
+  color: var(--foreground);
+  background: var(--surface-3);
+  border-radius: var(--radius-xs);
+  padding: 0.08em 0.28em;
+}
+
+.architecture-box > [data-slot='card-panel'] pre.architecture-pre {
+  background: transparent;
+  padding: 0;
 }
 
 .architecture-box-title {
   margin-bottom: 0.375rem;
   color: var(--foreground);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
 }
 
 .architecture-box-copy {
@@ -499,8 +535,9 @@ td.tabular-nums {
 }
 
 .architecture-interface {
-  border-color: var(--ring);
-  background: var(--selection);
+  border-width: 2px;
+  border-color: var(--brand-foreground);
+  background: var(--surface-1);
 }
 
 .architecture-interface .architecture-layer-label,
@@ -510,10 +547,10 @@ td.tabular-nums {
 
 .architecture-pre {
   max-width: 100%;
-  overflow-x: auto;
+  overflow: hidden;
   color: var(--foreground);
-  font-size: 0.6875rem;
-  line-height: 1.45;
+  font-size: 0.75rem;
+  line-height: 1.55;
   white-space: pre;
 }
 

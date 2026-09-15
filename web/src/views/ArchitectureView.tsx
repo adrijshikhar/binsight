@@ -1,9 +1,9 @@
-import { useEffect, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardPanel } from '@/components/ui/card'
 import { Close } from '../components/icons'
-import { IconChevronDown } from '@tabler/icons-react'
+import { IconArrowDown } from '@tabler/icons-react'
 
 // In-app rendering of the pluggable-decoder architecture diagram, so anyone
 // opening the tool can understand how it fits together. Mirrors
@@ -27,15 +27,15 @@ function Layer({ label, children, className }: LayerProps) {
 function Arrow({ note }: { note: string }) {
   return (
     <div className="architecture-arrow">
-      <IconChevronDown size={14} aria-hidden="true" />
+      <IconArrowDown size={18} stroke={1.75} aria-hidden="true" />
       <code>{note}</code>
     </div>
   )
 }
 
-function Box({ children }: { children: ReactNode }) {
+function Box({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Card className="architecture-box">
+    <Card className={`architecture-box ${className ?? ''}`}>
       <CardPanel>{children}</CardPanel>
     </Card>
   )
@@ -102,12 +102,6 @@ function CapBadges({ caps }: { caps: string[] }) {
 }
 
 export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) {
-  useEffect(() => {
-    document.querySelectorAll<HTMLElement>('[data-slot="scroll-area-viewport"]').forEach((viewport) => {
-      if (viewport.closest('[data-slot="dialog-popup"]')) viewport.scrollTop = 0
-    })
-  }, [])
-
   return (
     <div className="architecture-content">
       {/* Header */}
@@ -184,7 +178,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
       <Layer label="Adapters (2 shipped · 1 planned)">
         <div className="flex flex-col gap-2">
           <div className="architecture-row">
-            <Box>
+            <Box className="architecture-builtin">
               <div className="flex items-center gap-1.5 mb-1">
                 <span>go-mysql</span>
                 <Badge size="sm" variant="secondary">
@@ -194,7 +188,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
               <div>Default indexer + detail + stream. Compiled in, but holds no special status - just adapter #1.</div>
               <CapBadges caps={['FullScan', 'SeekDecode', 'ResumeDecode', 'RemoteStream', 'RowImages']} />
             </Box>
-            <Box>
+            <Box className="architecture-exec">
               <div className="flex items-center gap-1.5 mb-1">
                 <span>mysqlbinlog</span>
                 <Badge size="sm" variant="warning">
@@ -207,7 +201,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
               </div>
               <CapBadges caps={['FullScan', 'RowImages']} />
             </Box>
-            <Box>
+            <Box className="architecture-exec architecture-planned">
               <div className="flex items-center gap-1.5 mb-1">
                 <span>connector-java</span>
                 <Badge size="sm" variant="warning">
