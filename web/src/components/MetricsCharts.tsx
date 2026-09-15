@@ -166,7 +166,7 @@ export default function MetricsCharts({ series, byType, onOpenType, loading, err
         <Alert variant="error" role="alert" className="flex items-center justify-between">
           <span>Chart data unavailable: {error}</span>
           {onRetry && (
-            <Button size="xs" variant="outline" className="ml-2" onClick={onRetry}>
+            <Button variant="outline" className="ml-2" onClick={onRetry}>
               retry
             </Button>
           )}

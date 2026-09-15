@@ -61,7 +61,7 @@ export default function HexView({ fileId, pos }: Props) {
     return (
       <Alert variant="error" role="alert" className="flex items-center justify-between">
         <span>{err}</span>
-        <Button size="xs" variant="outline" onClick={fetchHex}>
+        <Button variant="outline" onClick={fetchHex}>
           retry
         </Button>
       </Alert>
@@ -122,13 +122,12 @@ export default function HexView({ fileId, pos }: Props) {
           <span className="ml-3 inline-flex gap-2">
             <Button
               variant="ghost"
-              size="xs"
               disabled={!hasPrev}
               onClick={() => setWinStart(Math.max(0, base - HEX_WINDOW))}
             >
               ‹ prev
             </Button>
-            <Button variant="ghost" size="xs" disabled={!hasMore} onClick={() => setWinStart(base + HEX_WINDOW)}>
+            <Button variant="ghost" disabled={!hasMore} onClick={() => setWinStart(base + HEX_WINDOW)}>
               next ›
             </Button>
           </span>

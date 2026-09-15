@@ -536,7 +536,7 @@ export default function EventsView(props: EventsViewProps) {
       {err && (
         <Alert variant="error" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" onClick={() => load(0, false)}>
+          <Button variant="outline" onClick={() => load(0, false)}>
             retry
           </Button>
         </Alert>
@@ -558,7 +558,6 @@ export default function EventsView(props: EventsViewProps) {
         <Button
           className="mx-auto my-3"
           variant="ghost"
-          size="xs"
           onClick={() => load(nextCursor, true)}
           aria-label={`load more (${events.length} / ${total})`}
         >

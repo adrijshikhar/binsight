@@ -122,7 +122,6 @@ export default function OverviewView({
         <h2 className="wrap-anywhere">{file.path.split('/').pop()}</h2>
         <Button
           variant="outline"
-          size="xs"
           onClick={doReindex}
           disabled={reindexing}
           title="Re-decode and re-index this file (rebuilds the event index, parsed schema, and anomalies)"
@@ -160,7 +159,7 @@ export default function OverviewView({
           <div className="flex items-center justify-between mb-2">
             <div>Health & Data Mutations</div>
             {total > 0 && (
-              <Button variant="ghost" size="xs" onClick={onShowAnomalies}>
+              <Button variant="ghost" onClick={onShowAnomalies}>
                 View all
                 <IconArrowRight size={12} className="ml-1" />
               </Button>
@@ -251,7 +250,7 @@ export default function OverviewView({
       {err && (
         <Alert variant="error" role="alert" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" className="ml-2" onClick={() => setRetryKey((k) => k + 1)}>
+          <Button variant="outline" className="ml-2" onClick={() => setRetryKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
@@ -264,7 +263,7 @@ export default function OverviewView({
             <EmptyDescription>The file may still be indexing or contain no parseable events.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button variant="outline" size="xs" onClick={doReindex}>
+            <Button variant="outline" onClick={doReindex}>
               re-index now
             </Button>
           </EmptyContent>

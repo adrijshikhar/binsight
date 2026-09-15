@@ -192,7 +192,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
       {err && (
         <Alert variant="error" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
+          <Button variant="outline" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
             retry
           </Button>
         </Alert>

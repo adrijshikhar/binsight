@@ -399,7 +399,6 @@ export default function App() {
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
-              size="xs"
               onClick={() => {
                 setSettingsSection('decoding')
                 setSettingsOpen(true)
@@ -471,7 +470,7 @@ export default function App() {
                 <IconAlertTriangle size={16} />
                 <AlertDescription className="flex items-center justify-between">
                   <span>file list unavailable: {filesErr}</span>
-                  <Button size="xs" variant="outline" onClick={refreshFiles}>
+                  <Button variant="outline" onClick={refreshFiles}>
                     retry
                   </Button>
                 </AlertDescription>

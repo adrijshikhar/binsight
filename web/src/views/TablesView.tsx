@@ -49,7 +49,7 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
       {err && (
         <Alert variant="error" role="alert" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
+          <Button variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>

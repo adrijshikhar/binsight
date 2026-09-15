@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
-import { clickable } from '../lib/a11y'
 import type { Anomaly, Severity } from '../lib/types'
 import { Alert } from '@/components/ui/alert'
 import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
@@ -79,14 +78,14 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
             <SelectItem value="low">low</SelectItem>
           </SelectPopup>
         </Select>
-        <Button size="xs" variant="outline" onClick={rerunDetection} disabled={detecting}>
+        <Button variant="outline" onClick={rerunDetection} disabled={detecting}>
           {detecting ? 'detecting...' : 're-run detection'}
         </Button>
       </div>
       {err && (
         <Alert variant="error" role="alert" className="flex items-center justify-between mb-0">
           <span>{err}</span>
-          <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
+          <Button variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
@@ -128,13 +127,13 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
                   <TableCell className="max-w-72 truncate">{a.message || '-'}</TableCell>
                   <TableCell>
                     {a.txn_id ? (
-                      <button type="button" {...clickable(() => onOpenTxn(a.txn_id!))}>
+                      <Button variant="link" onClick={() => onOpenTxn(a.txn_id!)}>
                         txn #{a.txn_id}
-                      </button>
+                      </Button>
                     ) : a.event_pos ? (
-                      <button type="button" {...clickable(() => onOpenEvent(a.event_pos!))}>
+                      <Button variant="link" onClick={() => onOpenEvent(a.event_pos!)}>
                         @ {a.event_pos}
-                      </button>
+                      </Button>
                     ) : (
                       '-'
                     )}
