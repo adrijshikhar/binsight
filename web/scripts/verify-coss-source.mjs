@@ -25,14 +25,18 @@ const colors = await fetch(lock.source.replace('{name}', 'colors-neutral'))
 assert.ok(colors.ok)
 const palette = (await colors.json()).cssVars
 assert.deepEqual(palette, lock.colors)
-const css = postcss.parse(await readFile(new URL('web/src/styles/ui.css', root), 'utf8'))
-for (const theme of ['light', 'dark']) {
-  const actual = {}
-  css.walkRules(`:root[data-theme='${theme}']`, (rule) => {
-    rule.walkDecls((declaration) => {
-      if (declaration.prop.startsWith('--')) actual[declaration.prop.slice(2)] = declaration.value
+if (process.argv.includes('--stock-palette')) {
+  const css = postcss.parse(await readFile(new URL('web/src/styles/ui.css', root), 'utf8'))
+  for (const theme of ['light', 'dark']) {
+    const actual = {}
+    css.walkRules(`:root[data-theme='${theme}']`, (rule) => {
+      rule.walkDecls((declaration) => {
+        if (declaration.prop.startsWith('--')) actual[declaration.prop.slice(2)] = declaration.value
+      })
     })
-  })
-  assert.deepEqual(actual, palette[theme], `${theme}: application CSS palette differs from upstream`)
+    assert.deepEqual(actual, palette[theme], `${theme}: application CSS palette differs from upstream`)
+  }
 }
-console.log(`PASS: ${Object.keys(lock.files).length} source files and neutral palette match live upstream Coss.`)
+console.log(
+  `PASS: ${Object.keys(lock.files).length} source files match live upstream Coss; archived neutral palette unchanged.`,
+)

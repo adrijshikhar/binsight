@@ -15,7 +15,9 @@ This file provides non-negotiable architectural, styling, and coding guidance fo
 
 ## Frontend Styling & CSS Standards (Strict)
 
-### Current Phase: Stock Coss, Desktop Only
+### Current Phase: Centralized Colors, Desktop Only
+
+2026-09-15: The user approved colors only after checkpoint `1437a7a`. All application palette values and color-state rules belong in `web/src/styles/ui.css`. Components may select semantic data roles or reference CSS tokens, but must not contain literal colors, inline appearance styles, or local color recipes. Keep pinned Coss source unchanged. Typography, geometry, density, radii, shadows, and mobile work remain paused. This override takes precedence over the earlier stock-only phase below.
 
 Stock checkpoint update: `web/coss-stock-lock.json` pins 23 upstream component/helper files and the complete Coss neutral palette. Shared source permits import-path changes only. Do not format or modify locked files; `rtk bun scripts/verify-coss-source.mjs` from `web/` checks live upstream on demand. Do not add redundant unit tests for upstream markup, styling, or source hashes; retain Binsight behavior tests. Built-in badge variants replace custom mutation variants. The forced 32px density and bespoke tab animations are paused along with final DESIGN.md styling. Domain layout and runtime virtualization/resizing remain application code, outside the stock component directory.
 

@@ -7,19 +7,19 @@ import type { Bucket, TypeBytes } from '../lib/types'
 describe('MetricsCharts color mapping', () => {
   it('maps event types to semantic theme variables', () => {
     // Write events must be data-insert
-    expect(colorFor('WRITE_ROWS_V1')).toBe('var(--success)')
-    expect(colorFor('WRITE_ROWS_V2')).toBe('var(--success)')
+    expect(colorFor('WRITE_ROWS_V1')).toBe('var(--data-insert)')
+    expect(colorFor('WRITE_ROWS_V2')).toBe('var(--data-insert)')
 
     // Update events must be data-update
-    expect(colorFor('UPDATE_ROWS_V1')).toBe('var(--warning)')
-    expect(colorFor('UPDATE_ROWS_V2')).toBe('var(--warning)')
+    expect(colorFor('UPDATE_ROWS_V1')).toBe('var(--data-update)')
+    expect(colorFor('UPDATE_ROWS_V2')).toBe('var(--data-update)')
 
     // Delete events must be data-delete
-    expect(colorFor('DELETE_ROWS_V1')).toBe('var(--destructive)')
-    expect(colorFor('DELETE_ROWS_V2')).toBe('var(--destructive)')
+    expect(colorFor('DELETE_ROWS_V1')).toBe('var(--data-delete)')
+    expect(colorFor('DELETE_ROWS_V2')).toBe('var(--data-delete)')
 
     // Query events must be data-query
-    expect(colorFor('QUERY')).toBe('var(--info)')
+    expect(colorFor('QUERY')).toBe('var(--data-query)')
 
     // Others fall back to neutral muted-foreground
     expect(colorFor('ROTATE')).toBe('var(--muted-foreground)')

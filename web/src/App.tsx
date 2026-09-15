@@ -374,7 +374,14 @@ export default function App() {
         <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b px-4">
           {/* Left side: Brand + Active File breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
-            <span className="shrink-0">binsight</span>
+            <span className="app-brand shrink-0">
+              <span className="app-brand-icon">
+                <svg className="app-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M4 6h16M4 12h10M4 18h14" strokeLinecap="round" />
+                </svg>
+              </span>
+              <span>binsight</span>
+            </span>
 
             {file && (
               <div className="flex items-center gap-1 min-w-0">

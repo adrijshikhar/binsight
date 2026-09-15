@@ -7,6 +7,8 @@ description: A dense forensic workbench with neutral surfaces, blue interaction,
 
 ## Current Phase Override - 2026-09-14
 
+2026-09-15 update: Colors-only implementation is approved after checkpoint `1437a7a`. `web/src/styles/ui.css` is the sole executable theme source for this phase, including semantic data colors and state colors. Stock Coss component source remains pinned. All non-color design changes remain paused. The archived neutral palette remains in the stock lockfile as checkpoint evidence, not as the current theme.
+
 The verified source checkpoint is pinned in `web/coss-stock-lock.json`. It uses upstream Coss components, neutral colors, built-in semantic variants, and stock table padding. No custom mutation badge variants, success-token override, forced 32px row height, or application tab animations remain. The 32px target and final palettes below are explicitly deferred.
 
 Custom design implementation is paused by explicit user instruction. The current checkpoint uses stock Coss UI and removes all application CSS Modules and the bespoke theme. Only Tailwind/Coss foundation CSS remains in `web/src/styles/ui.css`; application layout utilities, dynamic geometry, and forensic data semantics remain. This desktop web app has no mobile acceptance target. The specifications below are future work, not current acceptance criteria. Codex now owns implementation. Apply these design changes incrementally only after user review of the stock baseline.

@@ -21,10 +21,10 @@ const TOP_TYPES = 8
 
 // Semantic colors for event types: WRITE green, UPDATE amber, DELETE rose, QUERY grape, others neutral.
 export function colorFor(type: string): string {
-  if (type.startsWith('WRITE_ROWS')) return 'var(--success)'
-  if (type.startsWith('UPDATE_ROWS')) return 'var(--warning)'
-  if (type.startsWith('DELETE_ROWS')) return 'var(--destructive)'
-  if (type === 'QUERY') return 'var(--info)'
+  if (type.startsWith('WRITE_ROWS')) return 'var(--data-insert)'
+  if (type.startsWith('UPDATE_ROWS')) return 'var(--data-update)'
+  if (type.startsWith('DELETE_ROWS')) return 'var(--data-delete)'
+  if (type === 'QUERY') return 'var(--data-query)'
   return 'var(--muted-foreground)'
 }
 
