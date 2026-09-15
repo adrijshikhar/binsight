@@ -176,13 +176,13 @@
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --background: #010102;
-  --surface-1: #0f1011;
-  --surface-2: #141516;
-  --surface-3: #18191a;
-  --surface-4: #191a1b;
-  --border: #23252a;
-  --border-strong: #34343a;
+  --background: #141516;
+  --surface-1: #1b1c1e;
+  --surface-2: #212224;
+  --surface-3: #252629;
+  --surface-4: #27282b;
+  --border: #34363b;
+  --border-strong: #45484f;
   --input: #777c85;
   --foreground: #f7f8f8;
   --foreground-secondary: #d0d6e0;

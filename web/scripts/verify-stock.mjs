@@ -60,7 +60,7 @@ try {
         },
       ))
     })
-    assert.equal(palette.background, theme === 'dark' ? '#010102' : '#ffffff')
+    assert.equal(palette.background, theme === 'dark' ? '#141516' : '#ffffff')
     assert.equal(palette.primary, theme === 'dark' ? '#0075de' : '#0062bd')
     assert.equal(palette['data-insert'], theme === 'dark' ? '#34d399' : '#047857')
     assert.equal(palette['data-query'], theme === 'dark' ? '#c4b5fd' : '#6d28d9')

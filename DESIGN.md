@@ -71,13 +71,13 @@ Theme contract: `html[data-theme="dark"]` or `html[data-theme="light"]`, with th
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
-| `--background` | `#010102` | `#ffffff` | Canvas |
-| `--surface-1` | `#0f1011` | `#f5f6f6` | Base panels |
-| `--surface-2` | `#141516` | `#f6f7f7` | Lifted/hover surfaces |
-| `--surface-3` | `#18191a` | `#ffffff` | Subnav and popovers |
-| `--surface-4` | `#191a1b` | `#f1f3f5` | Highest tonal surface |
-| `--border` | `#23252a` | `#e1e4ea` | Decorative 1px hairlines |
-| `--border-strong` | `#34343a` | `#ced4da` | Strong decorative separators |
+| `--background` | `#141516` | `#ffffff` | Canvas |
+| `--surface-1` | `#1b1c1e` | `#f5f6f6` | Base panels |
+| `--surface-2` | `#212224` | `#f6f7f7` | Lifted/hover surfaces |
+| `--surface-3` | `#252629` | `#ffffff` | Subnav and popovers |
+| `--surface-4` | `#27282b` | `#f1f3f5` | Highest tonal surface |
+| `--border` | `#34363b` | `#e1e4ea` | Decorative 1px hairlines |
+| `--border-strong` | `#45484f` | `#ced4da` | Strong decorative separators |
 | `--input` | `#777c85` | `#7e838c` | Essential control boundaries |
 | `--foreground` | `#f7f8f8` | `#000000` | Primary text |
 | `--foreground-secondary` | `#d0d6e0` | `#2c313a` | Secondary text |
