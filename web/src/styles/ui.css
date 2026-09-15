@@ -393,6 +393,22 @@ td.tabular-nums {
   white-space: normal;
 }
 
+.events-toolbar-primary {
+  align-items: center;
+}
+
+.events-toolbar-primary > .min-w-40 {
+  order: 2;
+}
+
+.events-toolbar-secondary {
+  order: 3;
+}
+
+.events-jump-control {
+  opacity: 0.84;
+}
+
 .architecture-header {
   display: flex;
   min-width: 0;
@@ -431,6 +447,28 @@ td.tabular-nums {
 
 .architecture-subtitle {
   margin-top: 0.25rem;
+}
+
+.architecture-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.architecture-nav a {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--brand-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-decoration: none;
+}
+
+.architecture-nav a:hover,
+.architecture-nav a:focus-visible {
+  background: var(--surface-2);
 }
 
 .architecture-layer {
@@ -573,10 +611,11 @@ td.tabular-nums {
 .architecture-pre {
   max-width: 100%;
   overflow: hidden;
+  overflow-wrap: anywhere;
   color: var(--foreground);
   font-size: 0.75rem;
   line-height: 1.55;
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 .architecture-glossary-panel,

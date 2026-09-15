@@ -13,11 +13,12 @@ interface LayerProps {
   label: string
   children: ReactNode
   className?: string
+  id?: string
 }
 
-function Layer({ label, children, className }: LayerProps) {
+function Layer({ label, children, className, id }: LayerProps) {
   return (
-    <section className={`architecture-layer ${className ?? ''}`}>
+    <section id={id} className={`architecture-layer ${className ?? ''}`}>
       <h4 className="architecture-layer-label">{label}</h4>
       {children}
     </section>
@@ -112,6 +113,12 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
             <h3>- Pluggable Decoder Architecture</h3>
           </div>
           <p className="architecture-subtitle">Go core · no privileged library · adapters behind one interface · roles assigned by config</p>
+          <nav className="architecture-nav" aria-label="Architecture sections">
+            <a href="#architecture-contract">Contract</a>
+            <a href="#architecture-adapters">Adapters</a>
+            <a href="#architecture-core">Core</a>
+            <a href="#architecture-web">Web UI</a>
+          </nav>
         </div>
         {onClose && (
           <Button variant="ghost" size="icon-xs" onClick={onClose} aria-label="Close architecture view">
@@ -148,7 +155,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
       <Arrow note="file path + offset" />
 
       {/* Interface */}
-      <Layer label="The Only Contract Core Knows" className="architecture-interface">
+      <Layer id="architecture-contract" label="The Only Contract Core Knows" className="architecture-interface">
         <div className="architecture-cols">
           <Box>
             <pre className="architecture-pre">{`type Decoder interface {
@@ -175,7 +182,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
       <Arrow note="implemented by" />
 
       {/* Adapters */}
-      <Layer label="Adapters (2 shipped · 1 planned)">
+      <Layer id="architecture-adapters" label="Adapters (2 shipped · 1 planned)">
         <div className="flex flex-col gap-2">
           <div className="architecture-row">
             <Box className="architecture-builtin">
@@ -265,7 +272,7 @@ roles:
       <Arrow note="JSON-lines (exec) / structs (builtin) - same schema" />
 
       {/* Core */}
-      <Layer label="Core (Go binary)">
+      <Layer id="architecture-core" label="Core (Go binary)">
         <div className="architecture-row">
           <Box>
             <div className="mb-1">Indexer</div>
@@ -305,7 +312,7 @@ roles:
       <Arrow note="REST/JSON + SSE" />
 
       {/* Web UI */}
-      <Layer label="Web UI (React + TS · go:embed · localhost)">
+      <Layer id="architecture-web" label="Web UI (React + TS · go:embed · localhost)">
         <div className="architecture-row">
           <Box>
             <div className="mb-1">Event list</div>

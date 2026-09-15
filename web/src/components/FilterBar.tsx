@@ -95,7 +95,7 @@ export default function FilterBar(props: FilterBarProps) {
   return (
     <div className="flex flex-col">
       {/* Tier 1: View mode, universal search, live toggle, jump to position */}
-      <div className="flex flex-wrap items-center gap-3 border-b p-3">
+      <div className="events-toolbar-primary flex flex-wrap items-center gap-3 border-b p-3">
         <RadioGroupPrimitive
           aria-label="View mode"
           className={segmentedControlRootClassName}
@@ -132,7 +132,7 @@ export default function FilterBar(props: FilterBarProps) {
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+          <div className="events-toolbar-secondary flex flex-wrap items-center gap-3">
           {props.onToggleLive && (
             <Tooltip>
               <TooltipTrigger
@@ -151,7 +151,7 @@ export default function FilterBar(props: FilterBarProps) {
             </Tooltip>
           )}
 
-          <div className="flex items-center gap-1 flex-nowrap">
+          <div className="events-jump-control flex items-center gap-1 flex-nowrap">
             <Input
               aria-label="Jump to byte position"
               aria-invalid={jumpInvalid}
