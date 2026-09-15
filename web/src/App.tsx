@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
 import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogPopup, DialogTitle, DialogHeader, DialogPanel } from '@/components/ui/dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconSettings } from '@tabler/icons-react'
 import { api } from './lib/api'
@@ -63,6 +64,9 @@ export default function App() {
   const [tab, setTab] = useState<MainTab>(normalizeTab(initialUrl.tab))
   const [settingsOpen, setSettingsOpen] = useState(
     initialUrl.tab === 'settings' || initialUrl.tab === 'architecture' || initialUrl.tab === 'how-it-works',
+  )
+  const [architectureOpen, setArchitectureOpen] = useState(
+    initialUrl.tab === 'architecture' || initialUrl.tab === 'how-it-works',
   )
   const [settingsSection, setSettingsSection] = useState<
     'decoding' | 'how-it-works' | 'display' | 'anomalies' | 'streaming' | 'watch'
@@ -397,6 +401,9 @@ export default function App() {
 
           {/* Right side: Settings button */}
           <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={() => setArchitectureOpen(true)} aria-label="Architecture">
+              Architecture
+            </Button>
             <Button
               variant="ghost"
               onClick={() => {
@@ -432,8 +439,7 @@ export default function App() {
                   setSettingsOpen(true)
                 }}
                 onArchitecture={() => {
-                  setSettingsSection('how-it-works')
-                  setSettingsOpen(true)
+                  setArchitectureOpen(true)
                 }}
                 streamStatus={streamStatus ?? undefined}
               />
@@ -640,6 +646,16 @@ export default function App() {
         </div>
       </div>
       <SettingsView opened={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} />
+      <Dialog open={architectureOpen} onOpenChange={setArchitectureOpen}>
+        <DialogPopup className="max-w-5xl" closeProps={{ 'aria-label': 'Close architecture' }}>
+          <DialogHeader>
+            <DialogTitle className="sr-only">Architecture</DialogTitle>
+          </DialogHeader>
+          <DialogPanel className="min-h-0 overflow-auto">
+            <ArchitectureView />
+          </DialogPanel>
+        </DialogPopup>
+      </Dialog>
       {showAgentation && <Agentation endpoint="http://localhost:4747" />}
     </SSEContext.Provider>
   )

@@ -330,6 +330,6 @@ roles:
   )
 }
 
-export default function ArchitectureView({ onClose }: { onClose: () => void }) {
+export default function ArchitectureView({ onClose }: { onClose?: () => void } = {}) {
   return <ArchitectureContent onClose={onClose} />
 }
