@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MantineProvider, Table } from '@mantine/core'
 import React from 'react'
 import TruncCell from './TruncCell'
 
@@ -28,16 +27,16 @@ vi.mock('../lib/api', () => ({
 import { api } from '../lib/api'
 
 function wrap(ui: React.ReactNode) {
-  return render(<MantineProvider>{ui}</MantineProvider>)
+  return render(<div data-theme="dark">{ui}</div>)
 }
 
 function renderInTable(ui: React.ReactNode) {
   return wrap(
-    <Table>
-      <Table.Tbody>
-        <Table.Tr>{ui}</Table.Tr>
-      </Table.Tbody>
-    </Table>,
+    <table>
+      <tbody>
+        <tr>{ui}</tr>
+      </tbody>
+    </table>,
   )
 }
 
@@ -56,7 +55,7 @@ describe('TruncCell', () => {
     const td = screen.getByText('short')
     // jsdom: scrollWidth == clientWidth == 0 → not truncated
     fireEvent.mouseEnter(td)
-    // With truncated=false, the Tooltip is disabled — no tooltip role in DOM
+    // With truncated=false, the Tooltip is disabled - no tooltip role in DOM
     expect(screen.queryByRole('tooltip')).toBeFalsy()
   })
 
@@ -76,9 +75,7 @@ describe('TruncCell', () => {
   it('applies monospace font family when mono prop is true', () => {
     renderInTable(<TruncCell label="SELECT 1" className="tbl" mono />)
     const td = screen.getByText('SELECT 1')
-    // Mantine renders ff as --mantine-ff- or inline style; check style attribute
-    const style = td.getAttribute('style') ?? ''
-    expect(style).toContain('monospace')
+    expect(td.tagName).toBe('CODE')
   })
 
   it('does not apply monospace font family when mono is not set', () => {

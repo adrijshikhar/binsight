@@ -4,7 +4,15 @@ import { fmtBytes } from '../lib/format'
 import { clickable, clickableRow } from '../lib/a11y'
 import MetricsCharts from '../components/MetricsCharts'
 import type { Anomaly, BinlogFile, FileMetrics, TypeCount } from '../lib/types'
-import { Alert, Badge, Button, Card, Center, Group, Paper, Stack, Table, Text, Title, Tooltip } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent } from '@/components/ui/empty'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
+import { IconArrowRight, IconCheck, IconRefresh } from '@tabler/icons-react'
+import KindBadge from '../components/KindBadge'
 
 const ROW_TYPES = new Set([
   'WRITE_ROWS_V2',
@@ -15,7 +23,7 @@ const ROW_TYPES = new Set([
   'DELETE_ROWS_V1',
 ])
 
-// fmtDuration renders a second count compactly, e.g. 5 → "5s", 3700 → "1h 1m".
+// fmtDuration renders a second count compactly, e.g. 5 -> "5s", 3700 -> "1h 1m".
 function fmtDuration(sec: number): string {
   if (sec < 60) return `${sec}s`
   if (sec < 3600) return `${Math.floor(sec / 60)}m ${sec % 60}s`
@@ -91,10 +99,10 @@ export default function OverviewView({
   const meta: [string, string][] = [
     ['Path', file.path],
     ['Size', fmtBytes(file.size)],
-    ['Server version', file.server_version || '—'],
-    ['Format', file.format_version ? `v${file.format_version}` : '—'],
+    ['Server version', file.server_version || '-'],
+    ['Format', file.format_version ? `v${file.format_version}` : '-'],
     ['Checksum', file.checksum_algo || 'none'],
-    ['Indexed by', file.indexed_by_adapter || '—'],
+    ['Indexed by', file.indexed_by_adapter || '-'],
     ['State', file.state],
   ]
 
@@ -106,153 +114,206 @@ export default function OverviewView({
     }, {}),
   ).sort((a, b) => b[1] - a[1])
 
+  const mutationCounts = counts.filter((c) => ROW_TYPES.has(c.type_name) && c.count > 0)
+
   return (
-    <Stack p="md" gap="md" style={{ width: '100%', overflowY: 'auto' }}>
-      <Group justify="space-between" align="flex-start" gap="sm">
-        <Title order={2} ff="monospace" c="blue.4" style={{ overflowWrap: 'anywhere' }}>
-          {file.path.split('/').pop()}
-        </Title>
+    <div className="p-4 flex flex-col gap-4 w-full overflow-auto">
+      <div className="flex items-start justify-between gap-2">
+        <h2 className="wrap-anywhere">{file.path.split('/').pop()}</h2>
         <Button
-          variant="default"
+          variant="outline"
           size="xs"
-          ff="monospace"
           onClick={doReindex}
           disabled={reindexing}
           title="Re-decode and re-index this file (rebuilds the event index, parsed schema, and anomalies)"
         >
-          {reindexing ? 'indexing…' : '↻ re-index'}
+          <IconRefresh size={14} />
+          {reindexing ? 'Indexing...' : 'Re-index'}
         </Button>
-      </Group>
+      </div>
 
       {reindexErr && (
-        <Alert color="red" role="alert">
+        <Alert variant="error" role="alert">
           {reindexErr}
         </Alert>
       )}
 
-      {/* File metadata grid */}
-      <Paper withBorder p="sm" style={{ maxWidth: 720 }}>
-        <Table withRowBorders={false} style={{ tableLayout: 'fixed' }}>
-          <Table.Tbody>
-            {meta.map(([k, v]) => (
-              <Table.Tr key={k}>
-                <Table.Td w={140} c="dimmed">
-                  {k}
-                </Table.Td>
-                <Table.Td ff="monospace" style={{ overflowWrap: 'anywhere' }}>
-                  {v}
-                </Table.Td>
-              </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </Paper>
+      {/* Balanced 2-column top grid: File Specifications + Health & Row Mutations */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Left column: File Specifications */}
+        <div className="py-3 flex h-full flex-col">
+          <div className="mb-2">File Specifications</div>
+          <Table className="table-fixed">
+            <TableBody>
+              {meta.map(([k, v]) => (
+                <TableRow key={k}>
+                  <TableCell className="w-[110px]">{k}</TableCell>
+                  <TableCell className="break-all">{v}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
-      {/* Anomaly summary strip */}
-      <Tooltip label="view anomalies" openDelay={150} withinPortal disabled={total === 0}>
-        <Paper
-          withBorder
-          p="xs"
-          style={{
-            borderLeft: total > 0 ? '3px solid var(--mantine-color-red-6)' : undefined,
-            cursor: total > 0 ? 'pointer' : undefined,
-          }}
-          {...(total > 0 ? clickable(onShowAnomalies) : {})}
-        >
-          <Group gap="xs" wrap="wrap" align="center">
-            <Text size="sm">Anomalies: {total}</Text>
-            {byDetector.map(([det, n]) => (
-              <Badge key={det} color="gray" variant="light" size="sm" ff="monospace">
-                {det} <strong>{n}</strong>
-              </Badge>
-            ))}
-          </Group>
-        </Paper>
-      </Tooltip>
+        {/* Right column: Health & Row Mutations */}
+        <div className="py-3 flex h-full flex-col">
+          <div className="flex items-center justify-between mb-2">
+            <div>Health & Data Mutations</div>
+            {total > 0 && (
+              <Button variant="ghost" size="xs" onClick={onShowAnomalies}>
+                View all
+                <IconArrowRight size={12} className="ml-1" />
+              </Button>
+            )}
+          </div>
+
+          {/* Anomaly summary badge strip */}
+          <Alert
+            variant={total > 0 ? 'warning' : 'default'}
+            className="mb-2"
+            {...(total > 0 ? clickable(onShowAnomalies) : {})}
+          >
+            {total === 0 ? (
+              <div className="flex items-center gap-1.5">
+                <IconCheck size={16} />
+                <span>No anomalies detected in this binlog</span>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>Anomalies: {total}</span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {byDetector.map(([det, n]) => (
+                    <Badge key={det} variant="secondary" size="sm" className="cursor-pointer" onClick={onShowAnomalies}>
+                      {det} <strong className="ml-1">{n}</strong>
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Alert>
+
+          {/* Row mutations breakdown table (relocated from sidebar) */}
+          <div className="flex flex-col gap-1 flex-1">
+            <div className="flex items-center justify-between mt-1">
+              <span>Row Mutations</span>
+              <span>
+                {mutationCounts.length > 0
+                  ? `${mutationCounts.reduce((n, c) => n + c.rows_total, 0).toLocaleString()} rows affected`
+                  : '0 rows'}
+              </span>
+            </div>
+
+            {mutationCounts.length === 0 ? (
+              <p className="py-2">No row mutation events (inserts/updates/deletes) found in this binlog.</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Events</TableHead>
+                    <TableHead className="text-right">Rows</TableHead>
+                    <TableHead className="text-right">Bytes</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mutationCounts.map((c) => {
+                    const bytes = bytesByType.get(c.type_name)
+                    return (
+                      <TableRow
+                        key={c.type_name}
+                        {...clickableRow(() => onOpenType(c.type_name))}
+                        className="cursor-pointer"
+                      >
+                        <TableCell>
+                          <KindBadge typeName={c.type_name} size="sm" />
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{c.count.toLocaleString()}</TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {c.rows_total > 0 ? c.rows_total.toLocaleString() : '-'}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{bytes ? fmtBytes(bytes) : '-'}</TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            )}
+
+            {decodeWarn && (
+              <Alert variant="warning" className="mt-2">
+                Decoded stream contains partial frames or errors.
+              </Alert>
+            )}
+          </div>
+        </div>
+      </div>
 
       {err && (
-        <Alert color="red" role="alert">
-          {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => setRetryKey((k) => k + 1)}>
+        <Alert variant="error" role="alert" className="flex items-center justify-between">
+          <span>{err}</span>
+          <Button size="xs" variant="outline" className="ml-2" onClick={() => setRetryKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
       )}
 
       {!loading && !err && metrics && metrics.events === 0 && counts.length === 0 && (
-        <Center py="xl">
-          <Stack align="center" gap="xs" role="status">
-            <Text c="dimmed">No events indexed for this file.</Text>
-            <Text c="dimmed" size="xs">
-              The file may still be indexing or contain no parseable events.
-            </Text>
-            <Button variant="default" size="xs" onClick={doReindex}>
+        <Empty role="status">
+          <EmptyHeader>
+            <EmptyTitle>No events indexed for this file.</EmptyTitle>
+            <EmptyDescription>The file may still be indexing or contain no parseable events.</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="outline" size="xs" onClick={doReindex}>
               re-index now
             </Button>
-          </Stack>
-        </Center>
+          </EmptyContent>
+        </Empty>
       )}
 
       {metrics && (
         <>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 1 }}>
-            Metrics
-          </Text>
-          <Group gap="sm" wrap="wrap">
-            <Card withBorder padding="sm" style={{ minWidth: 160 }}>
-              <Text size="xs" c="dimmed">
-                event size (avg)
-              </Text>
-              <Text size="lg" fw={600} ff="monospace">
-                {fmtBytes(metrics.event_size.avg)}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {fmtBytes(metrics.event_size.min)} min · {fmtBytes(metrics.event_size.max)} max ·{' '}
-                {fmtBytes(metrics.event_size.total)} total
-              </Text>
+          <div>Metrics</div>
+          <div className="flex flex-wrap gap-3">
+            <Card className="min-w-40 flex-1 basis-40">
+              <CardHeader>
+                <CardDescription>event size (avg)</CardDescription>
+                <CardTitle>{fmtBytes(metrics.event_size.avg)}</CardTitle>
+                <CardDescription>
+                  {fmtBytes(metrics.event_size.min)} min · {fmtBytes(metrics.event_size.max)} max ·{' '}
+                  {fmtBytes(metrics.event_size.total)} total
+                </CardDescription>
+              </CardHeader>
             </Card>
-            <Card withBorder padding="sm" style={{ minWidth: 160 }}>
-              <Text size="xs" c="dimmed">
-                events
-              </Text>
-              <Text size="lg" fw={600} ff="monospace">
-                {metrics.events.toLocaleString()}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {metrics.events_per_sec.toFixed(1)}/s · {fmtBytes(metrics.bytes_per_sec)}/s
-              </Text>
+            <Card className="min-w-40 flex-1 basis-40">
+              <CardHeader>
+                <CardDescription>events</CardDescription>
+                <CardTitle>{metrics.events.toLocaleString()}</CardTitle>
+                <CardDescription>
+                  {metrics.events_per_sec.toFixed(1)}/s · {fmtBytes(metrics.bytes_per_sec)}/s
+                </CardDescription>
+              </CardHeader>
             </Card>
-            <Card withBorder padding="sm" style={{ minWidth: 160 }}>
-              <Text size="xs" c="dimmed">
-                time span
-              </Text>
-              <Text size="lg" fw={600} ff="monospace">
-                {fmtDuration(metrics.span_sec)}
-              </Text>
-              <Text size="xs" c="dimmed">
-                {metrics.txns.count.toLocaleString()} txns
-              </Text>
+            <Card className="min-w-40 flex-1 basis-40">
+              <CardHeader>
+                <CardDescription>time span</CardDescription>
+                <CardTitle>{fmtDuration(metrics.span_sec)}</CardTitle>
+                <CardDescription>{metrics.txns.count.toLocaleString()} txns</CardDescription>
+              </CardHeader>
             </Card>
-            <Card
-              withBorder
-              padding="sm"
-              style={{ minWidth: 160, borderColor: decodeWarn ? 'var(--mantine-color-orange-6)' : undefined }}
-            >
-              <Text size="xs" c="dimmed">
-                decode
-              </Text>
-              <Text size="lg" fw={600} ff="monospace" c={decodeWarn ? 'orange' : undefined}>
-                {metrics.decode.full.toLocaleString()} full
-              </Text>
-              <Text size="xs" c="dimmed">
-                {metrics.decode.partial} partial · {metrics.decode.none} none · {metrics.decode.errors} err
-              </Text>
+            <Card className="min-w-40 flex-1 basis-40">
+              <CardHeader>
+                <CardDescription>decode</CardDescription>
+                <CardTitle>{metrics.decode.full.toLocaleString()} full</CardTitle>
+                {decodeWarn && <Badge variant="warning">Incomplete decoding</Badge>}
+                <CardDescription>
+                  {metrics.decode.partial} partial · {metrics.decode.none} none · {metrics.decode.errors} err
+                </CardDescription>
+              </CardHeader>
             </Card>
-          </Group>
+          </div>
 
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 1 }}>
-            Event activity
-          </Text>
+          <div>Event activity</div>
           <MetricsCharts
             series={metrics.series}
             byType={metrics.by_type}
@@ -264,177 +325,127 @@ export default function OverviewView({
         </>
       )}
 
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 1 }}>
-        Breakdown
-      </Text>
-      <Group gap="md" align="stretch" wrap="wrap">
+      <div>Breakdown</div>
+      <div className="flex flex-wrap items-stretch gap-4">
         {metrics && metrics.largest_events.length > 0 && (
-          <Paper
-            withBorder
-            p="xs"
-            style={{ flex: '1 1 280px', minWidth: 220, display: 'flex', flexDirection: 'column' }}
-          >
-            <Text size="xs" c="dimmed" mb="xs">
-              Largest events by size
-            </Text>
-            <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
-              <Table fz="xs" style={{ tableLayout: 'fixed', width: '100%' }}>
-                <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--panel)' }}>
-                  <Table.Tr>
-                    <Table.Th>type</Table.Th>
-                    <Table.Th w="3.5rem" ta="right">
-                      txn
-                    </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
-                      size
-                    </Table.Th>
-                    <Table.Th w="5.5rem" ta="right" title="byte offset of the event in the binlog file">
+          <div className="py-3 flex min-w-0 flex-1 basis-72 flex-col" data-slot="breakdown-panel">
+            <div className="mb-2">Largest events by size</div>
+            <div className="min-h-0 flex-1 overflow-auto">
+              <Table className="w-full table-fixed">
+                <TableHeader className="sticky top-0 z-10">
+                  <TableRow>
+                    <TableHead>type</TableHead>
+                    <TableHead className="w-14 text-right">txn</TableHead>
+                    <TableHead className="w-20 text-right">size</TableHead>
+                    <TableHead className="w-20 text-right" title="byte offset of the event in the binlog file">
                       offset
-                    </Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {metrics.largest_events.map((e) => (
-                    <Tooltip key={e.pos} label="open event" openDelay={150} withinPortal>
-                      <Table.Tr {...clickableRow(() => onOpenEvent(e.pos))} style={{ cursor: 'pointer' }}>
-                        <Table.Td style={{ overflowWrap: 'anywhere' }}>{e.type_name}</Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {e.txn_id ? `#${e.txn_id}` : '—'}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {fmtBytes(e.size)}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {e.pos.toLocaleString()}
-                        </Table.Td>
-                      </Table.Tr>
-                    </Tooltip>
+                    <TableRow key={e.pos} {...clickableRow(() => onOpenEvent(e.pos))} className="cursor-pointer">
+                      <TableCell>
+                        <KindBadge typeName={e.type_name} size="sm" />
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">{e.txn_id ? `#${e.txn_id}` : '-'}</TableCell>
+                      <TableCell className="text-right tabular-nums">{fmtBytes(e.size)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{e.pos.toLocaleString()}</TableCell>
+                    </TableRow>
                   ))}
-                </Table.Tbody>
+                </TableBody>
               </Table>
             </div>
-          </Paper>
+          </div>
         )}
 
         {metrics && metrics.largest_txns.length > 0 && (
-          <Paper
-            withBorder
-            p="xs"
-            style={{ flex: '1 1 280px', minWidth: 220, display: 'flex', flexDirection: 'column' }}
-          >
-            <Text size="xs" c="dimmed" mb="xs">
-              Largest transactions by event count
-            </Text>
-            <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
-              <Table fz="xs" style={{ tableLayout: 'fixed', width: '100%' }}>
-                <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--panel)' }}>
-                  <Table.Tr>
-                    <Table.Th>txn</Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
-                      events
-                    </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
-                      rows
-                    </Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
+          <div className="py-3 flex min-w-0 flex-1 basis-72 flex-col" data-slot="breakdown-panel">
+            <div className="mb-2">Largest transactions by event count</div>
+            <div className="min-h-0 flex-1 overflow-auto">
+              <Table className="w-full table-fixed">
+                <TableHeader className="sticky top-0 z-10">
+                  <TableRow>
+                    <TableHead>txn</TableHead>
+                    <TableHead className="w-20 text-right">events</TableHead>
+                    <TableHead className="w-20 text-right">rows</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {metrics.largest_txns.map((t) => (
-                    <Tooltip key={t.id} label={t.gtid} openDelay={150} withinPortal disabled={!t.gtid}>
-                      <Table.Tr {...clickableRow(() => onOpenTxn(t.id))} style={{ cursor: 'pointer' }}>
-                        <Table.Td style={{ overflowWrap: 'anywhere' }}>
-                          {t.gtid && t.gtid !== 'ANONYMOUS' ? t.gtid : `#${t.id}`}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {t.events.toLocaleString()}
-                        </Table.Td>
-                        <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                          {t.rows.toLocaleString()}
-                        </Table.Td>
-                      </Table.Tr>
-                    </Tooltip>
+                    <TableRow key={t.id} {...clickableRow(() => onOpenTxn(t.id))} className="cursor-pointer">
+                      <TableCell className="break-all">
+                        {t.gtid && t.gtid !== 'ANONYMOUS' ? (
+                          <Tooltip>
+                            <TooltipTrigger render={<span>{t.gtid}</span>} />
+                            <TooltipPopup side="top" align="center">
+                              {t.gtid}
+                            </TooltipPopup>
+                          </Tooltip>
+                        ) : (
+                          `#${t.id}`
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right tabular-nums">{t.events.toLocaleString()}</TableCell>
+                      <TableCell className="text-right tabular-nums">{t.rows.toLocaleString()}</TableCell>
+                    </TableRow>
                   ))}
-                </Table.Tbody>
+                </TableBody>
               </Table>
             </div>
-          </Paper>
+          </div>
         )}
 
-        <Paper withBorder p="xs" style={{ flex: '1 1 280px', minWidth: 220, display: 'flex', flexDirection: 'column' }}>
-          <Text size="xs" c="dimmed" mb="xs">
-            Event types
-          </Text>
+        <div className="py-3 flex min-w-0 flex-1 basis-72 flex-col" data-slot="breakdown-panel">
+          <div className="mb-2">Event types</div>
           {loading && counts.length === 0 ? (
-            <Text size="xs" c="dimmed" p="xs">
-              loading…
-            </Text>
+            <div className="p-2">loading...</div>
           ) : (
-            <div style={{ flex: '1 1 auto', minHeight: 0, overflowY: 'auto' }}>
-              <Table fz="xs" style={{ tableLayout: 'fixed', width: '100%' }}>
-                <Table.Thead style={{ position: 'sticky', top: 0, background: 'var(--panel)' }}>
-                  <Table.Tr>
-                    <Table.Th>type</Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
-                      events
-                    </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
-                      rows
-                    </Table.Th>
-                    <Table.Th w="5.5rem" ta="right">
-                      bytes
-                    </Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
+            <div className="min-h-0 flex-1 overflow-auto">
+              <Table className="w-full table-fixed">
+                <TableHeader className="sticky top-0 z-10">
+                  <TableRow>
+                    <TableHead>type</TableHead>
+                    <TableHead className="w-20 text-right">events</TableHead>
+                    <TableHead className="w-20 text-right">rows</TableHead>
+                    <TableHead className="w-20 text-right">bytes</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {counts.map((c) => {
                     const isRow = ROW_TYPES.has(c.type_name)
                     const bytes = bytesByType.get(c.type_name)
                     return (
-                      <Tooltip
+                      <TableRow
                         key={c.type_name}
-                        label="show these events"
-                        openDelay={150}
-                        withinPortal
-                        disabled={!isRow}
+                        {...clickableRow(() => onOpenType(c.type_name))}
+                        className="cursor-pointer"
                       >
-                        <Table.Tr
-                          {...(isRow ? clickableRow(() => onOpenType(c.type_name)) : {})}
-                          style={{ cursor: isRow ? 'pointer' : undefined }}
-                        >
-                          <Table.Td>{c.type_name}</Table.Td>
-                          <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {c.count.toLocaleString()}
-                          </Table.Td>
-                          <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {isRow && c.rows_total > 0 ? c.rows_total.toLocaleString() : ''}
-                          </Table.Td>
-                          <Table.Td ta="right" style={{ fontVariantNumeric: 'tabular-nums' }}>
-                            {bytes ? fmtBytes(bytes) : ''}
-                          </Table.Td>
-                        </Table.Tr>
-                      </Tooltip>
+                        <TableCell>
+                          <KindBadge typeName={c.type_name} size="sm" />
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{c.count.toLocaleString()}</TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {isRow && c.rows_total > 0 ? c.rows_total.toLocaleString() : ''}
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">{bytes ? fmtBytes(bytes) : ''}</TableCell>
+                      </TableRow>
                     )
                   })}
-                  <Table.Tr style={{ borderTop: '1px solid var(--border)' }}>
-                    <Table.Td c="dimmed" fw={600}>
-                      total
-                    </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
-                      {totalEvents.toLocaleString()}
-                    </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
-                      {totalRows.toLocaleString()}
-                    </Table.Td>
-                    <Table.Td ta="right" c="dimmed" fw={600} style={{ fontVariantNumeric: 'tabular-nums' }}>
+                  <TableRow>
+                    <TableCell>total</TableCell>
+                    <TableCell className="text-right tabular-nums">{totalEvents.toLocaleString()}</TableCell>
+                    <TableCell className="text-right tabular-nums">{totalRows.toLocaleString()}</TableCell>
+                    <TableCell className="text-right tabular-nums">
                       {fmtBytes(metrics?.event_size.total ?? 0)}
-                    </Table.Td>
-                  </Table.Tr>
-                </Table.Tbody>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
               </Table>
             </div>
           )}
-        </Paper>
-      </Group>
-    </Stack>
+        </div>
+      </div>
+    </div>
   )
 }

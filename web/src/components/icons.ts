@@ -1,12 +1,12 @@
 import { IconX, IconAlertTriangle, IconRotateClockwise2, IconCheck, type IconProps } from '@tabler/icons-react'
-import { createElement, type ComponentType, type CSSProperties, type FC } from 'react'
+import { createElement, type ComponentType, type FC } from 'react'
 
 /**
  * Inline icon wrapper: tabler icons default to 24px (oversized next to this
- * app's 11–13px text). Wrap with a consistent 16px / 1.75-stroke default and
+ * app's 11-13px text). Wrap with a consistent 16px / 1.75-stroke default and
  * middle vertical alignment so icons sit centered inline with content. Any
  * prop (size, stroke, color, style) is overridable per call site. Defined with
- * createElement so this stays a .ts file (no rename → no dev-server HMR churn).
+ * createElement so this stays a .ts file (no rename -> no dev-server HMR churn).
  */
 function inlineIcon(Inner: ComponentType<IconProps>): FC<IconProps> {
   return (props: IconProps) =>
@@ -14,50 +14,29 @@ function inlineIcon(Inner: ComponentType<IconProps>): FC<IconProps> {
       size: 16,
       stroke: 1.75,
       ...props,
-      style: { verticalAlign: 'middle', ...props.style },
+      className: props.className ? `${'align-middle'} ${props.className}` : 'align-middle',
     })
 }
 
 export const Close = inlineIcon(IconX)
 export const Warning = inlineIcon(IconAlertTriangle)
-// uint32 end_log_pos rolled over past 4 GiB — a circular "wrapped around"
+// uint32 end_log_pos rolled over past 4 GiB - a circular "wrapped around"
 // glyph, not a back/undo arrow.
 export const WrapArrow = inlineIcon(IconRotateClockwise2)
 export const Check = inlineIcon(IconCheck)
 export const Cross = inlineIcon(IconX)
 
-/** Event-kind → palette CSS var. Mantine's `variant="light"` renders washed-out
- *  in dark mode (~10% fill + a muted `-light-color` text). We drive the badge
- *  off our own tokens instead so the hue reads clearly in both schemes. */
-const KIND_VAR: Record<string, string> = {
-  WRITE_ROWS_V2: '--green',
-  WRITE_ROWS_V1: '--green',
-  UPDATE_ROWS_V2: '--orange',
-  UPDATE_ROWS_V1: '--orange',
-  DELETE_ROWS_V2: '--red',
-  DELETE_ROWS_V1: '--red',
-  QUERY: '--grape',
-  XID: '--accent',
-  // Indigo, not teal: teal sits right next to WRITE's green and the two were
-  // near-indistinguishable. Indigo (between sky & violet) is clearly outside
-  // the green data-change family. See web/src/theme.ts `--indigo`.
-  TABLE_MAP: '--indigo',
-  default: '--muted',
-}
+export type EventBadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'outline'
 
-/** Inline style for a kind badge, overriding Mantine Badge's internal
- *  `--badge-*` vars. Pair with `variant="light"`. Goal: hue is distinct but
- *  quiet — a faint tinted fill and text dimmed toward the background, no loud
- *  border. Bright-on-dark full-chroma text reads as "glowing" and crowds
- *  adjacent rows; this keeps categories scannable at low cognitive load. */
-export function kindBadgeStyle(kind: string): CSSProperties {
-  const v = KIND_VAR[kind] ?? KIND_VAR.default
-  return {
-    '--badge-bg': `color-mix(in srgb, var(${v}) 14%, transparent)`,
-    '--badge-color': `var(${v})`,
-    border: 'none',
-    fontFamily: 'var(--mono)',
-  } as CSSProperties
+/** Event-kind -> semantic Badge variant following strict green quarantine and data roles. */
+export function kindToBadgeVariant(typeName: string): EventBadgeVariant {
+  if (typeName.startsWith('WRITE_ROWS')) return 'success'
+  if (typeName.startsWith('UPDATE_ROWS')) return 'warning'
+  if (typeName.startsWith('DELETE_ROWS')) return 'error'
+  if (typeName === 'QUERY' || typeName === 'CREATE' || typeName === 'ALTER') return 'info'
+  if (typeName === 'DROP') return 'error'
+  if (typeName === 'TRUNCATE') return 'warning'
+  return 'outline'
 }
 
 /** Anomaly severity → standard Mantine color name. */

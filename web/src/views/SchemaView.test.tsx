@@ -1,40 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
 import SchemaView from './SchemaView'
-import { theme } from '../theme'
 import * as apiModule from '../lib/api'
 import type { EventPage, EventRow } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
-// jsdom doesn't implement ResizeObserver — Mantine needs it.
-;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-
 function wrap(ui: React.ReactElement) {
-  return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      {ui}
-    </MantineProvider>,
-  )
+  return render(ui)
 }
 
 function makeEvent(overrides: Partial<EventRow> = {}): EventRow {
@@ -85,19 +57,23 @@ describe('SchemaView', () => {
 
   it('renders DDL rows after load', async () => {
     wrap(<SchemaView {...makeProps()} />)
-    // Note: TruncCell renders the label in both the <td> and its (cursor-following)
-    // Tooltip.Floating node, so the summary text appears twice — assert ≥1.
     await waitFor(() => {
       expect(screen.getAllByText('CREATE TABLE t1 (id INT)').length).toBeGreaterThan(0)
       expect(screen.getAllByText('ALTER TABLE t1 ADD COLUMN name VARCHAR(100)').length).toBeGreaterThan(0)
     })
   })
 
-  it('shows DDL kind badges', async () => {
+  it('shows DDL kind badges with query semantics, not green insert', async () => {
     wrap(<SchemaView {...makeProps()} />)
     await waitFor(() => {
-      expect(screen.getByText('CREATE')).toBeTruthy()
-      expect(screen.getByText('ALTER')).toBeTruthy()
+      const createBadge = screen.getByText('CREATE').closest('[data-slot="badge"]')
+      const alterBadge = screen.getByText('ALTER').closest('[data-slot="badge"]')
+      expect(createBadge).toBeTruthy()
+      expect(alterBadge).toBeTruthy()
+      expect(createBadge?.getAttribute('data-kind')).toBe('CREATE')
+      expect(createBadge?.getAttribute('data-variant')).toBe('info')
+      expect(alterBadge?.getAttribute('data-kind')).toBe('ALTER')
+      expect(alterBadge?.getAttribute('data-variant')).toBe('info')
     })
   })
 
@@ -105,13 +81,23 @@ describe('SchemaView', () => {
     const onOpenEvent = vi.fn()
     wrap(<SchemaView {...makeProps({ onOpenEvent })} />)
     await waitFor(() => screen.getAllByText('CREATE TABLE t1 (id INT)'))
-    // The <td> is the cell; the duplicate is the tooltip label node. Click the
-    // one inside a table row.
     screen
       .getAllByText('CREATE TABLE t1 (id INT)')
       .find((el) => el.closest('tr'))
       ?.closest('tr')
       ?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(onOpenEvent).toHaveBeenCalledWith(100)
+  })
+
+  it('activates onOpenEvent on keyboard Enter or Space key', async () => {
+    const onOpenEvent = vi.fn()
+    wrap(<SchemaView {...makeProps({ onOpenEvent })} />)
+    await waitFor(() => screen.getAllByText('CREATE TABLE t1 (id INT)'))
+    const row = screen
+      .getAllByText('CREATE TABLE t1 (id INT)')
+      .find((el) => el.closest('tr'))
+      ?.closest('tr')!
+    row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
     expect(onOpenEvent).toHaveBeenCalledWith(100)
   })
 

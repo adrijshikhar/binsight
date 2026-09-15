@@ -1,40 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
 import AnomaliesView from './AnomaliesView'
-import { theme } from '../theme'
 import * as apiModule from '../lib/api'
 import type { Anomaly } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
-// jsdom doesn't implement ResizeObserver — Mantine needs it.
-;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-
 function wrap(ui: React.ReactElement) {
-  return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      {ui}
-    </MantineProvider>,
-  )
+  return render(ui)
 }
 
 const MOCK_ANOMALIES: Anomaly[] = [
@@ -89,11 +61,13 @@ describe('AnomaliesView', () => {
     })
   })
 
-  it('shows severity badges', async () => {
+  it('shows severity badges with data-severity', async () => {
     wrap(<AnomaliesView {...makeProps()} />)
     await waitFor(() => {
-      expect(screen.getByText('high')).toBeTruthy()
-      expect(screen.getByText('critical')).toBeTruthy()
+      const badges = document.querySelectorAll('[data-slot="badge"]')
+      expect(badges.length).toBe(2)
+      expect(badges[0].getAttribute('data-severity')).toBe('high')
+      expect(badges[1].getAttribute('data-severity')).toBe('critical')
     })
   })
 
@@ -119,11 +93,29 @@ describe('AnomaliesView', () => {
     expect(onOpenTxn).toHaveBeenCalledWith(42)
   })
 
+  it('activates txn link on keyboard Enter key', async () => {
+    const onOpenTxn = vi.fn()
+    wrap(<AnomaliesView {...makeProps({ onOpenTxn })} />)
+    await waitFor(() => screen.getByText('txn #42'))
+    const link = screen.getByText('txn #42').closest('[role="button"]')!
+    link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    expect(onOpenTxn).toHaveBeenCalledWith(42)
+  })
+
   it('calls onOpenEvent when event link is clicked', async () => {
     const onOpenEvent = vi.fn()
     wrap(<AnomaliesView {...makeProps({ onOpenEvent })} />)
     await waitFor(() => screen.getByText('@ 100'))
     screen.getByText('@ 100').dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(onOpenEvent).toHaveBeenCalledWith(100)
+  })
+
+  it('activates event link on keyboard Space key', async () => {
+    const onOpenEvent = vi.fn()
+    wrap(<AnomaliesView {...makeProps({ onOpenEvent })} />)
+    await waitFor(() => screen.getByText('@ 100'))
+    const link = screen.getByText('@ 100').closest('[role="button"]')!
+    link.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }))
     expect(onOpenEvent).toHaveBeenCalledWith(100)
   })
 
@@ -151,5 +143,15 @@ describe('AnomaliesView', () => {
   it('shows re-run detection button', () => {
     wrap(<AnomaliesView {...makeProps()} />)
     expect(screen.getByRole('button', { name: /re-run detection/i })).toBeTruthy()
+  })
+
+  it('preserves high and critical severity on rows', async () => {
+    wrap(<AnomaliesView {...makeProps()} />)
+    await waitFor(() => {
+      expect(screen.getByText('huge_txn_rows')).toBeTruthy()
+    })
+    const rows = screen.getAllByRole('row')
+    expect(rows[1].getAttribute('data-severity')).toMatch(/high|critical/)
+    expect(rows[2].getAttribute('data-severity')).toMatch(/high|critical/)
   })
 })
