@@ -5,69 +5,31 @@ description: A dense forensic workbench with neutral surfaces, blue interaction,
 
 # Binsight Design System
 
-## Current Phase Override - 2026-09-14
+## Current Phase - Centralized Palette and Typography
 
-2026-09-15 update: Colors-only implementation is approved after checkpoint `1437a7a`. `web/src/styles/ui.css` is the sole executable theme source for this phase, including semantic data colors and state colors. Stock Coss component source remains pinned. All non-color design changes remain paused. The archived neutral palette remains in the stock lockfile as checkpoint evidence, not as the current theme.
+Binsight is a desktop operational tool for inspecting binlog events, transactions, schema changes, anomalies, and decoder differences. Preserve API/SSE behavior, URL navigation, persisted preferences, virtualized rendering, forensic identifiers, and the original logo.
 
-The verified source checkpoint is pinned in `web/coss-stock-lock.json`. It uses upstream Coss components, neutral colors, built-in semantic variants, and stock table padding. No custom mutation badge variants, success-token override, forced 32px row height, or application tab animations remain. The 32px target and final palettes below are explicitly deferred.
+`web/src/styles/ui.css` is the sole executable application style and token source. Components may select semantic roles and layout utilities but must not add literal colors, inline appearance styles, local appearance recipes, or CSS Modules. Inline styles are reserved for dynamic runtime geometry such as virtual offsets and dragged widths. Never use imperative JavaScript hover styling.
 
-Custom design implementation is paused by explicit user instruction. The current checkpoint uses stock Coss UI and removes all application CSS Modules and the bespoke theme. Only Tailwind/Coss foundation CSS remains in `web/src/styles/ui.css`; application layout utilities, dynamic geometry, and forensic data semantics remain. This desktop web app has no mobile acceptance target. The specifications below are future work, not current acceptance criteria. Codex now owns implementation. Apply these design changes incrementally only after user review of the stock baseline.
+The approved charcoal dark palette is: `#141516` background; `#1b1c1e`, `#212224`, `#252629`, and `#27282b` surface levels; and `#34363b` / `#45484f` separators. Light tokens, blue interaction tokens, semantic data tokens, and logo tokens remain unchanged.
 
-## Overview
+Typography is approved without a new font dependency. Centralize the existing system sans and mono stacks in `ui.css`; apply view headings `20px/26px`, section headings `16px/22px`, metrics `24px/30px`, and application prose `13px/20px`, with zero letter spacing. Numeric data uses tabular monospace and right alignment. Stock Coss controls and badges retain their own type recipes and geometry.
 
-This root document is the canonical visual contract for the application in `web/`. It replaces the previous marketing-site analysis and private companion design reference. The Astro marketing website is outside this document's migration scope.
+Ordinary Coss controls use stock default props and the stock 32px desktop size. Do not add 28px filter controls or CSS size overrides. Mobile sheets, mobile-specific controls, and mobile acceptance checks are out of scope. Density, 32px event-row enforcement, radii, shapes, shadows, and elevation remain deferred rather than mandatory.
 
-Status: target specification, not a claim that the current partially migrated UI conforms. The user approved native stock Coss UI on 2026-09-14. Coss is the component source, Base UI supplies its behavior, and Tailwind supplies its styling. This supersedes both the earlier Radix-first direction and generic shadcn-as-foundation instructions. Codex maintains the design with user review; AntiGravity implements it. Do not silently change this contract to justify implementation drift.
+The verified stock checkpoint in `web/coss-stock-lock.json` pins upstream Coss component and helper sources. Do not format or modify those files except for import-path changes; verify them with `rtk bun scripts/verify-coss-source.mjs` from `web/`. The archived neutral palette is checkpoint evidence, not the active palette.
 
-Binsight is an operational tool for inspecting binlog events, transactions, schema changes, anomalies, and decoder differences. Prioritize scanning, comparison, keyboard operation, and accurate data. Preserve API/SSE behavior, URL navigation, persisted preferences, virtualized rendering, and forensic identifiers.
+## Historical Reference
 
-### Stock-first implementation
-
-1. Start each replacement with the actual [Coss UI](https://coss.com/ui/docs) source and documented stock composition. Coss is the library, not visual inspiration for homemade components.
-2. Preserve stock component sizes, radii, neutral primary, borders, shadows and state recipes during the functional migration. Do not port Mantine appearance overrides or apply final Binsight variants immediately.
-3. Preserve domain behavior, accessibility, data semantics, 32px virtual event rows and specialized layout throughout. Stock defaults never excuse lost actions, illegible controls, green operational success, or unbounded rendering.
-4. Record a working stock checkpoint across all views before applying the theme. Then apply colors, typography/density, shapes/pills, and elevation/states in separate tested passes.
-5. Add custom CSS only for a demonstrated gap that stock composition, tokens, or a shared variant cannot cover. Delete superseded CSS only after its replacement is verified; never strip all styles first.
-
-**Phase precedence:** Until the stock checkpoint, stock Coss appearance is explicitly accepted instead of the final appearance tables below. Neutral operational feedback is accepted; green chrome is not. Accessibility, zero tracking, no em dash copy, correct event semantics, responsive access, and virtual-row geometry apply from the start. Final Binsight values become acceptance requirements in their corresponding theme pass. Existing valid Binsight domain styling may remain; do not restyle retained forensic surfaces simply to make them stock.
-
-### Ownership and executable tokens
-
-- `DESIGN.md` specifies intent; target `web/src/styles/theme.css` is the single executable token source. Do not build a Markdown-to-CSS compiler, runtime theme generator, or duplicate palette file.
-- Own Coss source in `web/src/components/ui/` and its documented support files in `web/src/lib/`. Use Coss registry entries through the shadcn CLI, or copy their official source, with the compatible `@base-ui/react` package. Verify actual generated imports and versions; do not infer the primitive layer from a generic preset name or CLI default.
-- Base UI is headless behavior, not an additional theme. Coss source owns stock appearance; the single theme file and small shared recipes own later Binsight changes. Native display components and Recharts do not need artificial Base UI wrappers. Use Coss Toast, not Sonner. Do not add Radix primitives, Slot, or a second interactive primitive layer for convenience.
-- After the stock checkpoint, Tailwind maps Binsight semantic tokens through CSS variable references and supplies layout utilities. Do not put a second hex palette in Tailwind configuration. Shared components own visual variants. Views must not override shared control colors, radii, or states.
-- CSS Modules remain valid for table geometry, virtualization, resizable panes, charts, hex/diff inspectors, and specialized layout. Do not translate working layout CSS merely to reduce the number of CSS files.
-- Keep Mantine temporarily while replacing vertical slices. Its theme is a temporary adapter, not a second long-term design system. Remove the provider, styles, hooks, and packages only after all consumers migrate.
-- Coexistence exception: freeze the old Mantine internal color ladders for unmigrated controls instead of forcing CSS variables through its color parser. Do not expand those ladders or treat them as target tokens. Remove them at the Mantine-free checkpoint. New primitive tests run without Mantine; legacy test wrappers remain only while their tested subtree still needs them.
-- shadcn's conventional `--accent` means a subtle surface, while Binsight's existing `--accent` means solid blue. Do not blindly merge those namespaces: use `--primary` for solid blue, `--accent` for the stock subtle interaction surface, and explicit `--brand` for legacy blue consumers. Rewrite existing solid-blue consumers to `--brand` before switching the meaning of `--accent`.
-- Inventory both token definitions and consumers before the namespace change, including tests and charts. Rewrite legacy references and remove resolver declarations that shadow the new roles in one tested step. Keep Tailwind preflight disabled during coexistence; enable it only after legacy components and competing resets are removed.
-
-### Coss installation and coexistence
-
-Follow [Get Started](https://coss.com/ui/docs/get-started) and [Styling](https://coss.com/ui/docs/styling). Inspect generated files in a temporary directory and record source URLs, resolved CLI version, registry entries, dependencies and license. Prefer individual entries such as `@coss/button`, `@coss/tooltip`, `@coss/combobox` and `@coss/toast`. Do not run full `@coss/style` initialization or install all `@coss/ui` components over the existing app. Those presets also install fonts and base styles; Next.js font/layout examples are not Vite instructions.
-
-Keep stock Coss neutral light/dark role values in a clearly labeled temporary section of `theme.css`, never a second competing theme file. Preserve Binsight legacy and domain values in their existing explicit roles. Detach legacy aliases from stock roles where a Coss default would otherwise change an unmigrated surface, and test each affected consumer. Do not let two root declarations silently compete. Portals inherit the same root scheme and Coss roles. At the theme passes, replace temporary values with the target table and reconsolidate aliases; remove the temporary section rather than retaining two palettes. Preserve already completed namespace fixes, not necessarily the early custom appearance of generic shadcn controls.
-
-Keep Tailwind preflight disabled while Mantine remains. Integrate Coss-required base rules deliberately, including app-root isolation and body relative positioning, and check portal stacking. Do not copy a second global reset. Coss docs still label the library early-development; freeze reviewed source and verify upgrades rather than tracking regenerated latest source blindly.
-
-Coss roles differ in details from generic shadcn. Inventory its info, warning, success, destructive, sidebar, font-heading and shadow consumers. Keep needed stock support tokens defined in the stock section; never expose green success variants for operational feedback. Use neutral/default or info notifications. Final mappings belong in the role table below, not in per-view patches.
-
-Rule precedence within this document: explicit role-specific exceptions override the general component rule; the target-token and shape tables define final values. Temporary coexistence rules expire when Mantine is removed. Research values and current-code observations are evidence, not alternative requirements. New deviations require a documented design decision, not a local override.
-
-### Resuming the interrupted migration
-
-Preserve all partial work, tests, tokens, and unrelated changes. Before resuming, inventory installed packages, generated UI files, consumers, and completed task evidence. Existing Radix-backed controls may remain only while their stock Coss replacements are being verified; do not build further on them. Replace their primitive bindings through a tested, component-scoped Coss source change, then remove unused Radix dependencies. This temporary exception does not permit a mixed-primitive final application.
-
-Do not mechanically rename imports. Base UI composition uses its documented `render` API where applicable rather than assuming Radix `asChild`/Slot; ref forwarding, event callback details, controlled state, portal placement, and open/disabled data attributes must match the installed Base UI component. Verify behavior and update shared selectors accordingly. Never introduce a compatibility wrapper that recreates Radix's whole API.
+The following sections preserve prior design decisions and migration evidence. They are not active requirements when they conflict with the current phase above.
 
 ## Colors
 
 ### Target tokens
 
-All values are CSS custom properties in the single theme file. Light mode is first-class. Match the scheme on the document root so portals inherit it.
+All values are CSS custom properties in `web/src/styles/ui.css`. Light mode is first-class. Match the scheme on the document root so portals inherit it.
 
-Theme contract: `html[data-theme="dark"]` or `html[data-theme="light"]`, with the `.dark` class synchronized for stock utilities. The saved preference is `dark`, `light`, or `auto`; retain the existing `localStorage["mantine-color-scheme-value"]` key as a compatibility contract, not a package dependency. Missing, invalid, or inaccessible storage defaults to dark. Auto resolves through `prefers-color-scheme`, and follows changes while selected. Apply the resolved scheme before mounting React and test reloads for a wrong-theme flash. The owned provider is the only writer; during coexistence, pass its resolved value to Mantine with `forceColorScheme` rather than maintaining two independent writers. Cross-tab storage updates must synchronize without write loops. Portals inherit the root scheme.
+Theme contract: `html[data-theme="dark"]` or `html[data-theme="light"]`, with the `.dark` class synchronized for stock utilities. The saved preference is `dark`, `light`, or `auto`; missing, invalid, or inaccessible storage defaults to dark. Auto resolves through `prefers-color-scheme` and follows changes while selected. Apply the resolved scheme before mounting React and test reloads for a wrong-theme flash. Portals inherit the root scheme.
 
 | Token | Dark | Light | Use |
 |---|---|---|---|
@@ -135,30 +97,10 @@ Coss uses `--destructive-foreground` for error ink on subtle surfaces as well as
 
 Name the destructive hover token `--destructive-hover`. Name the permitted ready-dot token `--status-ready`; all other passive operational status labels are neutral. A Coss compatibility `success` token is neutral and never broadens the green exception.
 
-### Legacy consumer completion
-
-Deleting the old theme must not leave retained CSS Modules with unresolved variables. The following compatibility mappings are permitted in the same theme file; new components use the explicit role tokens instead.
-
-| Legacy family | Target |
-|---|---|
-| `--accent-hi`, `--accent-focus`, `--accent-soft`, `--surface-active` | Primary-hover, ring, selection, row-selected respectively |
-| `--green`, `--orange`, `--red`, `--grape` | Data-insert, data-update, data-delete, data-query respectively |
-| `--sev-critical-text`, `--sev-high-text` | Data-delete |
-| `--sev-medium-text`, `--warn`, `--warn-border` | Data-update |
-| `--sev-low-text` | Muted-foreground |
-| `--warn-bg`, `--warn-row-bg`, `--warn-row-hover` | Data-update-bg; the persistent rail conveys warning even on selection |
-| `--diff-dis-bg`, `--diff-dis-bar` | Data-delete-bg and data-delete |
-| `--badge-{green,orange,red,grape}-{bg,text}` | Corresponding data-role background and ink |
-| `--badge-*-border` | Border |
-| `--badge-accent-{bg,text}` | Selection and brand-foreground |
-| `--badge-gray-{bg,text}` | Surface-2 and foreground-secondary |
-
-Remove `--diff-ok` agreement consumers rather than preserving its misleading meaning. Retire teal/indigo event badges: neutral event categories use neutral tokens; schema/query categories use data-query. Any surviving non-event use must be assigned its actual role, not receive a blanket hue alias. `--border-subtle` may alias surface-3 for decorative separators only. Before removing the resolver, inventory every remaining `var()` reference and verify a definition, a valid fallback, or an explicitly identified library-owned runtime variable. No unresolved token is an acceptable migration remainder.
-
 ## Typography
 
 System sans: `-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif`.
-Mono: `'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, Consolas, monospace`. Bundle fonts locally when needed; no remote font dependency.
+Mono: `'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Monaco, Consolas, monospace`. Use these existing fallbacks only; do not add or load a font dependency.
 
 Expose these stacks as `--font-sans` and `--font-mono`; `--mono` is a compatibility alias to `--font-mono`.
 
@@ -169,27 +111,28 @@ Existing size aliases may remain for retained layouts: `--fs-sm: 11px`, `--fs-ba
 | View heading | 20px / 26px | 600 |
 | Section heading | 16px / 22px | 600 |
 | Body/form label | 13px / 20px | 400 / 500 |
-| Compact control/supporting text | 12px / 16px | 400 / 500 |
-| Data badge | 11px / 14px | 500 |
+| Application prose | 13px / 20px | 400 / 500 |
+| Stock control and badge text | Stock recipe | Stock recipe |
 | Metric value | 24px / 30px | 600 |
 
 All letter spacing is zero. Do not use fluid viewport-scaled type or oversized marketing headings. Numbers, timestamps, offsets, GTIDs, transaction IDs, and metrics use monospace with tabular numerals. Right-align numeric columns. Preserve uppercase event names without uppercasing user identifiers.
 
 Use concise factual copy. No em dash characters in UI copy, placeholders, or authored documentation. Use regular hyphens. No visible styling, framework, or shortcut explanations; accessible names/tooltips may name actions or expose truncated data.
 
-## Layout
+## Deferred Layout, Elevation, and Shapes
+
+The following geometry, density, elevation, and shape material is historical reference. It is deferred and does not authorize current geometry changes.
+
+### Layout
 
 - Base spacing: 4, 8, 12, 16, 24, 32px. Specified chip interiors may use 6px padding and 2px optical spacing.
-- Preserve the 44px app header, file sidebar, underline tabs, filter ribbon, data surface, and resizable detail aside.
-- Desktop controls: 32px height. Dense filter inputs: 28px. Preserve minimum 38px top filter band and 34px filter row; wrap groups when required rather than clipping controls. On coarse pointers, standalone controls and chip remove targets grow to 44px and bands may grow with them.
+- Preserve the current app shell, file sidebar, tabs, filter ribbon, data surface, and resizable detail aside.
+- Ordinary desktop controls use the stock 32px Coss defaults; do not add compact filter sizing.
 - Events rows: 32px including the 1px separator. Virtualizer estimates and CSS must agree. Never replace virtualization with a full rendered stock table.
 - Sections are unframed or full-width bands. Individual metric/table items may be cards; no cards inside cards.
-- At narrow widths, collapse the sidebar behind an accessible control, wrap filter groups, and horizontally scroll the table within its data region. Preserve access to full identifiers.
-- Below 768px, detail uses a full-width modal Sheet with managed focus. Desktop detail remains nonmodal and resizable. Do not trap desktop aside focus.
-- All interactive targets are at least 24x24px. Dense table rows remain 32px even on coarse pointers; they are the explicit exception to the 44px standalone-control target. A smaller visual chip can have a larger nonoverlapping target outside dense rows. Inside rows, use a 24px action target with the 20px visual badge.
-- Validate at 1440x900 and 390x844, both themes, plus 200% zoom. No page-level horizontal overflow or overlapping controls; data-region overflow is intentional.
+- Validate desktop layouts at 1440x900 and 200% zoom. No page-level horizontal overflow or overlapping controls; data-region overflow is intentional.
 
-## Elevation & Depth
+### Elevation & Depth
 
 Use tonal surfaces and 1px hairlines, not dark drop shadows. Lifted panels receive `inset 0 1px 0 rgba(255,255,255,.05)` in dark mode and no highlight in light mode. Interactive panel hover changes surface without resizing or translation.
 
@@ -199,7 +142,7 @@ Portalled dropdowns/tooltips use the popover tokens and escape clipping scroll r
 
 Keyboard focus: 2px ring with 2px offset, visibly separated from solid controls by a surface-colored gap. Focus must remain visible in ribbons, tables, and portals.
 
-## Shapes
+### Shapes
 
 **Binsight pills are compact rounded rectangles, not oval capsules.** Their name is not a requirement for fully rounded ends.
 
@@ -215,7 +158,9 @@ Dots and switch thumbs are circles. App regions and table rows do not inherit ca
 
 Tailwind integration: radius and font names already match Tailwind v4 theme names. Declare their values once in the theme file's `@theme` block; do not create circular aliases such as `--radius-sm: var(--radius-sm)`. Color utilities use distinct names, for example `--color-primary: var(--primary)` in `@theme inline`. Spacing utilities may use the stock 4px base, with shared dense variants for the specified 2px/6px exceptions.
 
-## Components
+## Deferred Component Appearance Reference
+
+This component material is historical reference. Preserve stock Coss control and badge geometry until a dedicated approved phase.
 
 ### Pills and badges
 
