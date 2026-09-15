@@ -283,6 +283,38 @@ describe('SettingsView', () => {
     expect(restartSpy).not.toHaveBeenCalled()
   })
 
+  it('restarts streaming when confirmation is accepted', async () => {
+    const restartSpy = vi.spyOn(apiModule.api, 'restartStreamFromCurrent').mockResolvedValue()
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    vi.spyOn(apiModule.api, 'settings').mockResolvedValue({
+      ...MOCK_SETTINGS,
+      stream: { ...MOCK_SETTINGS.stream, enabled: true },
+    })
+
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    fireEvent.click(screen.getAllByRole('tab').find((t) => t.textContent === 'Remote streaming')!)
+    fireEvent.click(await screen.findByRole('button', { name: /restart from current position/i }))
+
+    await waitFor(() => expect(restartSpy).toHaveBeenCalledOnce())
+  })
+
+  it('shows an inline error for malformed settings JSON imports', async () => {
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    fireEvent.click(screen.getAllByRole('tab').find((t) => t.textContent === 'Backup & transfer')!)
+    const input = document.getElementById('import-json') as HTMLInputElement
+    expect(input).toBeTruthy()
+    const file = new File(['{'], 'settings.json', { type: 'application/json' })
+    Object.defineProperty(file, 'text', { value: vi.fn().mockResolvedValue('{') })
+
+    fireEvent.change(input, { target: { files: [file] } })
+
+    expect((await screen.findByRole('alert')).textContent).toContain('invalid settings JSON')
+  })
+
   it('handles JSON import validation and export links', async () => {
     wrap(<SettingsView onClose={() => {}} />)
     await waitForLoad()
