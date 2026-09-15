@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardPanel } from '@/components/ui/card'
 import { Close } from '../components/icons'
-import { IconChevronDown } from '@tabler/icons-react'
+import { IconArrowDown } from '@tabler/icons-react'
 
 // In-app rendering of the pluggable-decoder architecture diagram, so anyone
 // opening the tool can understand how it fits together. Mirrors
@@ -12,12 +12,14 @@ import { IconChevronDown } from '@tabler/icons-react'
 interface LayerProps {
   label: string
   children: ReactNode
+  className?: string
+  id?: string
 }
 
-function Layer({ label, children }: LayerProps) {
+function Layer({ label, children, className, id }: LayerProps) {
   return (
-    <section className="space-y-2">
-      <h4>{label}</h4>
+    <section id={id} className={`architecture-layer ${className ?? ''}`}>
+      <h4 className="architecture-layer-label">{label}</h4>
       {children}
     </section>
   )
@@ -25,16 +27,16 @@ function Layer({ label, children }: LayerProps) {
 
 function Arrow({ note }: { note: string }) {
   return (
-    <div className="flex items-center justify-center gap-1.5 py-0.5">
-      <IconChevronDown size={14} aria-hidden="true" />
+    <div className="architecture-arrow">
+      <IconArrowDown size={18} stroke={1.75} aria-hidden="true" />
       <code>{note}</code>
     </div>
   )
 }
 
-function Box({ children }: { children: ReactNode }) {
+function Box({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <Card className="min-w-36 flex-1">
+    <Card className={`architecture-box ${className ?? ''}`}>
       <CardPanel>{children}</CardPanel>
     </Card>
   )
@@ -72,11 +74,11 @@ const CAP_GLOSSARY: { cap: string; what: string; unlocks: string }[] = [
 
 function CapGlossary() {
   return (
-    <div className="flex flex-col gap-2.5" id="capabilities">
-      <div>What each capability means</div>
+    <div className="architecture-glossary" id="capabilities">
+      <div className="architecture-box-title">What each capability means</div>
       {CAP_GLOSSARY.map(({ cap, what, unlocks }) => (
-        <div key={cap} className="flex items-start gap-2 flex-nowrap">
-          <Badge variant="secondary" size="sm" className="min-w-28 shrink-0">
+        <div key={cap} className="architecture-glossary-row">
+          <Badge variant="secondary" size="sm" className="architecture-glossary-badge">
             {cap}
           </Badge>
           <div>
@@ -90,7 +92,7 @@ function CapGlossary() {
 
 function CapBadges({ caps }: { caps: string[] }) {
   return (
-    <div className="flex flex-wrap gap-1 mt-1.5">
+    <div className="architecture-badges">
       {caps.map((cap) => (
         <Badge key={cap} variant="secondary" size="sm">
           {cap}
@@ -102,15 +104,21 @@ function CapBadges({ caps }: { caps: string[] }) {
 
 export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) {
   return (
-    <div className="flex flex-col p-0 max-w-[1100px] gap-2 mx-auto">
+    <div className="architecture-content">
       {/* Header */}
-      <div className="flex items-start justify-between mb-0.5">
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-2">
+      <div className="architecture-header">
+        <div>
+          <div className="architecture-title">
             <code>binsight</code>
             <h3>- Pluggable Decoder Architecture</h3>
           </div>
-          <p>Go core · no privileged library · adapters behind one interface · roles assigned by config</p>
+          <p className="architecture-subtitle">Go core · no privileged library · adapters behind one interface · roles assigned by config</p>
+          <nav className="architecture-nav" aria-label="Architecture sections">
+            <a href="#architecture-contract">Contract</a>
+            <a href="#architecture-adapters">Adapters</a>
+            <a href="#architecture-core">Core</a>
+            <a href="#architecture-web">Web UI</a>
+          </nav>
         </div>
         {onClose && (
           <Button variant="ghost" size="icon-xs" onClick={onClose} aria-label="Close architecture view">
@@ -121,7 +129,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
 
       {/* Event Sources */}
       <Layer label="Event Sources">
-        <div className="flex items-stretch gap-2 flex-wrap">
+        <div className="architecture-row">
           <Box>
             <div className="mb-1">Directory watch</div>
             <div>
@@ -147,17 +155,17 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
       <Arrow note="file path + offset" />
 
       {/* Interface */}
-      <Layer label="The Only Contract Core Knows">
-        <div className="flex items-stretch gap-2 flex-wrap">
+      <Layer id="architecture-contract" label="The Only Contract Core Knows" className="architecture-interface">
+        <div className="architecture-cols">
           <Box>
-            <pre className="overflow-x-auto whitespace-pre">{`type Decoder interface {
+            <pre className="architecture-pre">{`type Decoder interface {
     Name() string
     Capabilities() Capabilities
     Decode(ctx, src Source, opts DecodeOpts) (EventStream, error)
 }`}</pre>
           </Box>
           <Box>
-            <pre className="overflow-x-auto whitespace-pre">{`type Capabilities struct {
+            <pre className="architecture-pre">{`type Capabilities struct {
     FullScan     bool // eligible: indexer
     SeekDecode   bool // eligible: detail view
     ResumeDecode bool // eligible: incremental append-index (true seek)
@@ -166,7 +174,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
 }`}</pre>
           </Box>
         </div>
-        <div className="p-3 border mt-2">
+        <div className="architecture-glossary-panel">
           <CapGlossary />
         </div>
       </Layer>
@@ -174,10 +182,10 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
       <Arrow note="implemented by" />
 
       {/* Adapters */}
-      <Layer label="Adapters (2 shipped · 1 planned)">
+      <Layer id="architecture-adapters" label="Adapters (2 shipped · 1 planned)">
         <div className="flex flex-col gap-2">
-          <div className="flex items-stretch gap-2 flex-wrap">
-            <Box>
+          <div className="architecture-row">
+            <Box className="architecture-builtin">
               <div className="flex items-center gap-1.5 mb-1">
                 <span>go-mysql</span>
                 <Badge size="sm" variant="secondary">
@@ -187,7 +195,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
               <div>Default indexer + detail + stream. Compiled in, but holds no special status - just adapter #1.</div>
               <CapBadges caps={['FullScan', 'SeekDecode', 'ResumeDecode', 'RemoteStream', 'RowImages']} />
             </Box>
-            <Box>
+            <Box className="architecture-exec">
               <div className="flex items-center gap-1.5 mb-1">
                 <span>mysqlbinlog</span>
                 <Badge size="sm" variant="warning">
@@ -200,7 +208,7 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
               </div>
               <CapBadges caps={['FullScan', 'RowImages']} />
             </Box>
-            <Box>
+            <Box className="architecture-exec architecture-planned">
               <div className="flex items-center gap-1.5 mb-1">
                 <span>connector-java</span>
                 <Badge size="sm" variant="warning">
@@ -218,11 +226,11 @@ export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) 
             </Box>
           </div>
 
-          <div className="flex items-stretch gap-2 flex-wrap">
+          <div className="architecture-cols">
             {/* roles */}
-            <div className="flex-1">
+            <div className="architecture-roles">
               <div className="mb-1.5">roles, not hardcode (configured in Settings)</div>
-              <pre className="overflow-x-auto whitespace-pre">{`adapters:
+              <pre className="architecture-pre">{`adapters:
   go-mysql:       { type: builtin }
   mysqlbinlog:    { type: exec }
   connector-java: { type: exec }   # planned
@@ -235,9 +243,9 @@ roles:
             </div>
 
             {/* normalized event schema */}
-            <div className="flex-1">
+            <div className="architecture-roles architecture-schema">
               <div className="mb-1.5">normalized event schema v1 - the real coupling point</div>
-              <div className="flex items-stretch gap-1.5 flex-wrap mt-1">
+              <div className="architecture-schema-layers">
                 <Box>
                   <div className="mb-1">header</div>
                   <div>
@@ -264,8 +272,8 @@ roles:
       <Arrow note="JSON-lines (exec) / structs (builtin) - same schema" />
 
       {/* Core */}
-      <Layer label="Core (Go binary)">
-        <div className="flex items-stretch gap-2 flex-wrap">
+      <Layer id="architecture-core" label="Core (Go binary)">
+        <div className="architecture-row">
           <Box>
             <div className="mb-1">Indexer</div>
             <div>
@@ -304,8 +312,8 @@ roles:
       <Arrow note="REST/JSON + SSE" />
 
       {/* Web UI */}
-      <Layer label="Web UI (React + TS · go:embed · localhost)">
-        <div className="flex items-stretch gap-2 flex-wrap">
+      <Layer id="architecture-web" label="Web UI (React + TS · go:embed · localhost)">
+        <div className="architecture-row">
           <Box>
             <div className="mb-1">Event list</div>
             <div>
@@ -330,6 +338,6 @@ roles:
   )
 }
 
-export default function ArchitectureView({ onClose }: { onClose: () => void }) {
+export default function ArchitectureView({ onClose }: { onClose?: () => void } = {}) {
   return <ArchitectureContent onClose={onClose} />
 }

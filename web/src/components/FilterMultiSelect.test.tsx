@@ -58,6 +58,18 @@ describe('FilterMultiSelect', () => {
     expect(onChange).toHaveBeenCalledWith(['alpha', 'beta'])
   })
 
+  it('keeps selected values absent from options visible and removable', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    render(<Harness initialValue={['retired']} options={['alpha']} onChange={onChange} />)
+
+    expect(screen.getByText('retired')).toBeTruthy()
+
+    await user.click(screen.getByRole('button', { name: 'Remove retired' }))
+
+    expect(onChange).toHaveBeenCalledWith([])
+  })
+
   it('shows no-results state when search does not match', async () => {
     const user = userEvent.setup()
     render(<Harness options={['alpha', 'beta']} label="Database" summaryNoun="dbs" />)

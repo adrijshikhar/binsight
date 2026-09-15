@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type React from 'react'
-import { IconX } from '@tabler/icons-react'
+import { XIcon } from 'lucide-react'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTab, TabsPanel } from '@/components/ui/tabs'
@@ -150,13 +150,13 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
                 </span>
               )}
             </div>
-            <div className="mt-1">
+            <div className="mt-1 data-text">
               pos {event.pos} &rarr; {event.end_pos} &middot;{' '}
               {[event.db_name, event.table_name].filter(Boolean).join('.')} &middot; {fmtBytes(event.size)}
             </div>
           </div>
           <Button variant="ghost" size="icon-xs" aria-label="Close drawer" onClick={onClose}>
-            <IconX className="size-4" />
+            <XIcon />
           </Button>
         </div>
       </div>
@@ -192,7 +192,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
       {err && (
         <Alert variant="error" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
+          <Button variant="outline" onClick={tab === 'diff' ? fetchDiff : fetchDetail}>
             retry
           </Button>
         </Alert>
@@ -200,7 +200,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
 
       {/* Tab strip + panels */}
       <Tabs value={tab} onValueChange={(v) => v && setTab(v as Tab)} className="flex min-h-0 flex-1 flex-col">
-        <TabsList variant="underline" size="sm" className="shrink-0" aria-label="Event inspector">
+        <TabsList size="sm" className="shrink-0" aria-label="Event inspector">
           {tabs.map((t) => (
             <TabsTab key={t} value={t}>
               {tabLabel(t)}

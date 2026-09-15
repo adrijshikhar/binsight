@@ -31,7 +31,7 @@ function DdlRow({ fileId, e, onOpen }: { fileId: number; e: EventRow; onOpen: (p
   return (
     <TableRow {...clickableRow(() => onOpen(e.pos))} className="cursor-pointer">
       <TableCell className="tabular-nums">{e.pos}</TableCell>
-      <TableCell className="w-fit">
+      <TableCell className="w-fit data-text">
         {(() => {
           const [date, clock] = fmtTimeParts(e.ts)
           return (

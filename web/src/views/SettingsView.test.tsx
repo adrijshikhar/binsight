@@ -47,7 +47,7 @@ function wrap(ui: React.ReactElement) {
 async function waitForLoad() {
   await waitFor(() => {
     const tabs = screen.getAllByRole('tab')
-    expect(tabs.length).toBe(7)
+    expect(tabs.length).toBe(6)
   })
 }
 
@@ -58,7 +58,7 @@ describe('SettingsView', () => {
     vi.spyOn(apiModule.api, 'saveSettings').mockResolvedValue({ ...MOCK_SETTINGS })
   })
 
-  it('renders the vertical tabs nav with all 7 sections', async () => {
+  it('renders the vertical tabs nav with all 6 settings sections', async () => {
     wrap(<SettingsView onClose={() => {}} />)
 
     await waitForLoad()
@@ -66,7 +66,6 @@ describe('SettingsView', () => {
     const tabs = screen.getAllByRole('tab')
     const tabLabels = tabs.map((t) => t.textContent)
     expect(tabLabels).toContain('Adapters & roles')
-    expect(tabLabels).toContain('How it works')
     expect(tabLabels).toContain('Display')
     expect(tabLabels).toContain('Anomalies')
     expect(tabLabels).toContain('Remote streaming')
@@ -281,6 +280,38 @@ describe('SettingsView', () => {
     await user.click(restartBtn)
 
     expect(restartSpy).not.toHaveBeenCalled()
+  })
+
+  it('restarts streaming when confirmation is accepted', async () => {
+    const restartSpy = vi.spyOn(apiModule.api, 'restartStreamFromCurrent').mockResolvedValue()
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    vi.spyOn(apiModule.api, 'settings').mockResolvedValue({
+      ...MOCK_SETTINGS,
+      stream: { ...MOCK_SETTINGS.stream, enabled: true },
+    })
+
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    fireEvent.click(screen.getAllByRole('tab').find((t) => t.textContent === 'Remote streaming')!)
+    fireEvent.click(await screen.findByRole('button', { name: /restart from current position/i }))
+
+    await waitFor(() => expect(restartSpy).toHaveBeenCalledOnce())
+  })
+
+  it('shows an inline error for malformed settings JSON imports', async () => {
+    wrap(<SettingsView onClose={() => {}} />)
+    await waitForLoad()
+
+    fireEvent.click(screen.getAllByRole('tab').find((t) => t.textContent === 'Backup & transfer')!)
+    const input = document.getElementById('import-json') as HTMLInputElement
+    expect(input).toBeTruthy()
+    const file = new File(['{'], 'settings.json', { type: 'application/json' })
+    Object.defineProperty(file, 'text', { value: vi.fn().mockResolvedValue('{') })
+
+    fireEvent.change(input, { target: { files: [file] } })
+
+    expect((await screen.findByRole('alert')).textContent).toContain('invalid settings JSON')
   })
 
   it('handles JSON import validation and export links', async () => {
