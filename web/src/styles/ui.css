@@ -120,6 +120,9 @@
 
 :root {
   --radius: 0.625rem;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Monaco, Consolas, monospace;
+  --font-brand: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --card: var(--surface-1);
   --card-foreground: var(--foreground);
   --popover: var(--surface-3);
@@ -246,12 +249,57 @@
   background-color: var(--primary-hover);
 }
 
+.app-prose {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0;
+}
+
+.view-heading {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 26px;
+  letter-spacing: 0;
+}
+
+.section-heading {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: 0;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 30px;
+  letter-spacing: 0;
+}
+
+.tabular-nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+td.tabular-nums {
+  text-align: right;
+}
+
+.data-text {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
 .app-brand {
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
   color: var(--app-brand-wordmark);
-  font-family: var(--font-mono);
+  font-family: var(--font-brand);
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1;
@@ -288,6 +336,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans);
   }
   code,
   kbd,

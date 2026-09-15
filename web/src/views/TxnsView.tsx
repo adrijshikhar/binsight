@@ -139,11 +139,11 @@ export default function TxnsView(props: {
                       </Tooltip>
                     )}
                   </TableCell>
-                  <TableCell className="tabular-nums">
+                  <TableCell className="data-text">
                     <span>txn {ordinalById.get(t.id)}</span>
                     <span className="ml-1.5">{t.gtid && t.gtid !== 'ANONYMOUS' ? t.gtid : `@ ${t.start_pos}`}</span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="data-text">
                     {t.start_ts ? new Date(t.start_ts * 1000).toISOString().slice(0, 19).replace('T', ' ') : ''}
                   </TableCell>
                   <TableCell className="tabular-nums">

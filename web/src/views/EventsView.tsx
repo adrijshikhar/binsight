@@ -428,7 +428,7 @@ export default function EventsView(props: EventsViewProps) {
           )}
         </TableCell>
         <TableCell className="text-right tabular-nums">{e.pos}</TableCell>
-        <TableCell>{fmtTime(e.ts)}</TableCell>
+        <TableCell className="data-text">{fmtTime(e.ts)}</TableCell>
         <TableCell>
           <KindBadge typeName={e.type_name} size="sm" />
         </TableCell>

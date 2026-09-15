@@ -150,7 +150,7 @@ export default function Drawer({ fileId, event, width, onResizeStart, onWidthCha
                 </span>
               )}
             </div>
-            <div className="mt-1">
+            <div className="mt-1 data-text">
               pos {event.pos} &rarr; {event.end_pos} &middot;{' '}
               {[event.db_name, event.table_name].filter(Boolean).join('.')} &middot; {fmtBytes(event.size)}
             </div>

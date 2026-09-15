@@ -370,7 +370,7 @@ export default function App() {
 
   return (
     <SSEContext.Provider value={lastIndexEvent}>
-      <div className="flex h-dvh w-full flex-col overflow-hidden bg-background">
+      <div className="app-prose flex h-dvh w-full flex-col overflow-hidden bg-background">
         <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b px-4">
           {/* Left side: Brand + Active File breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
