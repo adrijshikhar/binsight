@@ -5,7 +5,12 @@
       "release-type": "go",
       "package-name": "binsight",
       "include-component-in-tag": false,
-      "bump-minor-pre-major": false
+      "bump-minor-pre-major": false,
+      "exclude-paths": [
+        "website",
+        "docs"
+      ],
+      "last-release-sha": "d5bf7049751536d579ee5a0521262a3479e298c2"
     }
   }
 }
