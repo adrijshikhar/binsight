@@ -128,7 +128,7 @@ export interface DiffField {
   values: Record<string, string>
   agree: boolean
   // partial: only some adapters produced this field (a coverage gap, not a value
-  // conflict) — e.g. an adapter that couldn't decode this layer.
+  // conflict) - e.g. an adapter that couldn't decode this layer.
   partial?: boolean
   severity: 'header' | 'decoded' | 'info'
 }

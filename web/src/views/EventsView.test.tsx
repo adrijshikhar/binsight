@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MantineProvider } from '@mantine/core'
+import { useState, useEffect } from 'react'
 import EventsView from './EventsView'
 import { SSEContext, type IndexEvent } from '../lib/sse'
 import type { EventRow, Severity } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
+// jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -20,7 +20,7 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// jsdom doesn't implement ResizeObserver — Mantine's SegmentedControl/FloatingIndicator needs it.
+// jsdom doesn't implement ResizeObserver - Mantine's SegmentedControl/FloatingIndicator needs it.
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -68,14 +68,28 @@ function baseProps(fileId = ACTIVE_FILE) {
   }
 }
 
-function wrapEv(ev: IndexEvent | null, fileId = ACTIVE_FILE) {
+function EventsViewHarness({ ev, fileId = ACTIVE_FILE }: { ev: IndexEvent | null; fileId?: number }) {
+  const [live, setLive] = useState(false)
+  const [currentFileId, setCurrentFileId] = useState(fileId)
+
+  useEffect(() => {
+    if (fileId !== currentFileId) {
+      setCurrentFileId(fileId)
+      setLive(false)
+    }
+  }, [fileId, currentFileId])
+
   return (
-    <MantineProvider defaultColorScheme="dark">
+    <div data-theme="dark">
       <SSEContext.Provider value={ev}>
-        <EventsView {...baseProps(fileId)} />
+        <EventsView {...baseProps(fileId)} live={live} onToggleLive={setLive} />
       </SSEContext.Provider>
-    </MantineProvider>
+    </div>
   )
+}
+
+function wrapEv(ev: IndexEvent | null, fileId = ACTIVE_FILE) {
+  return <EventsViewHarness ev={ev} fileId={fileId} />
 }
 
 function renderView(ev: IndexEvent | null, fileId = ACTIVE_FILE) {
@@ -184,11 +198,11 @@ describe('EventsView live mode', () => {
     await settleInitialLoad()
 
     fireEvent.click(followButton())
-    await waitFor(() => expect(followButton().checked).toBe(true))
+    await waitFor(() => expect(followButton().getAttribute('aria-checked')).toBe('true'))
 
     // Switch to a new file -> live must reset to off.
     rerender(wrapEv({ type: 'index_done', file_id: OTHER_FILE, seq: 1 }, OTHER_FILE))
-    await waitFor(() => expect(followButton().checked).toBe(false))
+    await waitFor(() => expect(followButton().getAttribute('aria-checked')).toBe('false'))
 
     const before = eventsMock.mock.calls.length
     // An index_done for the new file must NOT auto-refetch since live was reset.
@@ -206,7 +220,7 @@ describe('EventsView live mode', () => {
     await settleInitialLoad()
 
     fireEvent.click(followButton())
-    await waitFor(() => expect(followButton().checked).toBe(true))
+    await waitFor(() => expect(followButton().getAttribute('aria-checked')).toBe('true'))
 
     await new Promise((r) => setTimeout(r, 30))
     expect(screen.queryByRole('button', { name: /load more/i })).toBeNull()

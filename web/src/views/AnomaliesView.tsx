@@ -2,13 +2,23 @@ import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { clickable } from '../lib/a11y'
 import type { Anomaly, Severity } from '../lib/types'
-import { severityColor } from '../components/icons'
-import { Alert, Anchor, Badge, Button, Center, Group, NativeSelect, Stack, Table, Text } from '@mantine/core'
+import { Alert } from '@/components/ui/alert'
+import { Empty, EmptyHeader, EmptyTitle } from '@/components/ui/empty'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem } from '@/components/ui/select'
 
 interface AnomaliesViewProps {
   fileId: number
   onOpenTxn: (id: number) => void
   onOpenEvent: (pos: number) => void
+}
+
+const severityToBadgeVariant = (sev: Severity): 'destructive' | 'warning' | 'secondary' => {
+  if (sev === 'critical' || sev === 'high') return 'destructive'
+  if (sev === 'medium') return 'warning'
+  return 'secondary'
 }
 
 export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: AnomaliesViewProps) {
@@ -54,95 +64,87 @@ export default function AnomaliesView({ fileId, onOpenTxn, onOpenEvent }: Anomal
   }
 
   return (
-    <Stack gap={0} style={{ height: '100%', overflow: 'hidden' }}>
-      <Group px="md" py="xs" gap="sm" style={{ borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-        <Text size="sm" c="dimmed">
-          severity
-        </Text>
-        <NativeSelect
-          size="xs"
-          value={sev}
-          onChange={(e) => setSev(e.target.value as Severity | '')}
-          data={[
-            { value: '', label: 'all' },
-            { value: 'critical', label: 'critical' },
-            { value: 'high', label: 'high' },
-            { value: 'medium', label: 'medium' },
-            { value: 'low', label: 'low' },
-          ]}
-        />
-        <Button size="xs" variant="default" onClick={rerunDetection} disabled={detecting}>
-          {detecting ? 'detecting…' : 're-run detection'}
+    <div className="flex flex-col h-full overflow-hidden min-h-0">
+      <div className="flex items-center gap-3 px-4 py-2 border-b border-border shrink-0 p-3">
+        <span>severity</span>
+        <Select value={sev} onValueChange={(value) => setSev((value ?? '') as Severity | '')}>
+          <SelectTrigger aria-label="Severity" className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopup>
+            <SelectItem value="">all</SelectItem>
+            <SelectItem value="critical">critical</SelectItem>
+            <SelectItem value="high">high</SelectItem>
+            <SelectItem value="medium">medium</SelectItem>
+            <SelectItem value="low">low</SelectItem>
+          </SelectPopup>
+        </Select>
+        <Button size="xs" variant="outline" onClick={rerunDetection} disabled={detecting}>
+          {detecting ? 'detecting...' : 're-run detection'}
         </Button>
-      </Group>
+      </div>
       {err && (
-        <Alert color="red" role="alert" radius={0} mb={0}>
-          {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => setFetchKey((k) => k + 1)}>
+        <Alert variant="error" role="alert" className="flex items-center justify-between mb-0">
+          <span>{err}</span>
+          <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
       )}
       {loading && anomalies.length === 0 ? (
-        <Text c="dimmed" p="md">
-          loading anomalies…
-        </Text>
+        <p className="p-4">loading anomalies...</p>
       ) : anomalies.length === 0 ? (
-        <Center py="xl">
-          <Text c="dimmed" role="status">
-            No anomalies detected for this file.
-          </Text>
-        </Center>
+        <Empty role="status">
+          <EmptyHeader>
+            <EmptyTitle>No anomalies detected for this file.</EmptyTitle>
+          </EmptyHeader>
+        </Empty>
       ) : (
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <Table stickyHeader fz="sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>severity</Table.Th>
-                <Table.Th>detector</Table.Th>
-                <Table.Th>db.table</Table.Th>
-                <Table.Th>metric / threshold</Table.Th>
-                <Table.Th>message</Table.Th>
-                <Table.Th>link</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
+        <div className="min-h-0 flex-1 overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>severity</TableHead>
+                <TableHead>detector</TableHead>
+                <TableHead>db.table</TableHead>
+                <TableHead className="text-right">metric / threshold</TableHead>
+                <TableHead>message</TableHead>
+                <TableHead>link</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {anomalies.map((a) => (
-                <Table.Tr key={a.id}>
-                  <Table.Td>
-                    <Badge color={severityColor(a.severity)} variant="light" size="sm">
+                <TableRow key={a.id} data-severity={a.severity}>
+                  <TableCell>
+                    <Badge variant={severityToBadgeVariant(a.severity)} size="sm" data-severity={a.severity}>
                       {a.severity}
                     </Badge>
-                  </Table.Td>
-                  <Table.Td ff="monospace">{a.detector}</Table.Td>
-                  <Table.Td>{[a.db_name, a.table_name].filter(Boolean).join('.')}</Table.Td>
-                  <Table.Td style={{ fontVariantNumeric: 'tabular-nums', textAlign: 'right' }}>
-                    {a.threshold > 0 ? `${a.metric.toLocaleString()} / ${a.threshold.toLocaleString()}` : '—'}
-                  </Table.Td>
-                  <Table.Td
-                    style={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                  >
-                    {a.message || '—'}
-                  </Table.Td>
-                  <Table.Td>
+                  </TableCell>
+                  <TableCell>{a.detector}</TableCell>
+                  <TableCell>{[a.db_name, a.table_name].filter(Boolean).join('.')}</TableCell>
+                  <TableCell className="tabular-nums text-right">
+                    {a.threshold > 0 ? `${a.metric.toLocaleString()} / ${a.threshold.toLocaleString()}` : '-'}
+                  </TableCell>
+                  <TableCell className="max-w-72 truncate">{a.message || '-'}</TableCell>
+                  <TableCell>
                     {a.txn_id ? (
-                      <Anchor size="sm" {...clickable(() => onOpenTxn(a.txn_id!))}>
+                      <button type="button" {...clickable(() => onOpenTxn(a.txn_id!))}>
                         txn #{a.txn_id}
-                      </Anchor>
+                      </button>
                     ) : a.event_pos ? (
-                      <Anchor size="sm" {...clickable(() => onOpenEvent(a.event_pos!))}>
+                      <button type="button" {...clickable(() => onOpenEvent(a.event_pos!))}>
                         @ {a.event_pos}
-                      </Anchor>
+                      </button>
                     ) : (
-                      '—'
+                      '-'
                     )}
-                  </Table.Td>
-                </Table.Tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </Table.Tbody>
+            </TableBody>
           </Table>
         </div>
       )}
-    </Stack>
+    </div>
   )
 }

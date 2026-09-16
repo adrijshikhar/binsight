@@ -1,5 +1,5 @@
 /**
- * Minimal URL state helpers — sync key view state to the query string via
+ * Minimal URL state helpers - sync key view state to the query string via
  * history.replaceState so the view is shareable and survives reload.
  * No router dependency; uses the History API directly.
  */
@@ -17,7 +17,7 @@ export interface UrlState {
 
 /**
  * Parse URL state from a query string (the part after "?", without the "?").
- * Pure function — testable without a browser.
+ * Pure function - testable without a browser.
  */
 export function parseUrlState(search: string): UrlState {
   const p = new URLSearchParams(search)
@@ -49,7 +49,7 @@ export function parseUrlState(search: string): UrlState {
 
 /**
  * Serialise URL state to a query string (without leading "?").
- * Pure function — testable without a browser.
+ * Pure function - testable without a browser.
  */
 export function buildUrlState(state: UrlState): string {
   const p = new URLSearchParams()

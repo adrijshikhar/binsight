@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
-import { ActionIcon, Badge, Card, Code, ColorSwatch, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardPanel } from '@/components/ui/card'
 import { Close } from '../components/icons'
 import { IconChevronDown } from '@tabler/icons-react'
 
@@ -10,70 +12,30 @@ import { IconChevronDown } from '@tabler/icons-react'
 interface LayerProps {
   label: string
   children: ReactNode
-  variant?: 'iface'
 }
 
-function Layer({ label, children, variant }: LayerProps) {
-  const isIface = variant === 'iface'
+function Layer({ label, children }: LayerProps) {
   return (
-    <Paper
-      withBorder
-      p="md"
-      radius="md"
-      style={{
-        borderColor: isIface ? 'var(--mantine-color-accent-6)' : undefined,
-        borderWidth: isIface ? 2 : 1,
-        background: isIface ? 'var(--panel)' : 'var(--bg)',
-      }}
-    >
-      <Text size="xs" tt="uppercase" fw={600} lts={1.5} mb="xs" c={isIface ? 'accent' : 'dimmed'}>
-        {label}
-      </Text>
+    <section className="space-y-2">
+      <h4>{label}</h4>
       {children}
-    </Paper>
+    </section>
   )
 }
 
 function Arrow({ note }: { note: string }) {
   return (
-    <Group justify="center" gap="xs" py={2} c="dimmed">
-      <IconChevronDown size={18} aria-hidden="true" />
-      <Code
-        style={{
-          fontFamily: 'var(--mantine-font-family-monospace)',
-          color: 'var(--mantine-color-accent-6)',
-          background: 'var(--bg)',
-        }}
-      >
-        {note}
-      </Code>
-    </Group>
+    <div className="flex items-center justify-center gap-1.5 py-0.5">
+      <IconChevronDown size={14} aria-hidden="true" />
+      <code>{note}</code>
+    </div>
   )
 }
 
-interface BoxProps {
-  children: ReactNode
-  borderColor?: string
-  dashed?: boolean
-  dimmed?: boolean
-}
-
-function Box({ children, borderColor, dashed, dimmed }: BoxProps) {
+function Box({ children }: { children: ReactNode }) {
   return (
-    <Card
-      withBorder
-      radius="sm"
-      p="sm"
-      style={{
-        flex: 1,
-        minWidth: 150,
-        background: 'var(--panel)',
-        borderColor: borderColor ?? undefined,
-        borderStyle: dashed ? 'dashed' : 'solid',
-        opacity: dimmed ? 0.75 : undefined,
-      }}
-    >
-      {children}
+    <Card className="min-w-36 flex-1">
+      <CardPanel>{children}</CardPanel>
     </Card>
   )
 }
@@ -84,17 +46,17 @@ const CAP_GLOSSARY: { cap: string; what: string; unlocks: string }[] = [
   {
     cap: 'FullScan',
     what: 'Decode an entire binlog file start-to-finish in one pass.',
-    unlocks: 'indexer role — building the SQLite index',
+    unlocks: 'indexer role - building the SQLite index',
   },
   {
     cap: 'SeekDecode',
     what: 'Decode a single event at a given byte offset, without reading the whole file first.',
-    unlocks: 'detail role — the drawer & jump-to-position',
+    unlocks: 'detail role - the drawer & jump-to-position',
   },
   {
     cap: 'ResumeDecode',
     what: 'Resume decoding from the last committed offset via a true seek, instead of re-parsing the prefix.',
-    unlocks: 'incremental append-index — the live tail',
+    unlocks: 'incremental append-index - the live tail',
   },
   {
     cap: 'RemoteStream',
@@ -110,235 +72,157 @@ const CAP_GLOSSARY: { cap: string; what: string; unlocks: string }[] = [
 
 function CapGlossary() {
   return (
-    <Stack gap={10} id="capabilities">
-      <Text size="xs" tt="uppercase" fw={600} lts={1.5} c="dimmed">
-        What each capability means
-      </Text>
+    <div className="flex flex-col gap-2.5" id="capabilities">
+      <div>What each capability means</div>
       {CAP_GLOSSARY.map(({ cap, what, unlocks }) => (
-        <Group key={cap} gap="sm" align="flex-start" wrap="nowrap">
-          <Badge
-            color="accent"
-            size="sm"
-            variant="light"
-            style={{ fontFamily: 'var(--mantine-font-family-monospace)', flexShrink: 0, minWidth: 120 }}
-          >
+        <div key={cap} className="flex items-start gap-2 flex-nowrap">
+          <Badge variant="secondary" size="sm" className="min-w-28 shrink-0">
             {cap}
           </Badge>
-          <Text size="sm" lh={1.5}>
-            {what}{' '}
-            <Text span size="sm" c="dimmed">
-              → unlocks {unlocks}.
-            </Text>
-          </Text>
-        </Group>
+          <div>
+            {what} <span>→ unlocks {unlocks}.</span>
+          </div>
+        </div>
       ))}
-    </Stack>
+    </div>
   )
 }
 
 function CapBadges({ caps }: { caps: string[] }) {
   return (
-    <Group gap={4} mt={6}>
+    <div className="flex flex-wrap gap-1 mt-1.5">
       {caps.map((cap) => (
-        <Badge
-          key={cap}
-          color="accent"
-          size="xs"
-          variant="light"
-          style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}
-        >
+        <Badge key={cap} variant="secondary" size="sm">
           {cap}
         </Badge>
       ))}
-    </Group>
+    </div>
   )
 }
 
-export default function ArchitectureView({ onClose }: { onClose: () => void }) {
+export function ArchitectureContent({ onClose }: { onClose?: () => void } = {}) {
   return (
-    <Stack p="md" maw={1100} gap="xs">
+    <div className="flex flex-col p-0 max-w-[1100px] gap-2 mx-auto">
       {/* Header */}
-      <Group justify="space-between" align="flex-start" mb={4}>
-        <Stack gap={4}>
-          <Title order={2} style={{ fontFamily: 'var(--mantine-font-family-monospace)' }}>
-            <Code
-              style={{
-                fontSize: 'inherit',
-                fontFamily: 'inherit',
-                color: 'var(--mantine-color-accent-6)',
-                background: 'transparent',
-              }}
-            >
-              binsight
-            </Code>{' '}
-            — Pluggable Decoder Architecture
-          </Title>
-          <Text size="sm" c="dimmed">
-            Go core · no privileged library · adapters behind one interface · roles assigned by config
-          </Text>
-        </Stack>
-        <ActionIcon variant="subtle" color="gray" onClick={onClose} aria-label="Close architecture view">
-          <Close aria-hidden="true" />
-        </ActionIcon>
-      </Group>
+      <div className="flex items-start justify-between mb-0.5">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
+            <code>binsight</code>
+            <h3>- Pluggable Decoder Architecture</h3>
+          </div>
+          <p>Go core · no privileged library · adapters behind one interface · roles assigned by config</p>
+        </div>
+        {onClose && (
+          <Button variant="ghost" size="icon-xs" onClick={onClose} aria-label="Close architecture view">
+            <Close aria-hidden="true" />
+          </Button>
+        )}
+      </div>
 
       {/* Event Sources */}
       <Layer label="Event Sources">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <div className="flex items-stretch gap-2 flex-wrap">
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Directory watch
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Scan dir / <Code>binlog.index</Code> · magic-byte check · fsnotify tail of growing file (live mode A)
-            </Text>
+            <div className="mb-1">Directory watch</div>
+            <div>
+              Scan dir / <code>binlog.index</code> · magic-byte check · fsnotify tail of growing file (live mode A)
+            </div>
           </Box>
           <Box>
-            <Group gap={6} mb={4}>
-              <Text size="sm" fw={600} ff="monospace">
-                Remote stream
-              </Text>
-              <Badge size="xs" color="green" variant="light">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span>Remote stream</span>
+              <Badge size="sm" variant="secondary">
                 shipped
               </Badge>
-            </Group>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Connects as a replica (go-mysql <Code>BinlogSyncer</Code>) → spools raw events into a{' '}
-              <strong>byte-identical local mirror</strong> under <Code>DATA_DIR/spool/</Code> → re-enters the pipeline
+            </div>
+            <div>
+              Direct TCP connection to source MySQL/MariaDB server using replication protocol (live mode B). Spools to
+              temp binlog file, indexer processes identical code path. Exposes local port, browser interacts with stream
               as a normal file. GTID-set resume (else file+pos), always txn-boundary aligned; cap + prune retention.
-            </Text>
+            </div>
           </Box>
-        </Group>
+        </div>
       </Layer>
 
       <Arrow note="file path + offset" />
 
       {/* Interface */}
-      <Layer label="The Only Contract Core Knows" variant="iface">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+      <Layer label="The Only Contract Core Knows">
+        <div className="flex items-stretch gap-2 flex-wrap">
           <Box>
-            <Code
-              block
-              style={{
-                fontFamily: 'var(--mantine-font-family-monospace)',
-                fontSize: 'var(--mantine-font-size-sm)',
-                lineHeight: 1.55,
-                background: 'transparent',
-                color: 'var(--text)',
-                whiteSpace: 'pre',
-              }}
-            >{`type Decoder interface {
+            <pre className="overflow-x-auto whitespace-pre">{`type Decoder interface {
     Name() string
     Capabilities() Capabilities
     Decode(ctx, src Source, opts DecodeOpts) (EventStream, error)
-}`}</Code>
+}`}</pre>
           </Box>
           <Box>
-            <Code
-              block
-              style={{
-                fontFamily: 'var(--mantine-font-family-monospace)',
-                fontSize: 'var(--mantine-font-size-sm)',
-                lineHeight: 1.55,
-                background: 'transparent',
-                color: 'var(--text)',
-                whiteSpace: 'pre',
-              }}
-            >{`type Capabilities struct {
+            <pre className="overflow-x-auto whitespace-pre">{`type Capabilities struct {
     FullScan     bool // eligible: indexer
     SeekDecode   bool // eligible: detail view
     ResumeDecode bool // eligible: incremental append-index (true seek)
     RemoteStream bool // eligible: remote streaming
     RowImages    bool // decodes row values
-}`}</Code>
+}`}</pre>
           </Box>
-        </Group>
-        <Paper withBorder p="sm" radius="sm" mt="sm" style={{ background: 'var(--bg)' }}>
+        </div>
+        <div className="p-3 border mt-2">
           <CapGlossary />
-        </Paper>
+        </div>
       </Layer>
 
       <Arrow note="implemented by" />
 
       {/* Adapters */}
       <Layer label="Adapters (2 shipped · 1 planned)">
-        <Stack gap="sm">
-          <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
-            <Box borderColor="var(--mantine-color-green-6)">
-              <Group gap={6} mb={4}>
-                <Text size="sm" fw={600} ff="monospace">
-                  go-mysql
-                </Text>
-                <Badge size="xs" color="accent" variant="light">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-stretch gap-2 flex-wrap">
+            <Box>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span>go-mysql</span>
+                <Badge size="sm" variant="secondary">
                   builtin · in-process
                 </Badge>
-              </Group>
-              <Text size="sm" c="dimmed" lh={1.5}>
-                Default indexer + detail + stream. Compiled in, but holds no special status — just adapter #1.
-              </Text>
+              </div>
+              <div>Default indexer + detail + stream. Compiled in, but holds no special status - just adapter #1.</div>
               <CapBadges caps={['FullScan', 'SeekDecode', 'ResumeDecode', 'RemoteStream', 'RowImages']} />
             </Box>
-            <Box borderColor="var(--mantine-color-orange-6)">
-              <Group gap={6} mb={4}>
-                <Text size="sm" fw={600} ff="monospace">
-                  mysqlbinlog
-                </Text>
-                <Badge size="xs" color="orange" variant="light">
+            <Box>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span>mysqlbinlog</span>
+                <Badge size="sm" variant="warning">
                   exec · subprocess
                 </Badge>
-              </Group>
-              <Text size="sm" c="dimmed" lh={1.5}>
+              </div>
+              <div>
                 Wraps the official CLI, parses its text → JSON-lines. Output marked{' '}
-                <Code>decode_confidence: partial</Code> where text is lossy.
-              </Text>
+                <code>decode_confidence: partial</code> where text is lossy.
+              </div>
               <CapBadges caps={['FullScan', 'RowImages']} />
             </Box>
-            <Box borderColor="var(--mantine-color-orange-6)" dashed dimmed>
-              <Group gap={6} mb={4}>
-                <Text size="sm" fw={600} ff="monospace">
-                  connector-java
-                </Text>
-                <Badge size="xs" color="orange" variant="light">
+            <Box>
+              <div className="flex items-center gap-1.5 mb-1">
+                <span>connector-java</span>
+                <Badge size="sm" variant="warning">
                   exec · subprocess
                 </Badge>
-                <Badge size="xs" color="gray" variant="light">
+                <Badge size="sm" variant="secondary">
                   planned
                 </Badge>
-              </Group>
-              <Text size="sm" c="dimmed" lh={1.5}>
+              </div>
+              <div>
                 Planned: ~200-line CLI wrapping mysql-binlog-connector-java (Debezium family) → JSON-lines. Drop-in:
                 register in config, zero core changes. Not yet implemented.
-              </Text>
+              </div>
               <CapBadges caps={['FullScan', 'SeekDecode', 'RowImages']} />
             </Box>
-          </Group>
+          </div>
 
-          <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+          <div className="flex items-stretch gap-2 flex-wrap">
             {/* roles */}
-            <Card
-              withBorder
-              radius="sm"
-              p="sm"
-              style={{
-                flex: 1,
-                background: 'var(--panel)',
-                borderColor: 'var(--mantine-color-grape-6)',
-              }}
-            >
-              <Text size="sm" fw={600} ff="monospace" c="grape" mb={6}>
-                roles, not hardcode (configured in Settings)
-              </Text>
-              <Code
-                block
-                style={{
-                  fontFamily: 'var(--mantine-font-family-monospace)',
-                  fontSize: 'var(--mantine-font-size-sm)',
-                  lineHeight: 1.55,
-                  background: 'transparent',
-                  color: 'var(--text)',
-                  whiteSpace: 'pre',
-                }}
-              >{`adapters:
+            <div className="flex-1">
+              <div className="mb-1.5">roles, not hardcode (configured in Settings)</div>
+              <pre className="overflow-x-auto whitespace-pre">{`adapters:
   go-mysql:       { type: builtin }
   mysqlbinlog:    { type: exec }
   connector-java: { type: exec }   # planned
@@ -347,170 +231,105 @@ roles:
   indexer: go-mysql                # swap → re-index prompted
   detail:  go-mysql
   diff:    [go-mysql, mysqlbinlog] # N-way compare set
-  stream:  go-mysql                # shipped`}</Code>
-            </Card>
+  stream:  go-mysql                # shipped`}</pre>
+            </div>
 
             {/* normalized event schema */}
-            <Card
-              withBorder
-              radius="sm"
-              p="sm"
-              style={{
-                flex: 1,
-                background: 'var(--panel)',
-                borderColor: 'var(--mantine-color-accent-6)',
-              }}
-            >
-              <Text size="sm" fw={600} ff="monospace" c="accent" mb={6}>
-                normalized event schema v1 — the real coupling point
-              </Text>
-              <Group gap="xs" align="stretch" style={{ flexWrap: 'wrap', marginTop: 4 }}>
-                <Box borderColor="var(--mantine-color-green-6)">
-                  <Text size="sm" fw={600} ff="monospace" mb={4}>
-                    header
-                  </Text>
-                  <Text size="sm" c="dimmed" lh={1.5}>
-                    19-byte common header. Mandatory. Byte-identical across correct adapters — disagreement = broken
+            <div className="flex-1">
+              <div className="mb-1.5">normalized event schema v1 - the real coupling point</div>
+              <div className="flex items-stretch gap-1.5 flex-wrap mt-1">
+                <Box>
+                  <div className="mb-1">header</div>
+                  <div>
+                    19-byte common header. Mandatory. Byte-identical across correct adapters - disagreement = broken
                     adapter.
-                  </Text>
+                  </div>
                 </Box>
-                <Box borderColor="var(--mantine-color-orange-6)">
-                  <Text size="sm" fw={600} ff="monospace" mb={4}>
-                    decoded
-                  </Text>
-                  <Text size="sm" c="dimmed" lh={1.5}>
-                    Best-effort canonical decode: tables, row values, SQL. Adapters fill what they can.
-                  </Text>
+                <Box>
+                  <div className="mb-1">decoded</div>
+                  <div>Best-effort canonical decode: tables, row values, SQL. Adapters fill what they can.</div>
                 </Box>
-                <Box borderColor="var(--mantine-color-grape-6)">
-                  <Text size="sm" fw={600} ff="monospace" mb={4}>
-                    native
-                  </Text>
-                  <Text size="sm" c="dimmed" lh={1.5}>
-                    Adapter-specific rendering, opaque. Preserved verbatim — this is what the diff view compares.
-                  </Text>
+                <Box>
+                  <div className="mb-1">native</div>
+                  <div>
+                    Adapter-specific rendering, opaque. Preserved verbatim - this is what the diff view compares.
+                  </div>
                 </Box>
-              </Group>
-            </Card>
-          </Group>
-        </Stack>
+              </div>
+            </div>
+          </div>
+        </div>
       </Layer>
 
-      <Arrow note="JSON-lines (exec) / structs (builtin) — same schema" />
+      <Arrow note="JSON-lines (exec) / structs (builtin) - same schema" />
 
       {/* Core */}
       <Layer label="Core (Go binary)">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <div className="flex items-stretch gap-2 flex-wrap">
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Indexer
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Streams events from the <Code>indexer</Code>-role adapter. Metadata only — no row values. On growth it{' '}
-              <strong>true-seeks from the committed boundary</strong> (<Code>last_indexed_offset</Code>) and appends
+            <div className="mb-1">Indexer</div>
+            <div>
+              Streams events from the <code>indexer</code>-role adapter. Metadata only - no row values. On growth it{' '}
+              <strong>true-seeks from the committed boundary</strong> (<code>last_indexed_offset</code>) and appends
               only the new tail. Positions come from a running byte accumulator, so &gt; 4 GiB files (uint32{' '}
-              <Code>end_log_pos</Code> wrap) index correctly.
-            </Text>
+              <code>end_log_pos</code> wrap) index correctly.
+            </div>
           </Box>
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              SQLite index
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              <Code>files · events · txns · tables · anomalies · decode_errors</Code>
+            <div className="mb-1">SQLite index</div>
+            <div>
+              <code>files · events · txns · tables · anomalies · decode_errors</code>
               <br />
               Metadata only. Records which adapter built it. A post-index anomaly engine flags oversized/long txns and
               the 4 GiB position wrap.
-            </Text>
+            </div>
           </Box>
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Diff engine
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Lazy, per-event, at click time: runs all <Code>diff</Code>-role adapters at one offset, aligns by schema
+            <div className="mb-1">Diff engine</div>
+            <div>
+              Lazy, per-event, at click time: runs all <code>diff</code>-role adapters at one offset, aligns by schema
               layer, flags disagreements.
-            </Text>
+            </div>
           </Box>
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Hex service
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
+            <div className="mb-1">Hex service</div>
+            <div>
               Adapter-independent. Raw bytes read straight from the file via offset, header fields annotated + CRC32
               checked.
-            </Text>
+            </div>
           </Box>
-        </Group>
+        </div>
       </Layer>
 
       <Arrow note="REST/JSON + SSE" />
 
       {/* Web UI */}
       <Layer label="Web UI (React + TS · go:embed · localhost)">
-        <Group gap="sm" align="stretch" style={{ flexWrap: 'wrap' }}>
+        <div className="flex items-stretch gap-2 flex-wrap">
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Event list
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Cursor-paginated on <Code>pos</Code>; filters compose: type / db / table / txn / position. Txn-grouped.
-            </Text>
+            <div className="mb-1">Event list</div>
+            <div>
+              Cursor-paginated on <code>pos</code>; filters compose: type / db / table / txn / position. Txn-grouped.
+            </div>
           </Box>
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Detail drawer
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Type-aware: row before/after, TABLE_MAP mapping, GTID/XID, diff, hex, raw JSON.
-            </Text>
+            <div className="mb-1">Detail drawer</div>
+            <div>Type-aware: row before/after, TABLE_MAP mapping, GTID/XID, diff, hex, raw JSON.</div>
           </Box>
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Transactions
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              GTID → BEGIN → rows → Xid grouped; rows in/up/del, duration, incomplete flagged.
-            </Text>
+            <div className="mb-1">Transactions</div>
+            <div>GTID → BEGIN → rows → Xid grouped; rows in/up/del, duration, incomplete flagged.</div>
           </Box>
           <Box>
-            <Text size="sm" fw={600} ff="monospace" mb={4}>
-              Tables
-            </Text>
-            <Text size="sm" c="dimmed" lh={1.5}>
-              Per-table column types, op counts, row counts, byte share.
-            </Text>
+            <div className="mb-1">Tables</div>
+            <div>Per-table column types, op counts, row counts, byte share.</div>
           </Box>
-        </Group>
+        </div>
       </Layer>
-
-      {/* Legend */}
-      <Group gap="xl" mt="md" pb="md" style={{ flexWrap: 'wrap' }}>
-        <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-green-6)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            builtin adapter (in-process)
-          </Text>
-        </Group>
-        <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-orange-6)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            exec adapter (subprocess, JSON-lines)
-          </Text>
-        </Group>
-        <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-grape-6)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            planned
-          </Text>
-        </Group>
-        <Group gap="xs">
-          <ColorSwatch color="var(--mantine-color-accent-6)" size={10} radius={3} />
-          <Text size="xs" c="dimmed">
-            interface / schema contract
-          </Text>
-        </Group>
-      </Group>
-    </Stack>
+    </div>
   )
+}
+
+export default function ArchitectureView({ onClose }: { onClose: () => void }) {
+  return <ArchitectureContent onClose={onClose} />
 }

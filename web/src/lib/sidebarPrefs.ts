@@ -49,7 +49,7 @@ export function saveDrawerWidth(width: number): void {
 }
 
 // Build prefs from raw localStorage strings (or null when unset/unavailable).
-// Pure — does not touch localStorage so it can be tested directly.
+// Pure - does not touch localStorage so it can be tested directly.
 export function parsePrefs(rawCollapsed: string | null, rawWidth: string | null): SidebarPrefs {
   return {
     collapsed: rawCollapsed === 'true',

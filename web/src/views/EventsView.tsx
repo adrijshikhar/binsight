@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Virtualizer } from '@tanstack/react-virtual'
-import { Alert, Badge, Button, Switch, Table, Tooltip } from '@mantine/core'
-import { IconChevronRight } from '@tabler/icons-react'
-import '../components/table-utils.module.css'
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Empty, EmptyHeader, EmptyTitle, EmptyContent } from '@/components/ui/empty'
+import { Table, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table'
+import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
+import { IconChevronRight, IconChevronUp, IconChevronDown } from '@tabler/icons-react'
 import { api } from '../lib/api'
 import { useIndexEvent } from '../lib/sse'
 import { clickable, clickableRow } from '../lib/a11y'
@@ -12,17 +15,26 @@ import type { EventRow, Severity } from '../lib/types'
 import EventsTable, { type VisualRow } from '../components/EventsTable'
 import FilterBar, { type Filters, emptyFilters } from '../components/FilterBar'
 import TruncCell from '../components/TruncCell'
-import { Warning, WrapArrow, kindBadgeStyle } from '../components/icons'
+import KindBadge from '../components/KindBadge'
+import { Warning, WrapArrow } from '../components/icons'
 
 /** Columns that can be sorted client-side. Unsorted = stream/load order (default). */
 type SortKey = 'pos' | 'ts' | 'size' | 'rows'
 
 /** Group type used inside the VisualRow union */
 // ordinal: a per-file, 1-based transaction number assigned in stream order at
-// grouping time. Readable and contiguous for ANY binlog — GTID or not (a
+// grouping time. Readable and contiguous for ANY binlog - GTID or not (a
 // GTID-less file has no seqno; GTID seqnos can also be huge/non-contiguous on
 // replicas). The exact GTID stays visible in each row for precise reference.
 type TxnGroup = { txnId: number; ordinal: number; events: EventRow[] }
+
+function kindToDataAttr(typeName: string): string {
+  if (typeName.startsWith('WRITE_ROWS_')) return typeName
+  if (typeName.startsWith('UPDATE_ROWS_')) return typeName
+  if (typeName.startsWith('DELETE_ROWS_')) return typeName
+  if (typeName === 'QUERY' || typeName === 'XID' || typeName === 'TABLE_MAP') return typeName
+  return 'default'
+}
 
 /** Number of body columns (kept in sync with the <colgroup> / colSpan usage). */
 const COL_COUNT = 9
@@ -65,9 +77,12 @@ export interface EventsViewProps {
   posSeverity: Map<number, Severity>
   onConsumeFilters: () => void
   onRemoveTxn: (id: number) => void
+  live: boolean
+  onToggleLive: (live: boolean) => void
 }
 
 export default function EventsView(props: EventsViewProps) {
+  const { live, onToggleLive } = props
   const [filters, setFilters] = useState<Filters>(initialFilters)
   const [events, setEvents] = useState<EventRow[]>([])
   const [nextCursor, setNextCursor] = useState(0)
@@ -76,7 +91,6 @@ export default function EventsView(props: EventsViewProps) {
   const [collapsed, setCollapsed] = useState<Set<number>>(new Set())
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
-  const [live, setLive] = useState(false)
   // refs forwarded into EventsTable so the parent can drive virtualizer + scroll
   const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element> | null>(null)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -132,11 +146,6 @@ export default function EventsView(props: EventsViewProps) {
   // Reset collapsed groups on file switch
   useEffect(() => {
     setCollapsed(new Set())
-  }, [props.fileId])
-
-  // Live/follow is per-file: switching files must reset it
-  useEffect(() => {
-    setLive(false)
   }, [props.fileId])
 
   // Sync filter state to URL
@@ -298,13 +307,7 @@ export default function EventsView(props: EventsViewProps) {
 
   /** Render a caret for the active sort column. */
   const sortIndicator = (key: SortKey) =>
-    sortKey === key ? (
-      <IconChevronRight
-        size={12}
-        className="sort-caret"
-        style={{ transform: sortDir === 'asc' ? 'rotate(90deg)' : undefined, transition: 'transform 0.15s ease' }}
-      />
-    ) : null
+    sortKey === key ? sortDir === 'asc' ? <IconChevronUp size={12} /> : <IconChevronDown size={12} /> : null
 
   /** Props to spread onto a sortable <th>. */
   const sortableProps = (key: SortKey) => ({
@@ -359,30 +362,22 @@ export default function EventsView(props: EventsViewProps) {
     const rows = g.events.reduce((n, e) => n + e.rows_count, 0)
     const label = `txn ${g.ordinal}`
     return (
-      <Table.Tr
+      <TableRow
         key={`g${g.txnId}`}
         data-index={index}
         ref={measureRef}
-        className="txn-hdr"
+
         {...clickableRow(() => toggleCollapsed(g.txnId))}
       >
-        <Table.Td colSpan={COL_COUNT}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <IconChevronRight
-              size={12}
-              className="caret"
-              style={{
-                transform: !isCollapsed ? 'rotate(90deg)' : undefined,
-                transition: 'transform 0.15s ease',
-                flexShrink: 0,
-              }}
-            />
+        <TableCell colSpan={COL_COUNT}>
+          <span className="inline-flex items-center gap-2">
+            <IconChevronRight size={12} className={!isCollapsed ? 'shrink-0 rotate-90' : 'shrink-0'} />
             <span>
               <span className="gtid">{label}</span> · {g.events.length} events · {rows} rows
             </span>
           </span>
-        </Table.Td>
-      </Table.Tr>
+        </TableCell>
+      </TableRow>
     )
   }
 
@@ -394,56 +389,70 @@ export default function EventsView(props: EventsViewProps) {
       `(server records it as ${e.end_pos % UINT32}). The viewer shows the TRUE byte offset instead.`
     const tblLabel = [e.db_name, e.table_name].filter(Boolean).join('.')
     return (
-      <Table.Tr
+      <TableRow
         key={e.pos}
         data-index={index}
         ref={measureRef}
-        className={`${index % 2 ? 'zebra-odd' : ''}${e.pos === props.selectedPos ? ' selected' : ''}${wrapped ? ' pos-wrap-row' : ''}`}
+        data-state={e.pos === props.selectedPos ? 'selected' : undefined}
         {...clickableRow(() => props.onSelect(e))}
       >
-        <Table.Td className="anom-marker">
+        <TableCell className="text-center">
           {wrapped ? (
-            <Tooltip label={wrapTitle} openDelay={150} withinPortal>
-              <span className="warn pos-wrap-marker" aria-label={wrapTitle}>
-                <WrapArrow size={12} />
-              </span>
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <span className="text-warning-foreground pos-wrap-marker" aria-label={wrapTitle}>
+                    <WrapArrow size={12} />
+                  </span>
+                }
+              />
+              <TooltipPopup side="top" align="center">
+                {wrapTitle}
+              </TooltipPopup>
             </Tooltip>
           ) : (
             props.posSeverity.has(e.pos) && (
-              <Tooltip label={`anomaly: ${props.posSeverity.get(e.pos)}`} openDelay={150} withinPortal>
-                <span
-                  className={`warn sev-${props.posSeverity.get(e.pos)}`}
-                  aria-label={`anomaly: ${props.posSeverity.get(e.pos)}`}
-                >
-                  <Warning size={12} />
-                </span>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <span className="text-warning-foreground" aria-label={`anomaly: ${props.posSeverity.get(e.pos)}`}>
+                      <Warning size={12} />
+                    </span>
+                  }
+                />
+                <TooltipPopup side="top" align="center">
+                  {`anomaly: ${props.posSeverity.get(e.pos)}`}
+                </TooltipPopup>
               </Tooltip>
             )
           )}
-        </Table.Td>
-        <Table.Td className="pos num">{e.pos}</Table.Td>
-        <Table.Td>{fmtTime(e.ts)}</Table.Td>
-        <Table.Td>
-          <Badge variant="light" size="sm" style={{ ...kindBadgeStyle(e.type_name), cursor: 'inherit' }}>
-            {e.type_name}
-          </Badge>
-        </Table.Td>
-        <TruncCell label={tblLabel} className="tbl" />
-        <TruncCell label={e.summary} className="summary" fileId={props.fileId} pos={e.pos} />
-        <Table.Td className="num">{e.rows_count > 0 ? e.rows_count : ''}</Table.Td>
-        <Table.Td className="num">{fmtBytes(e.size)}</Table.Td>
-        <Tooltip label={wrapped ? wrapTitle : undefined} openDelay={150} withinPortal disabled={!wrapped}>
-          <Table.Td className="pos num" aria-label={wrapped ? wrapTitle : undefined}>
-            {e.end_pos}
-            {wrapped && (
-              <>
-                {' '}
-                <WrapArrow size={12} />
-              </>
-            )}
-          </Table.Td>
-        </Tooltip>
-      </Table.Tr>
+        </TableCell>
+        <TableCell className="text-right tabular-nums">{e.pos}</TableCell>
+        <TableCell>{fmtTime(e.ts)}</TableCell>
+        <TableCell>
+          <KindBadge typeName={e.type_name} size="sm" />
+        </TableCell>
+        <TruncCell label={tblLabel} className="truncate" />
+        <TruncCell label={e.summary} className="truncate" fileId={props.fileId} pos={e.pos} />
+        <TableCell className="text-right tabular-nums">{e.rows_count > 0 ? e.rows_count : ''}</TableCell>
+        <TableCell className="text-right tabular-nums">{fmtBytes(e.size)}</TableCell>
+        {wrapped ? (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <TableCell className="text-right tabular-nums" aria-label={wrapTitle}>
+                  {e.end_pos} <WrapArrow size={12} />
+                </TableCell>
+              }
+            />
+            <TooltipPopup side="top" align="center">
+              {wrapTitle}
+            </TooltipPopup>
+          </Tooltip>
+        ) : (
+          <TableCell className="text-right tabular-nums">{e.end_pos}</TableCell>
+        )}
+      </TableRow>
     )
   }
 
@@ -451,80 +460,65 @@ export default function EventsView(props: EventsViewProps) {
 
   const colgroup = (
     <colgroup>
-      <col style={{ width: 28 }} />
-      <col style={{ width: 120 }} />
-      <col style={{ width: 150 }} />
-      <col style={{ width: 130 }} />
-      <col style={{ width: 160 }} />
+      <col className="w-7" />
+      <col className="w-24" />
+      <col className="w-36" />
+      <col className="w-44" />
+      <col className="w-32" />
       <col />
-      <col style={{ width: 70 }} />
-      <col style={{ width: 90 }} />
-      <col style={{ width: 120 }} />
+      <col className="w-14" />
+      <col className="w-20" />
+      <col className="w-24" />
     </colgroup>
   )
 
   const thead = (
-    <Table.Thead>
-      <Table.Tr>
-        <Table.Th scope="col"></Table.Th>
-        <Table.Th scope="col" className="num" {...sortableProps('pos')}>
+    <TableHeader>
+      <TableRow>
+        <TableHead scope="col"></TableHead>
+        <TableHead scope="col" className="text-right tabular-nums" {...sortableProps('pos')}>
           start pos{sortIndicator('pos')}
-        </Table.Th>
-        <Table.Th scope="col" {...sortableProps('ts')}>
+        </TableHead>
+        <TableHead scope="col" {...sortableProps('ts')}>
           time{sortIndicator('ts')}
-        </Table.Th>
-        <Table.Th scope="col">type</Table.Th>
-        <Table.Th scope="col">db.table</Table.Th>
-        <Table.Th scope="col">summary</Table.Th>
-        <Table.Th scope="col" className="num" {...sortableProps('rows')}>
+        </TableHead>
+        <TableHead scope="col">type</TableHead>
+        <TableHead scope="col">db.table</TableHead>
+        <TableHead scope="col">summary</TableHead>
+        <TableHead scope="col" className="text-right tabular-nums" {...sortableProps('rows')}>
           rows{sortIndicator('rows')}
-        </Table.Th>
-        <Table.Th scope="col" className="num" {...sortableProps('size')}>
+        </TableHead>
+        <TableHead scope="col" className="text-right tabular-nums" {...sortableProps('size')}>
           size{sortIndicator('size')}
-        </Table.Th>
-        <Table.Th scope="col" className="num">
+        </TableHead>
+        <TableHead scope="col" className="text-right tabular-nums">
           end pos
-        </Table.Th>
-      </Table.Tr>
-    </Table.Thead>
+        </TableHead>
+      </TableRow>
+    </TableHeader>
   )
 
   const emptyState = (
-    <div className="empty-state">
-      <span>No events match these filters.</span>
-      <button
-        onClick={() => {
-          setFilters(emptyFilters)
-          props.txnIds.forEach(props.onRemoveTxn)
-        }}
-      >
-        clear filters
-      </button>
-    </div>
+    <Empty>
+      <EmptyHeader>
+        <EmptyTitle>No events match these filters.</EmptyTitle>
+      </EmptyHeader>
+      <EmptyContent>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setFilters(emptyFilters)
+            props.txnIds.forEach(props.onRemoveTxn)
+          }}
+        >
+          clear filters
+        </Button>
+      </EmptyContent>
+    </Empty>
   )
 
   return (
     <>
-      <div className="events-toolbar">
-        <Tooltip
-          label={
-            live
-              ? 'Stop following new events (Live mode is ON)'
-              : 'Follow new events as they are indexed (Live mode is OFF)'
-          }
-          withArrow
-          position="left"
-        >
-          <Switch
-            checked={live}
-            onChange={(e) => setLive(e.currentTarget.checked)}
-            label="Live"
-            size="sm"
-            color="green"
-            aria-label="Follow new events as they are indexed"
-          />
-        </Tooltip>
-      </div>
       <FilterBar
         filters={filters}
         grouped={grouped}
@@ -536,11 +530,13 @@ export default function EventsView(props: EventsViewProps) {
         onToggleGrouped={() => setGrouped((g) => !g)}
         onJump={(pos) => setFilters((f) => ({ ...f, from_pos: pos, to_pos: 0 }))}
         searchRef={searchRef}
+        live={props.live}
+        onToggleLive={props.onToggleLive}
       />
       {err && (
-        <Alert color="red" role="alert" mb={0} radius={0} style={{ borderBottom: '1px solid var(--border)' }}>
-          {err}
-          <Button size="xs" variant="outline" color="blue" ml="xs" onClick={() => load(0, false)}>
+        <Alert variant="error" className="flex items-center justify-between">
+          <span>{err}</span>
+          <Button size="xs" variant="outline" onClick={() => load(0, false)}>
             retry
           </Button>
         </Alert>
@@ -560,8 +556,8 @@ export default function EventsView(props: EventsViewProps) {
       />
       {!loading && !live && nextCursor > 0 && (
         <Button
-          className="load-more"
-          variant="subtle"
+          className="mx-auto my-3"
+          variant="ghost"
           size="xs"
           onClick={() => load(nextCursor, true)}
           aria-label={`load more (${events.length} / ${total})`}
@@ -569,7 +565,7 @@ export default function EventsView(props: EventsViewProps) {
           load more ({events.length} / {total})
         </Button>
       )}
-      <div className="statusbar">
+      <div className="flex shrink-0 flex-wrap gap-4 border-t p-3">
         <span>
           {live ? `${events.length} events (live)` : `${total} events`}
           {props.txnIds.length ? ` · ${props.txnIds.length} txn filter${props.txnIds.length > 1 ? 's' : ''}` : ''}

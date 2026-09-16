@@ -2,40 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MantineProvider } from '@mantine/core'
 import OverviewView from './OverviewView'
-import { theme } from '../theme'
 import * as apiModule from '../lib/api'
 import type { BinlogFile, FileMetrics, TypeCount } from '../lib/types'
 
-// jsdom doesn't implement matchMedia — Mantine's color-scheme hook needs it.
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-})
-
-// jsdom doesn't implement ResizeObserver — Mantine needs it.
-;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
-
 function wrap(ui: React.ReactElement) {
-  return render(
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      {ui}
-    </MantineProvider>,
-  )
+  return render(ui)
 }
 
 const MOCK_FILE: BinlogFile = {
@@ -165,9 +137,9 @@ describe('OverviewView', () => {
     wrap(<OverviewView {...makeProps({ onOpenTxn })} />)
     // Wait for the txn panel header to appear
     await screen.findByText('Largest transactions by event count')
-    // Find the "Largest transactions" paper container by walking up from the header text
+    // Scope the click to the transaction breakdown, not the event breakdown.
     const headerText = screen.getByText('Largest transactions by event count')
-    const paper = headerText.closest('[class*="Paper"]')?.parentElement
+    const paper = headerText.closest('[data-slot="breakdown-panel"]')
     expect(paper).toBeTruthy()
     // Within that paper, find the row with #1 and events=5
     const txnRows = paper?.querySelectorAll('tbody tr')

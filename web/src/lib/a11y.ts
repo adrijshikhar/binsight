@@ -12,6 +12,7 @@ export function clickable(onActivate: () => void): {
   tabIndex: number
   onClick: () => void
   onKeyDown: (e: React.KeyboardEvent) => void
+  style: React.CSSProperties
 } {
   return {
     role: 'button',
@@ -23,6 +24,7 @@ export function clickable(onActivate: () => void): {
         onActivate()
       }
     },
+    style: { cursor: 'pointer' },
   }
 }
 
@@ -38,6 +40,7 @@ export function clickableRow(onActivate: () => void): {
   tabIndex: number
   onClick: () => void
   onKeyDown: (e: React.KeyboardEvent) => void
+  style: React.CSSProperties
 } {
   return {
     tabIndex: 0,
@@ -48,5 +51,6 @@ export function clickableRow(onActivate: () => void): {
         onActivate()
       }
     },
+    style: { cursor: 'pointer' },
   }
 }
