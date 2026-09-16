@@ -15,55 +15,21 @@ This file provides non-negotiable architectural, styling, and coding guidance fo
 
 ## Frontend Styling & CSS Standards (Strict)
 
-### Current Phase: Stock Coss, Desktop Only
+### Current Phase: Centralized Palette and Typography, Desktop Only
 
-Stock checkpoint update: `web/coss-stock-lock.json` pins 23 upstream component/helper files and the complete Coss neutral palette. Shared source permits import-path changes only. Do not format or modify locked files; `rtk bun scripts/verify-coss-source.mjs` from `web/` checks live upstream on demand. Do not add redundant unit tests for upstream markup, styling, or source hashes; retain Binsight behavior tests. Built-in badge variants replace custom mutation variants. The forced 32px density and bespoke tab animations are paused along with final DESIGN.md styling. Domain layout and runtime virtualization/resizing remain application code, outside the stock component directory.
+`web/src/styles/ui.css` is the sole application styling and token source. Components may use semantic roles and layout utilities, but must not add literal colors, inline appearance styles, local appearance recipes, or CSS Modules. Inline `style` is reserved for dynamic runtime geometry such as virtual offsets and dragged widths; never use JS hover handlers for appearance.
 
-The user's 2026-09-14 instruction supersedes the staged styling rules below: remove custom application CSS and pause DESIGN.md customization. Keep stock Coss component recipes and the Tailwind/Coss foundation in `web/src/styles/ui.css`. Do not add CSS Modules, custom theme palettes, radii, shadows, or component appearance overrides. Use layout utilities and runtime geometry only where required by the application. Preserve forensic data semantics and behavior. This is a desktop web application; mobile sheets and mobile acceptance work are out of scope. Codex owns implementation. Obtain user review of the stock checkpoint before applying DESIGN.md changes.
+The approved dark palette is the charcoal ladder: `#141516` canvas; `#1b1c1e`, `#212224`, `#252629`, and `#27282b` surfaces; `#34363b` and `#45484f` separators. Keep light tokens, blue interaction tokens, semantic data tokens, and the original logo unchanged.
 
-### 1. Ban on Inline Styles for Component Styling & Interactive States
-- **NEVER** use `style={{ ... }}` for reusable components, interactive elements, or states.
-- **NEVER** use imperative JS mouse handlers (`onMouseEnter`, `onMouseLeave`) to manually toggle element styles.
-- Use owned Coss UI components with token-backed Tailwind variants for shared controls. Use CSS Modules for specialized layout and data surfaces. States use CSS pseudo-classes or primitive data attributes, never JS appearance handlers.
-- Inline `style` is only permissible for dynamic runtime values that cannot be known at build time (e.g., dynamically dragged widths, absolute virtual scroll offsets). Everything else belongs in CSS classes.
+Typography is approved. Define centralized sans and mono stacks and apply semantic roles: view headings `20px/26px`, section headings `16px/22px`, metrics `24px/30px`, and application prose `13px/20px`, all with zero tracking. Numeric data is tabular monospace and right-aligned. Keep stock Coss controls and badges on their own type recipes so typography does not alter their geometry.
 
-### 2. Design Language: Binsight Design System
-The root `DESIGN.md` is canonical for `web/`. It supersedes older companion design references. Target stack: stock Coss UI source backed by Base UI (`@base-ui/react`), Tailwind, and retained specialized CSS Modules. This user-approved choice supersedes the previous Radix-first direction. Use Coss natively, not merely as inspiration. Keep its stock appearance through a functional checkpoint, then apply colors, density, shapes and elevation as separate verified passes; never delete layout CSS before its replacement is verified.
-- Resume interrupted work by inventorying current files and tests. Preserve useful partial changes; replace existing Radix primitive bindings with verified stock Coss source before building more components on them. Remove unused Radix packages only after their consumers migrate. Do not reset the worktree or mechanically rename primitive imports.
-- Use the Coss Combobox with multiple selection/chips. Do not build a custom Popover/Command multi-select or silently mix primitive systems. Radix Colors remains palette research only, not a runtime primitive choice.
-- **Phase rule**: Appearance values below are final theme targets. Before the stock checkpoint, Coss neutral primary, sizes, radii and shadows are accepted. Behavior, accessibility, zero tracking, no green chrome, semantic data mapping and 32px virtual rows remain mandatory. Keep stock and legacy role values explicit in the one theme file; do not overwrite legacy styling with the full Coss preset.
-- Use Coss Segmented Control's Radio Group particle, Number Field and Toast where applicable. Use individual registry sources through the shadcn CLI, not generic shadcn components or an all-component installation. Verify actual APIs and generated paths.
-- **Canvas**: `#010102` (deepest dark surface).
-- **Surface Ladder**:
-  - `surface-1`: `#0f1011` (base cards, panels)
-  - `surface-2`: `#141516` (lifted / hovered cards)
-  - `surface-3`: `#18191a` (sub-nav, dropdowns)
-  - `surface-4`: `#191a1b` (highest lifted surfaces)
-- **Hairlines**: 1px `#23252a` (`var(--border)`); strong hairline `#34343a`.
-- **Top-Edge Highlight**: Lifted panels on dark surfaces receive subtle top highlight: `box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);`.
-- **Radii Scale**:
-  - `xs: 4px` (filter summaries, transaction chips, jump links)
-  - `sm: 6px` (event badges, data/status pills, tags)
-  - `md: 8px` (buttons, text/number inputs - default radius)
-  - `lg: 12px` (cards, panels)
-  - `pill: 9999px` (segmented tracks and selected segments only)
-- Binsight data pills are compact rounded rectangles, not oval capsules. Shared variants own their appearance.
+Ordinary Coss controls use stock default props and the stock 32px desktop size. Do not reintroduce compact 28px filter controls or CSS size overrides. The pinned Coss source in `web/coss-stock-lock.json` is immutable except for import-path changes; do not format or modify it. Run `rtk bun scripts/verify-coss-source.mjs` from `web/` when source verification is needed.
 
-### 3. Strict Quarantine on Green (Zero Green in Chrome)
-- **Green** (`#34d399` / `#059669` / `var(--green)`) is strictly quarantined to **semantic data changes**:
-  - `WRITE_ROWS` events
-  - Genuine diff additions, not adapter agreement
-  - Ready state dot in `Sidebar`
-- Absolutely **zero green** in interactive chrome (buttons, active tabs, links, active file indicator, brand logo, focus rings).
-- Primary controls use Binsight Blue: dark `#0075de`, hover `#2c6bb3`; light `#0062bd`, hover `#0053ad`. Focus and text-blue roles are defined separately in `DESIGN.md`.
-- Adapter agreement is neutral. Operational success and live-tail indicators are blue, not green.
-- `web/src/styles/theme.css` is the target executable token source. Resolve legacy `--accent` and `--muted` name collisions before adopting Coss token meanings; follow the migration roadmap.
+This is a desktop application. Mobile sheets, mobile-specific controls, and mobile acceptance checks are out of scope. Event rows are the approved density exception: keep grouped and ungrouped event rows at 32px with synchronized virtualization. Radii, shapes, shadows, and elevation remain deferred. Preserve domain behavior, runtime virtualization/resizing, accessibility, the original logo, and forensic semantics.
 
-### 4. Typography & Data Density
-- **Display Headings**: Compact fixed-size headings with zero letter spacing and font weight 600.
-- **Numbers & Metrics**: Tabular monospace (`font-variant-numeric: tabular-nums`).
-- **Events Table**: Dense 32px rows with 1px hairlines.
-- **Labels**: Zero letter spacing; preserve event-name casing and user identifiers.
+Historical checkpoint and migration notes in `DESIGN.md` are reference only unless repeated in this current-phase section.
+
+TanStack Table v8 owns sorting and expansion; stock Coss renders the table UI and TanStack Virtual retains event virtualization. Preserve the Binsight transaction-run grouping adapter.
 
 ---
 

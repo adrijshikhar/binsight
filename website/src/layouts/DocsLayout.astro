@@ -3,7 +3,6 @@ import '../styles/global.css';
 import { SITE_CONFIG } from '../data/product';
 import { DOCS_NAVIGATION, type DocItem } from '../data/docs';
 import GitHubBadge from '../components/ui/GitHubBadge.astro';
-import CommandPalette from '../components/ui/CommandPalette.astro';
 
 interface Props {
   title: string;
@@ -59,7 +58,7 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
     <meta name="color-scheme" content="dark" />
   </head>
 
-  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#38bdf8]/20 selection:text-[#38bdf8] relative overflow-x-hidden max-w-full">
+  <body class="min-h-screen bg-[#0b0f14] text-[#c9d1d9] flex flex-col selection:bg-[#0075de]/30 selection:text-[#58a6ff] relative overflow-x-hidden max-w-full">
     <!-- Atmospheric Top Lighting Wash -->
     <div class="fixed inset-0 pointer-events-none bg-docs-radiance z-0" aria-hidden="true"></div>
 
@@ -86,29 +85,18 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
 
           <!-- Brand -->
           <a href="/" class="flex items-center gap-2.5 group">
-            <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] group-hover:border-[#38bdf8] transition-colors">
+            <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#58a6ff] group-hover:border-[#0075de] transition-colors">
               <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-                <path d="M4 17l6-6-6-6M12 19h8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 6h16M4 12h10M4 18h14" stroke-linecap="round"/>
               </svg>
             </div>
-            <span class="font-mono font-bold text-base text-[#f0f6fc] tracking-tight group-hover:text-[#38bdf8] transition-colors">binsight</span>
+            <span class="font-mono font-bold text-base text-[#f0f6fc] tracking-tight group-hover:text-[#58a6ff] transition-colors">binsight</span>
             <span class="text-xs text-[#8b949e] font-sans font-normal border-l border-[#2d3b4f] pl-2.5 ml-0.5">docs</span>
           </a>
         </div>
 
-        <!-- Search & External Links -->
+        <!-- External Links -->
         <div class="flex items-center gap-2 sm:gap-3">
-          <button
-            id="cmd-palette-btn"
-            class="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-md border border-[#2d3b4f] bg-[#11161d] text-xs text-[#8b949e] hover:text-[#f0f6fc] hover:border-[#38bdf8]/40 transition-colors"
-          >
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <span class="font-mono text-[11px]">Quick search</span>
-            <kbd class="px-1 py-0.5 text-[9px] font-mono rounded bg-[#161f2c] border border-[#2d3b4f] text-[#c9d1d9]">⌘K</kbd>
-          </button>
-
           <a
             href="/"
             class="text-xs font-medium text-[#8b949e] hover:text-[#f0f6fc] transition-colors hidden md:inline-block px-2"
@@ -143,7 +131,7 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
                         href={item.href}
                         class={`block px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
                           isActive
-                            ? 'bg-[#161f2c] text-[#38bdf8] font-semibold border-l-2 border-[#38bdf8]'
+                            ? 'bg-[#161f2c] text-[#58a6ff] font-semibold border-l-2 border-[#0075de]'
                             : 'text-[#8b949e] hover:text-[#f0f6fc] hover:bg-[#11161d]'
                         }`}
                       >
@@ -177,7 +165,7 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
             </>
           )}
           <span>/</span>
-          <span class="text-[#38bdf8] font-medium">{title}</span>
+          <span class="text-[#58a6ff] font-medium">{title}</span>
         </nav>
 
         <!-- Article Header -->
@@ -191,7 +179,7 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
         </header>
 
         <!-- Article Body -->
-        <article class="prose prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[#f0f6fc] prose-h2:text-2xl prose-h2:border-b prose-h2:border-[#212c3d]/60 prose-h2:pb-2 prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3 prose-p:text-[#c9d1d9] prose-p:leading-relaxed prose-code:text-[#38bdf8] prose-code:font-mono prose-code:bg-[#161f2c] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-[#2d3b4f] prose-pre:bg-[#11161d] prose-pre:border prose-pre:border-[#2d3b4f] prose-pre:rounded-xl prose-li:text-[#c9d1d9] prose-strong:text-[#f0f6fc]">
+        <article class="prose prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[#f0f6fc] prose-h2:text-2xl prose-h2:border-b prose-h2:border-[#212c3d]/60 prose-h2:pb-2 prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3 prose-p:text-[#c9d1d9] prose-p:leading-relaxed prose-code:text-[#58a6ff] prose-code:font-mono prose-code:bg-[#161f2c] prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:border prose-code:border-[#2d3b4f] prose-pre:bg-[#11161d] prose-pre:border prose-pre:border-[#2d3b4f] prose-pre:rounded-xl prose-li:text-[#c9d1d9] prose-strong:text-[#f0f6fc]">
           <slot />
         </article>
 
@@ -200,12 +188,12 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
           {prevItem ? (
             <a
               href={prevItem.href}
-              class="group flex flex-col p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] hover:border-[#38bdf8]/50 transition-all text-left"
+              class="group flex flex-col p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] hover:border-[#0075de]/50 transition-all text-left"
             >
               <span class="font-mono text-[10px] text-[#8b949e] uppercase tracking-wider mb-1 flex items-center gap-1">
                 &larr; Previous
               </span>
-              <span class="text-sm font-semibold text-[#f0f6fc] group-hover:text-[#38bdf8] transition-colors">
+              <span class="text-sm font-semibold text-[#f0f6fc] group-hover:text-[#58a6ff] transition-colors">
                 {prevItem.title}
               </span>
             </a>
@@ -214,12 +202,12 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
           {nextItem ? (
             <a
               href={nextItem.href}
-              class="group flex flex-col p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] hover:border-[#38bdf8]/50 transition-all text-right sm:col-start-2"
+              class="group flex flex-col p-4 rounded-xl border border-[#2d3b4f] bg-[#11161d] hover:border-[#0075de]/50 transition-all text-right sm:col-start-2"
             >
               <span class="font-mono text-[10px] text-[#8b949e] uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
                 Next &rarr;
               </span>
-              <span class="text-sm font-semibold text-[#f0f6fc] group-hover:text-[#38bdf8] transition-colors">
+              <span class="text-sm font-semibold text-[#f0f6fc] group-hover:text-[#58a6ff] transition-colors">
                 {nextItem.title}
               </span>
             </a>
@@ -238,7 +226,7 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
               <li class={h.depth === 3 ? 'pl-2.5' : ''}>
                 <a
                   href={`#${h.slug}`}
-                  class="text-[#8b949e] hover:text-[#38bdf8] transition-colors line-clamp-1 block py-0.5"
+                  class="text-[#8b949e] hover:text-[#58a6ff] transition-colors line-clamp-1 block py-0.5"
                 >
                   {h.text}
                 </a>
@@ -248,9 +236,6 @@ const currentSection = DOCS_NAVIGATION.find((sec) =>
         </aside>
       )}
     </div>
-
-    <!-- Command Palette modal -->
-    <CommandPalette />
 
     <!-- Mobile Sidebar Script -->
     <script>

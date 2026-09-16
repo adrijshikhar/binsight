@@ -36,7 +36,7 @@ const SKELETON_COUNT = 8
 
 export default function EventsTable<G, E>({
   visualRows,
-  estimateSize = 40,
+  estimateSize = 32,
   renderEventRow,
   renderGroupRow,
   colgroup,
@@ -91,6 +91,7 @@ export default function EventsTable<G, E>({
     <div className="min-h-0 flex-1 overflow-auto" ref={internalScrollRef}>
       <Table
         className="min-w-[960px] table-fixed [&_td]:overflow-hidden [&_td]:text-ellipsis [&_td]:whitespace-nowrap"
+        data-density="compact"
         render={<div className="contents" />}
       >
         {colgroup}

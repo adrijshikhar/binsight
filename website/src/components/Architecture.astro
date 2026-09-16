@@ -8,7 +8,7 @@ import { SITE_CONFIG } from '../data/product';
     <div data-anime="reveal" class="text-center max-w-3xl mx-auto mb-20">
       <h3 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Local-first</span>,
-        <span class="font-sans font-bold text-[#38bdf8] px-1">high-throughput streaming.</span>
+        <span class="font-sans font-bold text-[#58a6ff] px-1">high-throughput streaming.</span>
       </h3>
       <p class="text-base sm:text-lg text-[#8b949e] font-sans leading-relaxed">
         Decode never blocks the user interface. Everything the browser displays queries a fast, local SQLite index.
@@ -20,35 +20,35 @@ import { SITE_CONFIG } from '../data/product';
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 relative">
         <!-- Node 1 -->
         <div class="rounded-lg border border-[#2d3b4f] bg-[#161f2c] p-4 flex flex-col justify-between text-center">
-          <div class="text-[11px] font-mono text-[#38bdf8] uppercase tracking-wider mb-2">1. Sources</div>
+          <div class="text-[11px] font-mono text-[#58a6ff] uppercase tracking-wider mb-2">1. Sources</div>
           <div class="font-bold text-[#f0f6fc] text-sm mb-1">Binlog Files</div>
           <div class="text-xs text-[#8b949e]">or Live Replica (spool)</div>
         </div>
 
         <!-- Node 2 -->
         <div class="rounded-lg border border-[#2d3b4f] bg-[#161f2c] p-4 flex flex-col justify-between text-center">
-          <div class="text-[11px] font-mono text-[#38bdf8] uppercase tracking-wider mb-2">2. Parser</div>
+          <div class="text-[11px] font-mono text-[#58a6ff] uppercase tracking-wider mb-2">2. Parser</div>
           <div class="font-bold text-[#f0f6fc] text-sm mb-1">go-mysql Ingest</div>
           <div class="text-xs text-[#8b949e]">+ mysqlbinlog oracle</div>
         </div>
 
         <!-- Node 3 -->
-        <div class="rounded-lg border border-[#38bdf8]/50 bg-[#161f2c] p-4 flex flex-col justify-between text-center">
-          <div class="text-[11px] font-mono text-[#38bdf8] uppercase tracking-wider mb-2">3. Storage</div>
+        <div class="rounded-lg border border-[#0075de]/50 bg-[#161f2c] p-4 flex flex-col justify-between text-center">
+          <div class="text-[11px] font-mono text-[#58a6ff] uppercase tracking-wider mb-2">3. Storage</div>
           <div class="font-bold text-[#f0f6fc] text-sm mb-1">SQLite Index</div>
           <div class="text-xs text-[#3fb950]">WAL mode (zero CGO)</div>
         </div>
 
         <!-- Node 4 -->
         <div class="rounded-lg border border-[#2d3b4f] bg-[#161f2c] p-4 flex flex-col justify-between text-center">
-          <div class="text-[11px] font-mono text-[#38bdf8] uppercase tracking-wider mb-2">4. Server</div>
+          <div class="text-[11px] font-mono text-[#58a6ff] uppercase tracking-wider mb-2">4. Server</div>
           <div class="font-bold text-[#f0f6fc] text-sm mb-1">Go HTTP + SSE</div>
           <div class="text-xs text-[#8b949e]">fsnotify live watcher</div>
         </div>
 
         <!-- Node 5 -->
         <div class="rounded-lg border border-[#2d3b4f] bg-[#161f2c] p-4 flex flex-col justify-between text-center">
-          <div class="text-[11px] font-mono text-[#38bdf8] uppercase tracking-wider mb-2">5. UI</div>
+          <div class="text-[11px] font-mono text-[#58a6ff] uppercase tracking-wider mb-2">5. UI</div>
           <div class="font-bold text-[#f0f6fc] text-sm mb-1">React 19 Console</div>
           <div class="text-xs text-[#8b949e]">Virtualized list window</div>
         </div>
@@ -56,14 +56,14 @@ import { SITE_CONFIG } from '../data/product';
 
       <div class="mt-8 pt-6 border-t border-[#212c3d] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#8b949e]">
         <div class="flex items-center gap-2">
-          <span class="text-[#38bdf8]">Stack:</span>
+          <span class="text-[#58a6ff]">Stack:</span>
           <span>Go backend · React 19 UI · SQLite · Local-first</span>
         </div>
         <a
           href="https://adrijshikhar.dev/blogs/building-a-pure-go-binlog-analyzer"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-[#38bdf8] hover:underline flex items-center gap-1 font-sans"
+          class="text-[#58a6ff] hover:underline flex items-center gap-1 font-sans"
         >
           Read the 62% latency reduction engineering write-up →
         </a>

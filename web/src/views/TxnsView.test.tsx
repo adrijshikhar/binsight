@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import TxnsView from './TxnsView'
 import * as apiModule from '../lib/api'
 import type { Txn } from '../lib/types'
@@ -135,6 +135,17 @@ describe('TxnsView', () => {
       // Ordinal is by start_pos rank (stable across sort), so the @100 txn is "txn 1".
       const firstRowText = rows[0].textContent
       expect(firstRowText).toContain('txn 1')
+    })
+  })
+
+  it('reverses event_count sort on a second click', async () => {
+    wrap(<TxnsView {...makeProps()} />)
+    await waitFor(() => screen.getByText('txn 1'))
+    const eventsHeader = screen.getByRole('button', { name: /events/i })
+    fireEvent.click(eventsHeader)
+    fireEvent.click(eventsHeader)
+    await waitFor(() => {
+      expect(document.querySelectorAll('tbody tr')[0].textContent).toContain('txn 2')
     })
   })
 

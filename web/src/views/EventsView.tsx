@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Virtualizer } from '@tanstack/react-virtual'
+import {
+  getCoreRowModel,
+  getExpandedRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type ExpandedState,
+  type SortingState,
+} from '@tanstack/react-table'
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyHeader, EmptyTitle, EmptyContent } from '@/components/ui/empty'
@@ -8,7 +17,7 @@ import { Tooltip, TooltipTrigger, TooltipPopup } from '@/components/ui/tooltip'
 import { IconChevronRight, IconChevronUp, IconChevronDown } from '@tabler/icons-react'
 import { api } from '../lib/api'
 import { useIndexEvent } from '../lib/sse'
-import { clickable, clickableRow } from '../lib/a11y'
+import { clickableRow } from '../lib/a11y'
 import { fmtBytes } from '../lib/format'
 import { readUrlState, writeUrlState } from '../lib/url'
 import type { EventRow, Severity } from '../lib/types'
@@ -18,15 +27,13 @@ import TruncCell from '../components/TruncCell'
 import KindBadge from '../components/KindBadge'
 import { Warning, WrapArrow } from '../components/icons'
 
-/** Columns that can be sorted client-side. Unsorted = stream/load order (default). */
-type SortKey = 'pos' | 'ts' | 'size' | 'rows'
-
 /** Group type used inside the VisualRow union */
 // ordinal: a per-file, 1-based transaction number assigned in stream order at
 // grouping time. Readable and contiguous for ANY binlog - GTID or not (a
 // GTID-less file has no seqno; GTID seqnos can also be huge/non-contiguous on
 // replicas). The exact GTID stays visible in each row for precise reference.
-type TxnGroup = { txnId: number; ordinal: number; events: EventRow[] }
+type TxnGroup = { txnId: number; ordinal: number; rowId: string; events: EventRow[] }
+type EventTreeRow = { id: string; event?: EventRow; group?: TxnGroup; subRows?: EventTreeRow[] }
 
 function kindToDataAttr(typeName: string): string {
   if (typeName.startsWith('WRITE_ROWS_')) return typeName
@@ -88,7 +95,7 @@ export default function EventsView(props: EventsViewProps) {
   const [nextCursor, setNextCursor] = useState(0)
   const [total, setTotal] = useState(0)
   const [grouped, setGrouped] = useState(true)
-  const [collapsed, setCollapsed] = useState<Set<number>>(new Set())
+  const [expanded, setExpanded] = useState<ExpandedState>(true)
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(true)
   // refs forwarded into EventsTable so the parent can drive virtualizer + scroll
@@ -103,10 +110,10 @@ export default function EventsView(props: EventsViewProps) {
   const searchRef = useRef<HTMLInputElement>(null)
   // Generation counter: incremented each time a non-append load fires
   const loadGenRef = useRef(0)
+  const seenGroupIdsRef = useRef(new Set<string>())
 
   // Client-side column sort
-  const [sortKey, setSortKey] = useState<SortKey | null>(null)
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [sorting, setSorting] = useState<SortingState>([])
 
   useEffect(() => {
     let mounted = true
@@ -145,7 +152,8 @@ export default function EventsView(props: EventsViewProps) {
 
   // Reset collapsed groups on file switch
   useEffect(() => {
-    setCollapsed(new Set())
+    setExpanded(true)
+    seenGroupIdsRef.current.clear()
   }, [props.fileId])
 
   // Sync filter state to URL
@@ -209,71 +217,80 @@ export default function EventsView(props: EventsViewProps) {
     load(0, false)
   }, [indexEvent, live, props.fileId, load])
 
-  // Sorted copy of events for display
-  const sortedEvents = useMemo<EventRow[]>(() => {
-    if (!sortKey) return events
-    const s = [...events]
-    s.sort((a, b) => {
-      let diff = 0
-      switch (sortKey) {
-        case 'pos':
-          diff = a.pos - b.pos
-          break
-        case 'ts':
-          diff = a.ts - b.ts
-          break
-        case 'size':
-          diff = a.size - b.size
-          break
-        case 'rows':
-          diff = a.rows_count - b.rows_count
-          break
-      }
-      return sortDir === 'asc' ? diff : -diff
-    })
-    return s
-  }, [events, sortKey, sortDir])
-
-  const groups = useMemo(() => {
-    if (!grouped) return null
-    const out: TxnGroup[] = []
+  const treeRows = useMemo<EventTreeRow[]>(() => {
+    if (!grouped) return events.map((event) => ({ id: `event:${event.pos}`, event }))
+    const out: EventTreeRow[] = []
     let ord = 0
-    for (const e of sortedEvents) {
+    for (const e of events) {
       const tid = e.txn_id ?? 0
-      const last = out[out.length - 1]
-      if (last && last.txnId === tid) last.events.push(e)
-      else out.push({ txnId: tid, ordinal: tid !== 0 ? ++ord : 0, events: [e] })
+      const last = out[out.length - 1]?.group
+      if (tid !== 0 && last?.txnId === tid) {
+        last.events.push(e)
+        out[out.length - 1].subRows!.push({ id: `event:${e.pos}`, event: e })
+      } else if (tid === 0) {
+        out.push({ id: `event:${e.pos}`, event: e })
+      } else {
+        const group = { txnId: tid, ordinal: ++ord, rowId: `txn:${tid}:${e.pos}`, events: [e] }
+        out.push({ id: group.rowId, group, subRows: [{ id: `event:${e.pos}`, event: e }] })
+      }
     }
     return out
-  }, [sortedEvents, grouped])
+  }, [events, grouped])
+
+  const columns = useMemo<ColumnDef<EventTreeRow>[]>(
+    () => [
+      { id: 'pos', accessorFn: (row) => row.event?.pos ?? row.group?.events[0]?.pos ?? 0 },
+      { id: 'ts', accessorFn: (row) => row.event?.ts ?? row.group?.events[0]?.ts ?? 0 },
+      { id: 'size', accessorFn: (row) => row.event?.size ?? row.group?.events.reduce((n, e) => n + e.size, 0) ?? 0 },
+      {
+        id: 'rows',
+        accessorFn: (row) => row.event?.rows_count ?? row.group?.events.reduce((n, e) => n + e.rows_count, 0) ?? 0,
+      },
+    ],
+    [],
+  )
+  const table = useReactTable({
+    data: treeRows,
+    columns,
+    state: { sorting, expanded },
+    onSortingChange: setSorting,
+    onExpandedChange: setExpanded,
+    getRowId: (row) => row.id,
+    getSubRows: (row) => row.subRows,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    autoResetExpanded: false,
+    enableSortingRemoval: false,
+    enableMultiSort: false,
+    sortDescFirst: false,
+  })
+
+  useEffect(() => {
+    const groupIds = treeRows.flatMap((row) => (row.group ? [row.id] : []))
+    const newGroupIds = groupIds.filter((id) => !seenGroupIdsRef.current.has(id))
+    newGroupIds.forEach((id) => seenGroupIdsRef.current.add(id))
+    if (newGroupIds.length === 0) return
+    setExpanded((current) => {
+      if (current === true) return current
+      return { ...current, ...Object.fromEntries(newGroupIds.map((id) => [id, true])) }
+    })
+  }, [treeRows])
 
   // Flat ordered list of visible event rows (for j/k navigation)
   const flatEvents = useMemo<EventRow[]>(() => {
-    if (!grouped || !groups) return sortedEvents
-    const out: EventRow[] = []
-    for (const g of groups) {
-      if (g.txnId === 0 || !collapsed.has(g.txnId)) {
-        for (const e of g.events) out.push(e)
-      }
-    }
-    return out
-  }, [sortedEvents, grouped, groups, collapsed])
+    return table.getRowModel().rows.flatMap((row) => (row.original.event ? [row.original.event] : []))
+  }, [table, sorting, expanded, treeRows])
 
   // Flatten into one linear list for the virtualizer
   const visualRows = useMemo<VisualRow<TxnGroup, EventRow>[]>(() => {
     const out: VisualRow<TxnGroup, EventRow>[] = []
-    if (grouped && groups) {
-      for (const g of groups) {
-        if (g.txnId !== 0) out.push({ kind: 'group', g })
-        if (g.txnId === 0 || !collapsed.has(g.txnId)) {
-          for (const e of g.events) out.push({ kind: 'event', e })
-        }
-      }
-    } else {
-      for (const e of sortedEvents) out.push({ kind: 'event', e })
+    for (const row of table.getRowModel().rows) {
+      if (row.original.group) out.push({ kind: 'group', g: row.original.group })
+      else if (row.original.event) out.push({ kind: 'event', e: row.original.event })
     }
     return out
-  }, [grouped, groups, collapsed, sortedEvents])
+  }, [table, sorting, expanded, treeRows])
 
   // pos -> visualRows index, for scrolling a j/k-selected event into view
   const posToVisualIndex = useMemo(() => {
@@ -295,35 +312,14 @@ export default function EventsView(props: EventsViewProps) {
     }
   }, [events, live, visualRows.length])
 
-  /** Toggle sort: same key → flip direction; different key → asc. */
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortKey(key)
-      setSortDir('asc')
-    }
+  const sortIndicator = (key: string) => {
+    const sorted = table.getColumn(key)?.getIsSorted()
+    return sorted === 'asc' ? <IconChevronUp size={12} /> : sorted === 'desc' ? <IconChevronDown size={12} /> : null
   }
-
-  /** Render a caret for the active sort column. */
-  const sortIndicator = (key: SortKey) =>
-    sortKey === key ? sortDir === 'asc' ? <IconChevronUp size={12} /> : <IconChevronDown size={12} /> : null
-
-  /** Props to spread onto a sortable <th>. */
-  const sortableProps = (key: SortKey) => ({
-    'data-sortable': true,
-    'aria-sort':
-      sortKey === key ? (sortDir === 'asc' ? ('ascending' as const) : ('descending' as const)) : ('none' as const),
-    ...clickable(() => handleSort(key)),
-  })
-
-  const toggleCollapsed = (txnId: number) =>
-    setCollapsed((s) => {
-      const n = new Set(s)
-      if (n.has(txnId)) n.delete(txnId)
-      else n.add(txnId)
-      return n
-    })
+  const ariaSort = (key: string) => {
+    const sorted = table.getColumn(key)?.getIsSorted()
+    return sorted === 'asc' ? 'ascending' : sorted === 'desc' ? 'descending' : 'none'
+  }
 
   // Global keyboard shortcuts: j/k navigation, t toggle, / focus search
   useEffect(() => {
@@ -358,16 +354,17 @@ export default function EventsView(props: EventsViewProps) {
   // ── Row renderers ──────────────────────────────────────────────────────────
 
   const renderGroupRow = (g: TxnGroup, index: number, measureRef: (el: Element | null) => void) => {
-    const isCollapsed = collapsed.has(g.txnId)
+    const groupRow = table.getRow(g.rowId)
+    const isCollapsed = !groupRow.getIsExpanded()
     const rows = g.events.reduce((n, e) => n + e.rows_count, 0)
     const label = `txn ${g.ordinal}`
     return (
       <TableRow
-        key={`g${g.txnId}`}
+        key={g.rowId}
         data-index={index}
         ref={measureRef}
 
-        {...clickableRow(() => toggleCollapsed(g.txnId))}
+        {...clickableRow(groupRow.getToggleExpandedHandler())}
       >
         <TableCell colSpan={COL_COUNT}>
           <span className="inline-flex items-center gap-2">
@@ -428,7 +425,7 @@ export default function EventsView(props: EventsViewProps) {
           )}
         </TableCell>
         <TableCell className="text-right tabular-nums">{e.pos}</TableCell>
-        <TableCell>{fmtTime(e.ts)}</TableCell>
+        <TableCell className="data-text">{fmtTime(e.ts)}</TableCell>
         <TableCell>
           <KindBadge typeName={e.type_name} size="sm" />
         </TableCell>
@@ -461,13 +458,13 @@ export default function EventsView(props: EventsViewProps) {
   const colgroup = (
     <colgroup>
       <col className="w-7" />
-      <col className="w-24" />
+      <col className="w-36" />
       <col className="w-36" />
       <col className="w-44" />
       <col className="w-32" />
       <col />
-      <col className="w-14" />
-      <col className="w-20" />
+      <col className="w-24" />
+      <col className="w-24" />
       <col className="w-24" />
     </colgroup>
   )
@@ -476,20 +473,28 @@ export default function EventsView(props: EventsViewProps) {
     <TableHeader>
       <TableRow>
         <TableHead scope="col"></TableHead>
-        <TableHead scope="col" className="text-right tabular-nums" {...sortableProps('pos')}>
-          start pos{sortIndicator('pos')}
+        <TableHead scope="col" aria-sort={ariaSort('pos')}>
+          <Button variant="ghost" onClick={table.getColumn('pos')?.getToggleSortingHandler()}>
+            start pos{sortIndicator('pos')}
+          </Button>
         </TableHead>
-        <TableHead scope="col" {...sortableProps('ts')}>
-          time{sortIndicator('ts')}
+        <TableHead scope="col" aria-sort={ariaSort('ts')}>
+          <Button variant="ghost" onClick={table.getColumn('ts')?.getToggleSortingHandler()}>
+            time{sortIndicator('ts')}
+          </Button>
         </TableHead>
         <TableHead scope="col">type</TableHead>
         <TableHead scope="col">db.table</TableHead>
         <TableHead scope="col">summary</TableHead>
-        <TableHead scope="col" className="text-right tabular-nums" {...sortableProps('rows')}>
-          rows{sortIndicator('rows')}
+        <TableHead scope="col" aria-sort={ariaSort('rows')}>
+          <Button variant="ghost" onClick={table.getColumn('rows')?.getToggleSortingHandler()}>
+            rows{sortIndicator('rows')}
+          </Button>
         </TableHead>
-        <TableHead scope="col" className="text-right tabular-nums" {...sortableProps('size')}>
-          size{sortIndicator('size')}
+        <TableHead scope="col" aria-sort={ariaSort('size')}>
+          <Button variant="ghost" onClick={table.getColumn('size')?.getToggleSortingHandler()}>
+            size{sortIndicator('size')}
+          </Button>
         </TableHead>
         <TableHead scope="col" className="text-right tabular-nums">
           end pos
@@ -536,7 +541,7 @@ export default function EventsView(props: EventsViewProps) {
       {err && (
         <Alert variant="error" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" onClick={() => load(0, false)}>
+          <Button variant="outline" onClick={() => load(0, false)}>
             retry
           </Button>
         </Alert>
@@ -552,13 +557,12 @@ export default function EventsView(props: EventsViewProps) {
         loading={loading}
         virtualizerRef={virtualizerRef}
         scrollRef={scrollRef}
-        getItemKey={(i, r) => (r.kind === 'group' ? `g${r.g.txnId}` : `e${r.e.pos}`)}
+        getItemKey={(i, r) => (r.kind === 'group' ? r.g.rowId : `e${r.e.pos}`)}
       />
       {!loading && !live && nextCursor > 0 && (
         <Button
           className="mx-auto my-3"
           variant="ghost"
-          size="xs"
           onClick={() => load(nextCursor, true)}
           aria-label={`load more (${events.length} / ${total})`}
         >

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AnomaliesView from './AnomaliesView'
 import * as apiModule from '../lib/api'
 import type { Anomaly } from '../lib/types'
@@ -97,8 +98,9 @@ describe('AnomaliesView', () => {
     const onOpenTxn = vi.fn()
     wrap(<AnomaliesView {...makeProps({ onOpenTxn })} />)
     await waitFor(() => screen.getByText('txn #42'))
-    const link = screen.getByText('txn #42').closest('[role="button"]')!
-    link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    const link = screen.getByRole('button', { name: 'txn #42' })
+    link.focus()
+    await userEvent.keyboard('{Enter}')
     expect(onOpenTxn).toHaveBeenCalledWith(42)
   })
 
@@ -114,8 +116,9 @@ describe('AnomaliesView', () => {
     const onOpenEvent = vi.fn()
     wrap(<AnomaliesView {...makeProps({ onOpenEvent })} />)
     await waitFor(() => screen.getByText('@ 100'))
-    const link = screen.getByText('@ 100').closest('[role="button"]')!
-    link.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }))
+    const link = screen.getByRole('button', { name: '@ 100' })
+    link.focus()
+    await userEvent.keyboard(' ')
     expect(onOpenEvent).toHaveBeenCalledWith(100)
   })
 

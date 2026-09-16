@@ -95,7 +95,7 @@ export default function FilterBar(props: FilterBarProps) {
   return (
     <div className="flex flex-col">
       {/* Tier 1: View mode, universal search, live toggle, jump to position */}
-      <div className="flex flex-wrap items-center gap-3 border-b p-3">
+      <div className="events-toolbar-primary flex flex-wrap items-center gap-3 border-b p-3">
         <RadioGroupPrimitive
           aria-label="View mode"
           className={segmentedControlRootClassName}
@@ -106,14 +106,14 @@ export default function FilterBar(props: FilterBarProps) {
           }}
         >
           <RadioPrimitive.Root
-            className={segmentedControlItemVariants({ className: 'grow', size: 'sm', state: 'checked' })}
+            className={segmentedControlItemVariants({ className: 'grow', state: 'checked' })}
             value="flat"
             aria-label="Flat"
           >
             Flat
           </RadioPrimitive.Root>
           <RadioPrimitive.Root
-            className={segmentedControlItemVariants({ className: 'grow', size: 'sm', state: 'checked' })}
+            className={segmentedControlItemVariants({ className: 'grow', state: 'checked' })}
             value="grouped"
             aria-label="Grouped"
           >
@@ -128,12 +128,11 @@ export default function FilterBar(props: FilterBarProps) {
             placeholder="Search summary..."
             value={filters.q}
             onChange={(e) => props.onChange({ ...filters, q: e.target.value })}
-            size="sm"
             className="w-full"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+          <div className="events-toolbar-secondary flex flex-wrap items-center gap-3">
           {props.onToggleLive && (
             <Tooltip>
               <TooltipTrigger
@@ -152,7 +151,7 @@ export default function FilterBar(props: FilterBarProps) {
             </Tooltip>
           )}
 
-          <div className="flex items-center gap-1 flex-nowrap">
+          <div className="events-jump-control flex items-center gap-1 flex-nowrap">
             <Input
               aria-label="Jump to byte position"
               aria-invalid={jumpInvalid}
@@ -166,7 +165,6 @@ export default function FilterBar(props: FilterBarProps) {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleJump()
               }}
-              size="sm"
               className="w-40"
             />
             <Button
@@ -175,7 +173,6 @@ export default function FilterBar(props: FilterBarProps) {
               disabled={jump.trim() === ''}
               aria-label="Go to position"
               variant="outline"
-              size="sm"
             >
               Go
             </Button>
@@ -228,7 +225,6 @@ export default function FilterBar(props: FilterBarProps) {
         {filters.types.map((t) => (
           <Button
             variant="outline"
-            size="sm"
             data-filter-remove
             key={`type-${t}`}
             aria-label={`Remove ${t} filter`}
@@ -248,7 +244,6 @@ export default function FilterBar(props: FilterBarProps) {
         {filters.dbs.map((db) => (
           <Button
             variant="outline"
-            size="sm"
             data-filter-remove
             key={`db-${db}`}
             aria-label={`Remove database ${db} filter`}
@@ -268,7 +263,6 @@ export default function FilterBar(props: FilterBarProps) {
         {filters.tables.map((tbl) => (
           <Button
             variant="outline"
-            size="sm"
             data-filter-remove
             key={`tbl-${tbl}`}
             aria-label={`Remove table ${tbl} filter`}
@@ -290,7 +284,6 @@ export default function FilterBar(props: FilterBarProps) {
         {txnIds.map((id) => (
           <Button
             variant="outline"
-            size="sm"
             data-filter-remove
             key={`tx-${id}`}
             aria-label={`Remove txn ${id} filter`}
@@ -312,7 +305,6 @@ export default function FilterBar(props: FilterBarProps) {
         {hasActiveFilters && (
           <Button
             variant="ghost"
-            size="sm"
             type="button"
             onClick={() => {
               props.onChange({ ...filters, types: [], dbs: [], tables: [] })

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import FilterBar, { emptyFilters, type Filters } from './FilterBar'
 
-// jsdom doesn't implement ResizeObserver - used by Mantine's SegmentedControl FloatingIndicator
+// jsdom doesn't implement ResizeObserver.
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -70,7 +70,6 @@ describe('FilterBar', () => {
 
   it('renders flat/grouped segmented control', () => {
     wrap(<FilterBar {...makeProps()} />)
-    // Mantine SegmentedControl renders radio inputs
     expect(screen.getByRole('radio', { name: /flat/i })).toBeTruthy()
     expect(screen.getByRole('radio', { name: /grouped/i })).toBeTruthy()
   })
@@ -149,7 +148,6 @@ describe('FilterBar', () => {
     wrap(<FilterBar {...makeProps({ txnIds: [42, 99], onRemoveTxn })} />)
     expect(screen.getByText(/txn #42/)).toBeTruthy()
     expect(screen.getByText(/txn #99/)).toBeTruthy()
-    // Mantine Pill renders remove button accessible via aria-label from removeButtonProps
     expect(screen.getByLabelText('Remove txn 42 filter')).toBeTruthy()
     expect(screen.getByLabelText('Remove txn 99 filter')).toBeTruthy()
   })
@@ -276,4 +274,3 @@ describe('FilterBar', () => {
     })
   })
 })
-

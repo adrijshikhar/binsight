@@ -18,9 +18,9 @@ import { FEATURES } from '../data/product';
     <!-- Feature Cards -->
     <div data-anime="stagger" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
       {FEATURES.map((feature, i) => (
-        <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 hover:border-[#38bdf8]/40 hover:bg-[#151d28] transition-all flex flex-col justify-between group">
+        <div class="rounded-xl border border-[#212c3d] bg-[#10151d] p-6 hover:border-[#0075de]/40 hover:bg-[#151d28] transition-all flex flex-col justify-between group">
           <div>
-            <div class="w-10 h-10 rounded-lg bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] mb-5 group-hover:border-[#38bdf8] group-hover:scale-105 transition-all">
+            <div class="w-10 h-10 rounded-lg bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#58a6ff] mb-5 group-hover:border-[#0075de] group-hover:scale-105 transition-all">
               {feature.icon === 'stream' && (
                 <svg class="w-5 h-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
                   <path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round"/>
@@ -57,7 +57,7 @@ import { FEATURES } from '../data/product';
                 </svg>
               )}
             </div>
-            <div class="text-xs font-mono text-[#38bdf8] mb-1">{feature.tagline}</div>
+            <div class="text-xs font-mono text-[#58a6ff] mb-1">{feature.tagline}</div>
             <h4 class="text-lg font-bold text-[#f0f6fc] mb-2">{feature.title}</h4>
             <p class="text-sm text-[#8b949e] leading-relaxed">{feature.description}</p>
           </div>

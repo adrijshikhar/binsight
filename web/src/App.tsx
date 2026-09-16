@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type React from 'react'
 import { Tabs, TabsList, TabsTab } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogPopup, DialogTitle, DialogHeader, DialogPanel } from '@/components/ui/dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { IconAlertTriangle, IconArrowLeft, IconBinary, IconDatabase, IconSettings } from '@tabler/icons-react'
 import { api } from './lib/api'
@@ -64,10 +65,13 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(
     initialUrl.tab === 'settings' || initialUrl.tab === 'architecture' || initialUrl.tab === 'how-it-works',
   )
+  const [architectureOpen, setArchitectureOpen] = useState(
+    initialUrl.tab === 'architecture' || initialUrl.tab === 'how-it-works',
+  )
   const [settingsSection, setSettingsSection] = useState<
-    'decoding' | 'how-it-works' | 'display' | 'anomalies' | 'streaming' | 'watch'
+    'decoding' | 'display' | 'anomalies' | 'streaming' | 'watch'
   >(() => {
-    return initialUrl.tab === 'how-it-works' || initialUrl.tab === 'architecture' ? 'how-it-works' : 'decoding'
+    return 'decoding'
   })
   const [lastInspectorTab, setLastInspectorTab] = useState<MainTab>(() => {
     const t = normalizeTab(initialUrl.tab)
@@ -370,11 +374,18 @@ export default function App() {
 
   return (
     <SSEContext.Provider value={lastIndexEvent}>
-      <div className="flex h-dvh w-full flex-col overflow-hidden bg-background">
+      <div className="app-prose flex h-dvh w-full flex-col overflow-hidden bg-background">
         <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b px-4">
           {/* Left side: Brand + Active File breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
-            <span className="shrink-0">binsight</span>
+            <span className="app-brand shrink-0">
+              <span className="app-brand-icon">
+                <svg className="app-brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M4 6h16M4 12h10M4 18h14" strokeLinecap="round" />
+                </svg>
+              </span>
+              <span>binsight</span>
+            </span>
 
             {file && (
               <div className="flex items-center gap-1 min-w-0">
@@ -390,9 +401,11 @@ export default function App() {
 
           {/* Right side: Settings button */}
           <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={() => setArchitectureOpen(true)} aria-label="Architecture">
+              Architecture
+            </Button>
             <Button
               variant="ghost"
-              size="xs"
               onClick={() => {
                 setSettingsSection('decoding')
                 setSettingsOpen(true)
@@ -426,8 +439,7 @@ export default function App() {
                   setSettingsOpen(true)
                 }}
                 onArchitecture={() => {
-                  setSettingsSection('how-it-works')
-                  setSettingsOpen(true)
+                  setArchitectureOpen(true)
                 }}
                 streamStatus={streamStatus ?? undefined}
               />
@@ -464,7 +476,7 @@ export default function App() {
                 <IconAlertTriangle size={16} />
                 <AlertDescription className="flex items-center justify-between">
                   <span>file list unavailable: {filesErr}</span>
-                  <Button size="xs" variant="outline" onClick={refreshFiles}>
+                  <Button variant="outline" onClick={refreshFiles}>
                     retry
                   </Button>
                 </AlertDescription>
@@ -633,7 +645,17 @@ export default function App() {
           )}
         </div>
       </div>
-      <SettingsView opened={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} />
+      <SettingsView opened={settingsOpen} onClose={() => setSettingsOpen(false)} initialSection={settingsSection} onOpenArchitecture={() => { setSettingsOpen(false); setArchitectureOpen(true) }} />
+      <Dialog open={architectureOpen} onOpenChange={setArchitectureOpen}>
+        <DialogPopup className="max-w-5xl" closeProps={{ 'aria-label': 'Close architecture' }}>
+          <DialogHeader>
+            <DialogTitle className="sr-only">Architecture</DialogTitle>
+          </DialogHeader>
+          <DialogPanel className="min-h-0 overflow-auto">
+            <ArchitectureView key={architectureOpen ? 'architecture-open' : 'architecture-closed'} />
+          </DialogPanel>
+        </DialogPopup>
+      </Dialog>
       {showAgentation && <Agentation endpoint="http://localhost:4747" />}
     </SSEContext.Provider>
   )

@@ -6,13 +6,13 @@ import GitHubBadge from './ui/GitHubBadge.astro';
 <header class="sticky top-0 z-50 border-b border-[#212c3d] bg-[#0b0f14]/90 backdrop-blur-md px-4 sm:px-6 py-3 relative">
   <div class="max-w-6xl mx-auto flex items-center justify-between">
     <!-- Brand -->
-    <a href="#" class="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] rounded shrink-0">
-      <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#38bdf8] group-hover:border-[#38bdf8] transition-colors">
+    <a href="#" class="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0075de] rounded shrink-0">
+      <div class="w-7 h-7 rounded-md bg-[#161f2c] border border-[#2d3b4f] flex items-center justify-center text-[#58a6ff] group-hover:border-[#0075de] transition-colors">
         <svg class="w-3.5 h-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-          <path d="M4 17l6-6-6-6M12 19h8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M4 6h16M4 12h10M4 18h14" stroke-linecap="round"/>
         </svg>
       </div>
-      <span class="font-mono font-bold text-lg text-[#f0f6fc] tracking-tight group-hover:text-[#38bdf8] transition-colors">binsight</span>
+      <span class="font-mono font-bold text-lg text-[#f0f6fc] tracking-tight group-hover:text-[#58a6ff] transition-colors">binsight</span>
     </a>
 
     <!-- Desktop Nav Links (Visible on lg: 1024px+) -->
@@ -20,28 +20,15 @@ import GitHubBadge from './ui/GitHubBadge.astro';
       {NAV_LINKS.map((link) => (
         <a
           href={link.href}
-          class="text-[#8b949e] hover:text-[#f0f6fc] transition-colors focus:outline-none focus-visible:text-[#38bdf8] flex items-center gap-1.5"
+          class="text-[#8b949e] hover:text-[#f0f6fc] transition-colors focus:outline-none focus-visible:text-[#58a6ff] flex items-center gap-1.5"
         >
           {link.label}
         </a>
       ))}
     </nav>
 
-    <!-- Actions / Search & GitHub -->
+    <!-- Actions / GitHub -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-      <!-- Command Palette Trigger (md: and up) -->
-      <button
-        id="cmd-palette-btn"
-        class="hidden md:inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-[#2d3b4f] bg-[#11161d] text-xs text-[#8b949e] hover:text-[#f0f6fc] hover:border-[#38bdf8]/40 transition-colors"
-        title="Open Command Palette"
-      >
-        <svg class="w-3.5 h-3.5 text-[#8b949e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <span class="font-mono text-[11px]">Find</span>
-        <kbd class="px-1 py-0.5 text-[9px] font-mono rounded bg-[#161f2c] border border-[#2d3b4f] text-[#c9d1d9] leading-none">⌘K</kbd>
-      </button>
-
       <GitHubBadge size="sm" />
 
       <!-- Mobile Menu Toggle Button -->

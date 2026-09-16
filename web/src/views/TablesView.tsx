@@ -49,7 +49,7 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
       {err && (
         <Alert variant="error" role="alert" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
+          <Button variant="outline" className="ml-2" onClick={() => setFetchKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
@@ -77,13 +77,13 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
             <span>{(totalBytes / 1024).toFixed(1)} KB payload</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="success" size="sm">
+            <Badge variant="success" size="sm" data-kind="WRITE">
               +{totalIns} ins
             </Badge>
-            <Badge variant="warning" size="sm">
+            <Badge variant="warning" size="sm" data-kind="UPDATE">
               ~{totalUpd} upd
             </Badge>
-            <Badge variant="error" size="sm">
+            <Badge variant="error" size="sm" data-kind="DELETE">
               -{totalDel} del
             </Badge>
           </div>
@@ -111,13 +111,13 @@ export default function TablesView(props: { fileId: number; onOpenTable: (db: st
               </CardHeader>
               <CardPanel>
                 <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="success" size="sm">
+                  <Badge variant="success" size="sm" data-kind="WRITE">
                     {t.inserts} ins
                   </Badge>
-                  <Badge variant="warning" size="sm">
+                  <Badge variant="warning" size="sm" data-kind="UPDATE">
                     {t.updates} upd
                   </Badge>
-                  <Badge variant="error" size="sm">
+                  <Badge variant="error" size="sm" data-kind="DELETE">
                     {t.deletes} del
                   </Badge>
                 </div>

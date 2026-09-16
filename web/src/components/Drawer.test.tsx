@@ -5,7 +5,7 @@ import Drawer from './Drawer'
 import { api } from '../lib/api'
 import type { EventRow } from '../lib/types'
 
-// jsdom doesn't implement matchMedia - Mantine's color-scheme hook needs it.
+// jsdom doesn't implement matchMedia.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
@@ -20,7 +20,7 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// jsdom doesn't implement ResizeObserver - Mantine's Tabs/FloatingIndicator needs it.
+// jsdom doesn't implement ResizeObserver.
 ;(globalThis as unknown as { ResizeObserver: unknown }).ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
@@ -127,7 +127,7 @@ describe('Drawer (stock Coss UI)', () => {
     await waitFor(() => {
       expect(screen.getByRole('tab', { name: /hex/i }).getAttribute('aria-selected')).toBe('true')
     })
-    // Hex panel should be visible (Mantine Tabs.Panel is rendered; inactive panels are unmounted with keepMounted={false})
+    // Only the active panel is mounted.
     const hexPanel = screen.getByRole('tabpanel', { name: 'Hex' })
     expect(hexPanel).toBeTruthy()
   })

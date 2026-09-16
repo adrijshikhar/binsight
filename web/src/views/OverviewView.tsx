@@ -119,10 +119,9 @@ export default function OverviewView({
   return (
     <div className="p-4 flex flex-col gap-4 w-full overflow-auto">
       <div className="flex items-start justify-between gap-2">
-        <h2 className="wrap-anywhere">{file.path.split('/').pop()}</h2>
+        <h2 className="view-heading wrap-anywhere">{file.path.split('/').pop()}</h2>
         <Button
           variant="outline"
-          size="xs"
           onClick={doReindex}
           disabled={reindexing}
           title="Re-decode and re-index this file (rebuilds the event index, parsed schema, and anomalies)"
@@ -142,7 +141,7 @@ export default function OverviewView({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Left column: File Specifications */}
         <div className="py-3 flex h-full flex-col">
-          <div className="mb-2">File Specifications</div>
+          <div className="section-heading mb-2">File Specifications</div>
           <Table className="table-fixed">
             <TableBody>
               {meta.map(([k, v]) => (
@@ -158,9 +157,9 @@ export default function OverviewView({
         {/* Right column: Health & Row Mutations */}
         <div className="py-3 flex h-full flex-col">
           <div className="flex items-center justify-between mb-2">
-            <div>Health & Data Mutations</div>
+            <div className="section-heading">Health & Data Mutations</div>
             {total > 0 && (
-              <Button variant="ghost" size="xs" onClick={onShowAnomalies}>
+              <Button variant="ghost" onClick={onShowAnomalies}>
                 View all
                 <IconArrowRight size={12} className="ml-1" />
               </Button>
@@ -195,7 +194,7 @@ export default function OverviewView({
           {/* Row mutations breakdown table (relocated from sidebar) */}
           <div className="flex flex-col gap-1 flex-1">
             <div className="flex items-center justify-between mt-1">
-              <span>Row Mutations</span>
+              <span className="section-heading">Row Mutations</span>
               <span>
                 {mutationCounts.length > 0
                   ? `${mutationCounts.reduce((n, c) => n + c.rows_total, 0).toLocaleString()} rows affected`
@@ -251,7 +250,7 @@ export default function OverviewView({
       {err && (
         <Alert variant="error" role="alert" className="flex items-center justify-between">
           <span>{err}</span>
-          <Button size="xs" variant="outline" className="ml-2" onClick={() => setRetryKey((k) => k + 1)}>
+          <Button variant="outline" className="ml-2" onClick={() => setRetryKey((k) => k + 1)}>
             retry
           </Button>
         </Alert>
@@ -264,7 +263,7 @@ export default function OverviewView({
             <EmptyDescription>The file may still be indexing or contain no parseable events.</EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Button variant="outline" size="xs" onClick={doReindex}>
+            <Button variant="outline" onClick={doReindex}>
               re-index now
             </Button>
           </EmptyContent>
@@ -273,12 +272,12 @@ export default function OverviewView({
 
       {metrics && (
         <>
-          <div>Metrics</div>
+          <div className="section-heading">Metrics</div>
           <div className="flex flex-wrap gap-3">
             <Card className="min-w-40 flex-1 basis-40">
               <CardHeader>
                 <CardDescription>event size (avg)</CardDescription>
-                <CardTitle>{fmtBytes(metrics.event_size.avg)}</CardTitle>
+                <CardTitle className="metric-value">{fmtBytes(metrics.event_size.avg)}</CardTitle>
                 <CardDescription>
                   {fmtBytes(metrics.event_size.min)} min · {fmtBytes(metrics.event_size.max)} max ·{' '}
                   {fmtBytes(metrics.event_size.total)} total
@@ -288,7 +287,7 @@ export default function OverviewView({
             <Card className="min-w-40 flex-1 basis-40">
               <CardHeader>
                 <CardDescription>events</CardDescription>
-                <CardTitle>{metrics.events.toLocaleString()}</CardTitle>
+                <CardTitle className="metric-value">{metrics.events.toLocaleString()}</CardTitle>
                 <CardDescription>
                   {metrics.events_per_sec.toFixed(1)}/s · {fmtBytes(metrics.bytes_per_sec)}/s
                 </CardDescription>
@@ -297,14 +296,14 @@ export default function OverviewView({
             <Card className="min-w-40 flex-1 basis-40">
               <CardHeader>
                 <CardDescription>time span</CardDescription>
-                <CardTitle>{fmtDuration(metrics.span_sec)}</CardTitle>
+                <CardTitle className="metric-value">{fmtDuration(metrics.span_sec)}</CardTitle>
                 <CardDescription>{metrics.txns.count.toLocaleString()} txns</CardDescription>
               </CardHeader>
             </Card>
             <Card className="min-w-40 flex-1 basis-40">
               <CardHeader>
                 <CardDescription>decode</CardDescription>
-                <CardTitle>{metrics.decode.full.toLocaleString()} full</CardTitle>
+                <CardTitle className="metric-value">{metrics.decode.full.toLocaleString()} full</CardTitle>
                 {decodeWarn && <Badge variant="warning">Incomplete decoding</Badge>}
                 <CardDescription>
                   {metrics.decode.partial} partial · {metrics.decode.none} none · {metrics.decode.errors} err
@@ -313,7 +312,7 @@ export default function OverviewView({
             </Card>
           </div>
 
-          <div>Event activity</div>
+          <div className="section-heading">Event activity</div>
           <MetricsCharts
             series={metrics.series}
             byType={metrics.by_type}
@@ -325,11 +324,11 @@ export default function OverviewView({
         </>
       )}
 
-      <div>Breakdown</div>
+      <div className="section-heading">Breakdown</div>
       <div className="flex flex-wrap items-stretch gap-4">
         {metrics && metrics.largest_events.length > 0 && (
           <div className="py-3 flex min-w-0 flex-1 basis-72 flex-col" data-slot="breakdown-panel">
-            <div className="mb-2">Largest events by size</div>
+            <div className="section-heading mb-2">Largest events by size</div>
             <div className="min-h-0 flex-1 overflow-auto">
               <Table className="w-full table-fixed">
                 <TableHeader className="sticky top-0 z-10">
@@ -361,7 +360,7 @@ export default function OverviewView({
 
         {metrics && metrics.largest_txns.length > 0 && (
           <div className="py-3 flex min-w-0 flex-1 basis-72 flex-col" data-slot="breakdown-panel">
-            <div className="mb-2">Largest transactions by event count</div>
+            <div className="section-heading mb-2">Largest transactions by event count</div>
             <div className="min-h-0 flex-1 overflow-auto">
               <Table className="w-full table-fixed">
                 <TableHeader className="sticky top-0 z-10">
@@ -397,7 +396,7 @@ export default function OverviewView({
         )}
 
         <div className="py-3 flex min-w-0 flex-1 basis-72 flex-col" data-slot="breakdown-panel">
-          <div className="mb-2">Event types</div>
+          <div className="section-heading mb-2">Event types</div>
           {loading && counts.length === 0 ? (
             <div className="p-2">loading...</div>
           ) : (

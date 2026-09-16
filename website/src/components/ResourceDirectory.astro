@@ -62,7 +62,7 @@ const DIRECTORIES = [
     <div class="text-center max-w-2xl mx-auto mb-16 md:mb-20">
       <h2 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Resources &</span>
-        <span class="font-sans font-bold text-[#38bdf8] px-1">Tooling.</span>
+        <span class="font-sans font-bold text-[#58a6ff] px-1">Tooling.</span>
       </h2>
       <p class="text-base sm:text-lg text-[#8b949e] font-sans">
         Everything you need to integrate, automate, and explore MySQL binary log forensics.
@@ -72,11 +72,11 @@ const DIRECTORIES = [
     <!-- 4-Column Directory Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
       {DIRECTORIES.map((col) => (
-        <div class="resource-col rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between hover:border-[#38bdf8]/40 transition-colors">
+        <div class="resource-col rounded-xl border border-[#212c3d] bg-[#10151d] p-6 flex flex-col justify-between hover:border-[#0075de]/40 transition-colors">
           <div>
             <h3 class="text-base font-bold text-[#f0f6fc] mb-5 pb-3 border-b border-[#212c3d] flex items-center justify-between font-mono">
               <span>{col.title}</span>
-              <span class="w-1.5 h-1.5 rounded-full bg-[#38bdf8]"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[#0075de]"></span>
             </h3>
             <ul class="space-y-3 font-mono text-xs">
               {col.links.map((link) => (
@@ -85,15 +85,15 @@ const DIRECTORIES = [
                     href={link.href}
                     target={link.href.startsWith('http') ? '_blank' : '_self'}
                     rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    class="text-[#8b949e] hover:text-[#38bdf8] transition-colors flex items-center justify-between py-1 group/link"
+                    class="text-[#8b949e] hover:text-[#58a6ff] transition-colors flex items-center justify-between py-1 group/link"
                   >
                     <span class="truncate pr-2">{link.label}</span>
                     {link.badge ? (
-                      <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#38bdf8] shrink-0">
+                      <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#58a6ff] shrink-0">
                         {link.badge}
                       </span>
                     ) : (
-                      <svg class="w-3.5 h-3.5 opacity-0 group-hover/link:opacity-100 transition-opacity text-[#38bdf8] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <svg class="w-3.5 h-3.5 opacity-0 group-hover/link:opacity-100 transition-opacity text-[#58a6ff] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M7 17L17 7M17 7H7M17 7V17" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
                     )}

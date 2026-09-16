@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import type { AdapterInfo, Settings } from '../lib/types'
-import { ArchitectureContent } from './ArchitectureView'
 import { useColorScheme, type ThemePreference } from '../lib/colorScheme'
 import { Dialog, DialogPopup, DialogTitle, DialogHeader, DialogPanel, DialogFooter } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTab, TabsPanel } from '@/components/ui/tabs'
@@ -48,7 +47,6 @@ function humanizeBytes(n: number | null): string {
 /** Section ids - kept identical to the original so external callers don't break. */
 const SECTIONS = [
   { id: 'decoding', label: 'Adapters & roles' },
-  { id: 'how-it-works', label: 'How it works' },
   { id: 'display', label: 'Display' },
   { id: 'anomalies', label: 'Anomalies' },
   { id: 'streaming', label: 'Remote streaming' },
@@ -125,11 +123,11 @@ export default function SettingsView(props: SettingsViewProps) {
           if (!open) props.onClose()
         }}
       >
-        <DialogPopup closeProps={{ 'aria-label': 'Close settings' }}>
+        <DialogPopup className="max-w-4xl sm:h-[min(80vh,640px)]" closeProps={{ 'aria-label': 'Close settings' }}>
           <DialogHeader>
             <DialogTitle>Settings</DialogTitle>
           </DialogHeader>
-          <DialogPanel>
+          <DialogPanel className="min-h-0 flex-1">
             {loadError ? (
               <Alert variant="error">
                 <AlertDescription>{loadError}</AlertDescription>
@@ -265,32 +263,35 @@ export default function SettingsView(props: SettingsViewProps) {
         if (!open) props.onClose()
       }}
     >
-      <DialogPopup closeProps={{ 'aria-label': 'Close settings' }}>
+      <DialogPopup className="max-w-4xl sm:h-[min(80vh,640px)]" closeProps={{ 'aria-label': 'Close settings' }}>
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
 
-        <DialogPanel>
-          <Tabs value={active} onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}>
-            <div className="overflow-x-auto">
-              <TabsList>
+        <DialogPanel className="min-h-0 flex-1">
+          <Tabs
+            value={active}
+            orientation="vertical"
+            className="min-h-0 items-start sm:flex-row"
+            onValueChange={(v) => setActive((v as SectionId) ?? 'decoding')}
+          >
+            <TabsList className="w-full h-fit shrink-0 rounded-none bg-transparent p-0 sm:w-48 sm:flex-col sm:items-stretch">
                 {SECTIONS.map((s) => (
-                  <TabsTab key={s.id} value={s.id}>
+                  <TabsTab key={s.id} value={s.id} className="rounded-md">
                     {s.label}
                   </TabsTab>
                 ))}
-              </TabsList>
-            </div>
+            </TabsList>
 
             {/* Adapters & roles */}
-            <TabsPanel value="decoding" className="min-w-0">
+            <TabsPanel value="decoding" className="settings-panel min-w-0">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <div className="mb-2">Adapters</div>
                   <p className="mb-3">
                     Decoders available to the viewer and what each can do. Hover a capability for a one-line definition,
                     or{' '}
-                    <Button variant="link" onClick={() => setActive('how-it-works')}>
+                    <Button variant="link" onClick={() => props.onOpenArchitecture?.()}>
                       learn more
                     </Button>{' '}
                     in How It Works.
@@ -402,13 +403,8 @@ export default function SettingsView(props: SettingsViewProps) {
               </div>
             </TabsPanel>
 
-            {/* How it works */}
-            <TabsPanel value="how-it-works" className="min-w-0">
-              <ArchitectureContent />
-            </TabsPanel>
-
             {/* Display */}
-            <TabsPanel value="display" className="min-w-0">
+            <TabsPanel value="display" className="settings-panel min-w-0">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <div className="mb-2">Theme & Appearance</div>
@@ -473,7 +469,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Anomalies */}
-            <TabsPanel value="anomalies" className="min-w-0">
+            <TabsPanel value="anomalies" className="settings-panel min-w-0">
               <div className="space-y-3">
                 <div className="mb-2">Anomaly thresholds</div>
                 <p className="mb-3">
@@ -557,7 +553,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Remote streaming */}
-            <TabsPanel value="streaming" className="min-w-0">
+            <TabsPanel value="streaming" className="settings-panel min-w-0">
               <div className="space-y-3">
                 <div className="mb-2">Remote streaming</div>
                 <p className="mb-3">Stream events directly from a MySQL/MariaDB server via the binlog protocol.</p>
@@ -715,7 +711,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Watch */}
-            <TabsPanel value="watch" className="min-w-0">
+            <TabsPanel value="watch" className="settings-panel min-w-0">
               <div className="space-y-3">
                 <div className="mb-2">Watch</div>
                 <p className="mb-3">Local directory scanned for binlog files.</p>
@@ -750,7 +746,7 @@ export default function SettingsView(props: SettingsViewProps) {
             </TabsPanel>
 
             {/* Backup & transfer */}
-            <TabsPanel value="advanced" className="min-w-0">
+            <TabsPanel value="advanced" className="settings-panel min-w-0">
               <div className="flex flex-col gap-4">
                 <div className="space-y-3">
                   <div className="mb-2">Backup & Configuration Transfer</div>

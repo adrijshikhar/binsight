@@ -40,7 +40,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
             <div className="flex flex-col gap-3 mt-2">
               <p>The error was logged to the browser console. This is a UI bug - the data is fine.</p>
               <pre className="whitespace-pre-wrap overflow-x-auto">{error.message}</pre>
-              <Button size="xs" variant="outline" onClick={() => window.location.reload()} className="self-start">
+              <Button variant="outline" onClick={() => window.location.reload()} className="self-start">
                 Reload
               </Button>
             </div>

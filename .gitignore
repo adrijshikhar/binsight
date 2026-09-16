@@ -67,3 +67,4 @@ samples/mysql-bin.000001
 *.test
 *.pprof
 .DS_Store
+.agents/skills

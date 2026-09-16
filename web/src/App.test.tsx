@@ -196,7 +196,7 @@ describe('App - AppShell + tab routing', () => {
     expect(screen.getByRole('button', { name: 'Settings' })).toBeTruthy()
   })
 
-  it('switches to Settings view, accesses How It Works tab, and returns to Inspector', async () => {
+  it('opens Settings and the separate Architecture dialog', async () => {
     await renderApp()
 
     // Switch to Events tab first
@@ -213,14 +213,13 @@ describe('App - AppShell + tab routing', () => {
     const modal = await screen.findByRole('dialog', { name: 'Settings' })
     expect(modal).toBeTruthy()
 
-    // Inside Settings, click the "How it works" tab
-    const howTab = screen.getAllByRole('tab').find((t) => t.textContent === 'How it works')!
-    fireEvent.click(howTab)
-    expect(screen.getByText(/- Pluggable Decoder Architecture/)).toBeTruthy()
-
     // Click Cancel to close modal
     const cancelBtn = screen.getByRole('button', { name: 'Cancel' })
     fireEvent.click(cancelBtn)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Architecture' }))
+    expect(await screen.findByRole('dialog', { name: 'Architecture' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Close architecture' }))
 
     await waitFor(() => {
       const restoredEventsTab = screen.getAllByRole('tab').find((t) => t.textContent === 'Events')

@@ -36,12 +36,12 @@ const FAQS = [
   <div class="max-w-4xl mx-auto">
     <!-- Header -->
     <div class="text-center max-w-2xl mx-auto mb-16 md:mb-20">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#38bdf8] mb-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#2d3b4f] bg-[#11161d] text-xs font-mono text-[#58a6ff] mb-4">
         <span>TECHNICAL ARCHITECTURE</span>
       </div>
       <h2 class="text-3xl sm:text-5xl font-serif tracking-tight text-[#f0f6fc] mb-4">
         <span class="italic">Frequently</span>
-        <span class="font-sans font-bold text-[#38bdf8] px-1">Inspected.</span>
+        <span class="font-sans font-bold text-[#58a6ff] px-1">Inspected.</span>
       </h2>
       <p class="text-base sm:text-lg text-[#8b949e] font-sans">
         Everything you need to know about Binsight's pure-Go engine, differential verification, and local security model.
@@ -54,13 +54,13 @@ const FAQS = [
         <div class="faq-item rounded-xl border border-[#212c3d] bg-[#11161d]/80 overflow-hidden transition-colors hover:border-[#2d3b4f]">
           <button
             type="button"
-            class="faq-trigger w-full flex items-center justify-between p-5 md:p-6 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#38bdf8] select-none"
+            class="faq-trigger w-full flex items-center justify-between p-5 md:p-6 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0075de] select-none"
             aria-expanded={index === 0 ? 'true' : 'false'}
             aria-controls={`faq-answer-${faq.id}`}
             id={`faq-btn-${faq.id}`}
           >
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pr-4">
-              <span class="font-mono text-[10px] tracking-wider px-2 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#38bdf8] w-fit">
+              <span class="font-mono text-[10px] tracking-wider px-2 py-0.5 rounded bg-[#161f2c] border border-[#2d3b4f] text-[#58a6ff] w-fit">
                 {faq.category}
               </span>
               <span class="text-base sm:text-lg font-semibold text-[#f0f6fc] tracking-tight">

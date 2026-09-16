@@ -51,9 +51,23 @@ try {
       }
     })
     assert.doesNotMatch(foundation.font, /Times/)
+    const palette = await page.evaluate(() => {
+      const css = getComputedStyle(document.documentElement)
+      return Object.fromEntries(['background', 'primary', 'data-insert', 'data-query', 'success', 'surface-2'].map(
+        (name) => {
+          const value = css.getPropertyValue(`--${name}`).trim()
+          return [name, /^#[\da-f]{3}$/i.test(value) ? '#' + [...value.slice(1)].map((c) => c + c).join('') : value]
+        },
+      ))
+    })
+    assert.equal(palette.background, theme === 'dark' ? '#141516' : '#ffffff')
+    assert.equal(palette.primary, theme === 'dark' ? '#0075de' : '#0062bd')
+    assert.equal(palette['data-insert'], theme === 'dark' ? '#34d399' : '#047857')
+    assert.equal(palette['data-query'], theme === 'dark' ? '#c4b5fd' : '#6d28d9')
+    assert.equal(palette.success, palette['surface-2'], 'operational success must remain neutral')
     assert.equal(foundation.collapse, 'collapse')
-    assert.equal(foundation.cellPadding, 10, 'stock TableCell padding must not be overridden')
-    assert.ok(foundation.rowHeight > 32, 'the custom 32px row density must be removed')
+    assert.equal(foundation.cellPadding, 6, 'compact event rows must use scoped vertical padding')
+    assert.equal(foundation.rowHeight, 32, 'event and group rows must remain 32px')
     assert.ok(foundation.buttonPadding > 0, 'stock button padding must survive the cascade')
     assert.ok(foundation.badgePadding > 0, 'stock badge padding must survive the cascade')
     for (const width of [1440, 1024]) {

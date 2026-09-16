@@ -11,8 +11,9 @@
   --color-txt-main: #f0f6fc;
   --color-txt-muted: #8b949e;
   --color-txt-secondary: #c9d1d9;
-  --color-cyan-glow: #38bdf8;
-  --color-blue-accent: #58a6ff;
+  --color-cyan-glow: #388bfd;
+  --color-blue-glow: #388bfd;
+  --color-blue-accent: #0075de;
   --color-amber-alert: #e3b341;
   --color-emerald-ok: #3fb950;
   --font-serif: "IBM Plex Serif", Georgia, Cambria, serif;
@@ -57,9 +58,9 @@ html {
 
 .bg-ambient-radiance {
   background: 
-    radial-gradient(ellipse 90% 50% at 50% -5%, rgba(56, 189, 248, 0.12), transparent 70%),
-    radial-gradient(ellipse 70% 35% at 50% 50%, rgba(88, 166, 255, 0.05), transparent 75%),
-    radial-gradient(circle 500px at 50% 98%, rgba(56, 189, 248, 0.06), transparent 70%);
+    radial-gradient(ellipse 90% 50% at 50% -5%, rgba(0, 117, 222, 0.16), transparent 70%),
+    radial-gradient(ellipse 70% 35% at 50% 50%, rgba(56, 139, 253, 0.08), transparent 75%),
+    radial-gradient(circle 500px at 50% 98%, rgba(0, 117, 222, 0.10), transparent 70%);
 }
 
 .bg-docs-grid {
@@ -72,7 +73,7 @@ html {
 }
 
 .bg-docs-radiance {
-  background: radial-gradient(ellipse 80% 40% at 50% -10%, rgba(56, 189, 248, 0.08), transparent 70%);
+  background: radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0, 117, 222, 0.12), transparent 70%);
 }
 
 .bg-noise-grain {
