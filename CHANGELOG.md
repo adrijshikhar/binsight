@@ -3,6 +3,19 @@
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/adrijshikhar/binsight/compare/v0.2.1...v0.3.0) (2026-09-16)
+
+
+### Features
+
+* **website:** scaffold marketing website with Astro and static Cloudflare Pages pipeline ([#18](https://github.com/adrijshikhar/binsight/issues/18)) ([662ba53](https://github.com/adrijshikhar/binsight/commit/662ba53f3d9805c734c4b79f317ad8a338cc2746))
+* **website:** space out layout, add Anime.js scroll animations, and uupm.cc resources ([#25](https://github.com/adrijshikhar/binsight/issues/25)) ([0b51f02](https://github.com/adrijshikhar/binsight/commit/0b51f02d51e8c0efaec1cbd516fd97f88bd6f5c2))
+
+
+### Bug Fixes
+
+* **ci:** use HOMEBREW_TAP_TOKEN for release-please to trigger downstream distribution ([3143cee](https://github.com/adrijshikhar/binsight/commit/3143cee1b05a62073ccbf914d32489e35724437a))
+
 ## [0.2.1](https://github.com/adrijshikhar/binsight/compare/v0.2.0...v0.2.1) (2026-09-12)
 
 
