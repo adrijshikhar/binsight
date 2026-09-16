@@ -1,12 +1,12 @@
 module github.com/adrijshikhar/binsight
 
-go 1.26.3
+go 1.26.7
 
 require (
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-mysql-org/go-mysql v1.16.0
 	modernc.org/sqlite v1.55.0
-	vitess.io/vitess v0.24.1
+	vitess.io/vitess v0.24.3
 )
 
 require (
