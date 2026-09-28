@@ -10,12 +10,12 @@
     "check": "astro check"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.9",
+    "@tailwindcss/vite": "^4.3.3",
     "animejs": "^4.5.0",
-    "astro": "^7.3.2",
-    "tailwindcss": "^4.0.9"
+    "astro": "^7.3.5",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^5.9.3"
   }
 }
